@@ -73,9 +73,9 @@ const tileSize = 24;
 const tileGap = 2;
 
 const levelInfo: Record<CastleLevel, { label: string; weight: number; icon: string }> = {
-  1: { label: "본성", weight: 1.85, icon: "👑" },
-  2: { label: "주요성", weight: 1.25, icon: "🏯" },
-  3: { label: "지방성", weight: 0.82, icon: "🚩" }
+  1: { label: "본성", weight: 2.85, icon: "👑" },
+  2: { label: "주요성", weight: 2.25, icon: "🏰" },
+  3: { label: "지방성", weight: 1.82, icon: "🚩" }
 };
 
 function normalizeCastleSources(castles: CastleSource[]) {

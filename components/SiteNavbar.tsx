@@ -3,31 +3,35 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, Menu, Package, ScrollText, Shield, Swords, X } from "lucide-react";
+import { BookOpen, Home, Menu, Radio, ScrollText, Swords, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const navItems = [
+const baseNavItems = [
   { href: "/", label: "홈", icon: Home },
-  { href: "/heroes", label: "장수", icon: Swords },
-  { href: "/factions", label: "세력", icon: Shield },
-  { href: "/items", label: "아이템", icon: Package },
-  { href: "/guide", label: "가이드", icon: BookOpen },
-  { href: "/admin/map", label: "관리자", icon: ScrollText }
+  { href: "/factions", label: "세력", icon: Swords },
+  { href: "/items", label: "지통실", icon: Radio },
+  { href: "/guide", label: "가이드", icon: BookOpen }
 ];
 
-function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+function SidebarContent({ pathname, onNavigate, adminAuthenticated }: { pathname: string; onNavigate?: () => void; adminAuthenticated: boolean }) {
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const navItems = [
+    ...baseNavItems,
+    adminAuthenticated
+      ? { href: "/admin/map", label: "관리자", icon: ScrollText }
+      : { href: "/admin/login", label: "관리자 로그인", icon: ScrollText }
+  ];
 
   return (
     <>
-      <Link href="/" onClick={onNavigate} className="block border-b border-[var(--border)] px-5 py-5">
+      <Link href="/" onClick={onNavigate} className="block px-5 py-5">
         <Image
-          src="/assets/gamst-company-logo.png"
+          src="/assets/gamst-company-logo-aside.png"
           alt="삼국지 Gamst Company"
           width={1400}
           height={1122}
           priority
-          className="h-auto w-full"
+          className="mx-auto h-auto w-[86.5%]"
         />
       </Link>
 
@@ -65,18 +69,42 @@ function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate
 export function SiteNavbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
 
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetch("/api/admin/session", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (mounted) {
+          setAdminAuthenticated(Boolean(data?.authenticated));
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setAdminAuthenticated(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [pathname]);
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 flex-col border-r border-[var(--border)] bg-black md:flex">
-        <SidebarContent pathname={pathname} />
+      <aside className="site-chrome-bg fixed inset-y-0 left-0 z-50 hidden w-64 flex-col md:flex">
+        <SidebarContent pathname={pathname} adminAuthenticated={adminAuthenticated} />
       </aside>
 
-      <header className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between border-b border-[var(--border)] bg-black/95 px-4 backdrop-blur-sm md:hidden">
+      <header className="site-chrome-bg fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between border-b border-[var(--border)] px-4 md:hidden">
         <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/assets/gamst-company-logo.png" alt="삼국지" width={48} height={38} className="h-9 w-11 object-cover" priority />
+          <Image src="/assets/gamst-three-kingdoms-banner-source.png" alt="감컴퍼니 삼국지서버" width={2048} height={749} className="h-9 w-auto object-contain" priority />
           <span className="text-sm font-bold text-[#f4e0bc]">삼국지 Wiki</span>
         </Link>
         <button type="button" onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center text-[#f0c98b]" aria-label="메뉴 열기">
@@ -87,11 +115,11 @@ export function SiteNavbar() {
       {open && (
         <div className="fixed inset-0 z-[60] md:hidden">
           <button type="button" className="absolute inset-0 bg-black/70" onClick={() => setOpen(false)} aria-label="메뉴 닫기" />
-          <aside className="relative flex h-full w-[min(82vw,280px)] flex-col border-r border-[var(--border)] bg-black shadow-2xl">
+          <aside className="site-chrome-bg relative flex h-full w-[min(82vw,280px)] flex-col shadow-2xl">
             <button type="button" onClick={() => setOpen(false)} className="absolute right-2 top-2 z-10 grid h-10 w-10 place-items-center text-[#f0c98b]" aria-label="메뉴 닫기">
               <X size={21} />
             </button>
-            <SidebarContent pathname={pathname} onNavigate={() => setOpen(false)} />
+            <SidebarContent pathname={pathname} onNavigate={() => setOpen(false)} adminAuthenticated={adminAuthenticated} />
           </aside>
         </div>
       )}

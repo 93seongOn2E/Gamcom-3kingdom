@@ -69,9 +69,9 @@ const forceLayouts: Record<ForceId, { label: string; polygon: number[][]; marker
 };
 
 const levelInfo: Record<CastleLevel, { label: string; weight: number; icon: string }> = {
-  1: { label: "본성", weight: 1.85, icon: "👑" },
-  2: { label: "주요성", weight: 1.25, icon: "🏯" },
-  3: { label: "지방성", weight: 0.82, icon: "🚩" }
+  1: { label: "본성", weight: 2.85, icon: "👑" },
+  2: { label: "주요성", weight: 2.25, icon: "🏰" },
+  3: { label: "지방성", weight: 1.82, icon: "🚩" }
 };
 
 const tileSize = 24;
@@ -300,10 +300,9 @@ export function MapViewer({ compact = false }: { compact?: boolean }) {
   );
 
   return (
-    <section className={`map-viewer-shell pixel-frame overflow-hidden p-4 md:p-6 ${compact ? "compact" : ""}`}>
-      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <section className={`map-viewer-shell pixel-frame overflow-hidden ${compact ? "compact p-3 md:p-4" : "p-4 md:p-6"}`}>
+      <div className={`flex flex-col md:flex-row md:items-end md:justify-between ${compact ? "mb-3 gap-3" : "mb-4 gap-4"}`}>
         <div>
-          <p className="mb-2 text-xs font-bold tracking-[0.24em] text-[var(--accent)]">MAP</p>
           <h2 className="text-2xl font-black text-[#f3e7d0]">삼국지 점령 지도</h2>
         </div>
         <div className="admin-top-summary" aria-label="세력별 보유 성 수">

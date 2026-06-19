@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,16 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const token = request.headers.get("cookie")
+    ?.split(";")
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${ADMIN_SESSION_COOKIE}=`))
+    ?.split("=")[1];
+
+  if (!verifySessionToken(token)) {
+    return NextResponse.json({ message: "관리자 로그인이 필요합니다." }, { status: 401 });
+  }
+
   const databaseUrl = process.env.DATABASE_URL;
 
   if (!databaseUrl) {

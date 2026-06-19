@@ -10,6 +10,8 @@
   --accent: #d4a756;
   --primary: #9d722f;
   --secondary: #171717;
+  --desktop-header-height: clamp(190px, 18vh, 210px);
+  --desktop-header-image-height: clamp(120px, 11vh, 150px);
 }
 
 * { box-sizing: border-box; }
@@ -86,13 +88,30 @@ button, input, select { font: inherit; }
     repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0px, rgba(255,255,255,.018) 1px, transparent 1px, transparent 16px);
 }
 
+.site-chrome-bg {
+  background: #000000;
+}
+
+.site-header-image {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.site-header-left-logo {
+  height: calc(var(--desktop-header-height) - 28px);
+  width: auto;
+  object-fit: contain;
+}
+
 .map-viewer-shell {
   display: flex;
   flex-direction: column;
 }
 
 .map-viewer-shell.compact {
-  min-height: 598px;
+  min-height: 0;
 }
 
 .badge-soft {
@@ -185,9 +204,9 @@ button, input, select { font: inherit; }
   line-height: 1;
 }
 
-.admin-top-summary-card.wei { background: linear-gradient(180deg, #b43d2f, #86271f); }
+.admin-top-summary-card.wei { background: linear-gradient(180deg, #3f6797, #26405e); }
 .admin-top-summary-card.shu { background: linear-gradient(180deg, #3f8153, #28553a); }
-.admin-top-summary-card.wu { background: linear-gradient(180deg, #3f6797, #26405e); }
+.admin-top-summary-card.wu { background: linear-gradient(180deg, #b43d2f, #86271f); }
 
 .admin-map-wrap {
   flex: 1;
@@ -199,7 +218,7 @@ button, input, select { font: inherit; }
 }
 
 .admin-map-wrap.compact {
-  min-height: 440px;
+  min-height: 0;
 }
 
 .map-disclaimer {
@@ -238,9 +257,9 @@ button, input, select { font: inherit; }
   fill-opacity: .92;
 }
 
-.admin-territory[data-owner="wei"] { fill: #d8322d; }
+.admin-territory[data-owner="wei"] { fill: #2f78d8; }
 .admin-territory[data-owner="shu"] { fill: #22a457; }
-.admin-territory[data-owner="wu"] { fill: #2f78d8; }
+.admin-territory[data-owner="wu"] { fill: #d8322d; }
 .admin-territory[data-level="1"] { stroke-width: 1.5; }
 .admin-territory[data-level="2"] { stroke-width: 1.25; }
 .admin-territory[data-level="3"] { stroke-width: 1; }
@@ -276,9 +295,9 @@ button, input, select { font: inherit; }
   stroke-width: 2.8;
 }
 
-.admin-city-label.level-1 { font-size: 16px; }
-.admin-city-label.level-2 { font-size: 14px; }
-.admin-city-label.level-3 { font-size: 12px; }
+.admin-city-label.level-1 { font-size: 20px; }
+.admin-city-label.level-2 { font-size: 18px; }
+.admin-city-label.level-3 { font-size: 16px; }
 
 .admin-force-label {
   pointer-events: none;
@@ -293,9 +312,9 @@ button, input, select { font: inherit; }
   font-family: "Noto Serif KR", serif;
 }
 
-.admin-force-label.wei { fill: #a91f1a; }
+.admin-force-label.wei { fill: #1e59a6; }
 .admin-force-label.shu { fill: #14763b; }
-.admin-force-label.wu { fill: #1e59a6; }
+.admin-force-label.wu { fill: #a91f1a; }
 
 .admin-control-panel {
   border-left: 1px solid #b69061;
@@ -385,9 +404,9 @@ button, input, select { font: inherit; }
   border-right: 0;
 }
 
-.admin-segmented button[data-force="wei"].active { background: #d63d35; color: white; }
+.admin-segmented button[data-force="wei"].active { background: #365a84; color: white; }
 .admin-segmented button[data-force="shu"].active { background: #356f49; color: white; }
-.admin-segmented button[data-force="wu"].active { background: #365a84; color: white; }
+.admin-segmented button[data-force="wu"].active { background: #d63d35; color: white; }
 
 .admin-capture,
 .admin-secondary {
@@ -430,9 +449,9 @@ button, input, select { font: inherit; }
   text-align: center;
 }
 
-.admin-summary .wei { background: #d63d35; }
+.admin-summary .wei { background: #2f73c8; }
 .admin-summary .shu { background: #2f9b5f; }
-.admin-summary .wu { background: #2f73c8; }
+.admin-summary .wu { background: #d63d35; }
 .admin-summary b { font-size: 18px; }
 
 .admin-city-list {
@@ -475,9 +494,9 @@ button, input, select { font: inherit; }
   font-weight: 900;
 }
 
-.admin-badge.wei { background: #d63d35; }
+.admin-badge.wei { background: #2f73c8; }
 .admin-badge.shu { background: #2f9b5f; }
-.admin-badge.wu { background: #2f73c8; }
+.admin-badge.wu { background: #d63d35; }
 
 .chronicle-panel {
   display: flex;
@@ -493,11 +512,13 @@ button, input, select { font: inherit; }
   position: relative;
   display: grid;
   flex: 1;
+  height: 0;
   gap: 14px;
   min-height: 0;
   padding-left: 18px;
   padding-right: 8px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(200, 154, 93, .5) rgba(255, 255, 255, .04);
 }
@@ -551,9 +572,9 @@ button, input, select { font: inherit; }
   letter-spacing: .04em;
 }
 
-.chronicle-force.wei { background: linear-gradient(180deg, #b43d2f, #86271f); }
+.chronicle-force.wei { background: linear-gradient(180deg, #3f6797, #26405e); }
 .chronicle-force.shu { background: linear-gradient(180deg, #3f8153, #28553a); }
-.chronicle-force.wu { background: linear-gradient(180deg, #3f6797, #26405e); }
+.chronicle-force.wu { background: linear-gradient(180deg, #b43d2f, #86271f); }
 
 .chronicle-date {
   color: #dbc292;
@@ -588,16 +609,38 @@ button, input, select { font: inherit; }
 }
 
 .home-overview {
-  --home-overview-height: 598px;
+  align-items: stretch;
 }
 
 .home-overview-map,
-.home-overview .chronicle-panel {
-  min-height: var(--home-overview-height);
+.home-overview .map-viewer-shell.compact {
+  height: auto;
+  max-height: none;
+  width: 100%;
+}
+
+.home-overview .map-viewer-shell.compact {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.home-overview .map-viewer-shell.compact .admin-map-wrap.compact {
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 1180 / 720;
+  max-height: none;
 }
 
 .home-overview .chronicle-panel {
-  height: var(--home-overview-height);
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.home-overview .chronicle-list {
+  min-height: 0;
 }
 
 @media (max-width: 1100px) {
@@ -639,6 +682,7 @@ button, input, select { font: inherit; }
   .home-overview-map {
     min-height: auto;
     height: auto;
+    max-height: none;
   }
 
   .home-overview {

@@ -7,9 +7,9 @@
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {[
-          ["위", "#d63d35", "북방 중심의 강력한 군사 세력"],
+          ["위", "#2f73c8", "북방 중심의 강력한 군사 세력"],
           ["촉", "#2f9b5f", "서남부 산악 지형을 기반으로 한 세력"],
-          ["오", "#2f73c8", "강동과 수로를 장악한 해양 세력"]
+          ["오", "#d63d35", "강동과 수로를 장악한 해양 세력"]
         ].map(([name, color, desc]) => (
           <section key={name} className="pixel-frame p-5">
             <div className="mb-3 h-2 w-16" style={{ background: color }} />
