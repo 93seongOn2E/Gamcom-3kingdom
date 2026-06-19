@@ -13,10 +13,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko">
       <body>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen md:pl-64">
           <SiteNavbar />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <div className="flex min-h-screen flex-col pt-14 md:pt-0">
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
         </div>
       </body>
     </html>

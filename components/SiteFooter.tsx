@@ -9,7 +9,7 @@ export function SiteFooter() {
         </div>
         <div>
           <div className="mb-2 font-semibold text-[#e8d5b0]">메뉴</div>
-          <p className="leading-7">장수 · 세력 · 아이템 · 가이드 · 지도 · 관리자</p>
+          <p className="leading-7">장수 · 세력 · 아이템 · 가이드 · 관리자</p>
         </div>
         <div>
           <div className="mb-2 font-semibold text-[#e8d5b0]">관리</div>

@@ -218,7 +218,7 @@ function buildCastles(data: CastleData) {
   return castles;
 }
 
-export function MapViewer() {
+export function MapViewer({ compact = false }: { compact?: boolean }) {
   const [castleData, setCastleData] = useState<CastleData>({ forces: { 위: [], 촉: [], 오: [] } });
   const [counts, setCounts] = useState<Record<ForceId, number>>({ 위: 9, 촉: 9, 오: 9 });
   const [selectedCityId, setSelectedCityId] = useState("");
@@ -258,9 +258,49 @@ export function MapViewer() {
     acc[force] = counts[force];
     return acc;
   }, { 위: 0, 촉: 0, 오: 0 });
+  const renderMapLayers = () => (
+    <>
+      <rect x="0" y="0" width="1180" height="720" fill="#d8bd8b" />
+      <image className="admin-map-art" href="/assets/three-kingdoms-scroll-map.png" x="0" y="0" width="1180" height="720" preserveAspectRatio="xMidYMid slice" />
+
+      <g id="territories">
+        {castles.map((castle) => (
+          <g key={castle.id}>
+            {castle.cells.map((cell, index) => (
+              <rect
+                key={`${castle.id}-${index}`}
+                className={`admin-territory ${selectedCityId === castle.id ? "selected" : ""}`}
+                data-owner={forceThemeClass[castle.owner]}
+                data-city-id={castle.id}
+                data-level={castle.level}
+                x={cell.x}
+                y={cell.y}
+                width={cell.size}
+                height={cell.size}
+                onClick={() => setSelectedCityId(castle.id)}
+              />
+            ))}
+          </g>
+        ))}
+      </g>
+
+      <g id="cities">
+        {castles.map((castle) => (
+          <g key={`city-${castle.id}`}>
+            <text className={`admin-city-icon level-${castle.level}`} x={castle.cx} y={castle.cy + 7}>{levelInfo[castle.level].icon}</text>
+            <text className={`admin-city-label level-${castle.level}`} x={castle.cx + (castle.level === 1 ? 17 : 15)} y={castle.cy + 6}>{castle.name}</text>
+          </g>
+        ))}
+      </g>
+
+      <text className="admin-force-label wei" x="590" y="68">위나라</text>
+      <text className="admin-force-label shu" x="360" y="680">촉나라</text>
+      <text className="admin-force-label wu" x="865" y="680">오나라</text>
+    </>
+  );
 
   return (
-    <section className="pixel-frame overflow-hidden p-4 md:p-6">
+    <section className={`map-viewer-shell pixel-frame overflow-hidden p-4 md:p-6 ${compact ? "compact" : ""}`}>
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="mb-2 text-xs font-bold tracking-[0.24em] text-[var(--accent)]">MAP</p>
@@ -276,46 +316,18 @@ export function MapViewer() {
         </div>
       </div>
 
-      <div className="admin-map-wrap">
-        <svg id="map-viewer" viewBox="0 0 1180 720" role="img" aria-label="플레이어용 삼국지 지도">
-          <rect x="0" y="0" width="1180" height="720" fill="#d8bd8b" />
-          <image className="admin-map-art" href="/assets/three-kingdoms-scroll-map.png" x="0" y="0" width="1180" height="720" preserveAspectRatio="xMidYMid slice" />
-
-          <g id="territories">
-            {castles.map((castle) => (
-              <g key={castle.id}>
-                {castle.cells.map((cell, index) => (
-                  <rect
-                    key={`${castle.id}-${index}`}
-                    className={`admin-territory ${selectedCityId === castle.id ? "selected" : ""}`}
-                    data-owner={forceThemeClass[castle.owner]}
-                    data-city-id={castle.id}
-                    data-level={castle.level}
-                    x={cell.x}
-                    y={cell.y}
-                    width={cell.size}
-                    height={cell.size}
-                    onClick={() => setSelectedCityId(castle.id)}
-                  />
-                ))}
-              </g>
-            ))}
-          </g>
-
-          <g id="cities">
-            {castles.map((castle) => (
-              <g key={`city-${castle.id}`}>
-                <text className={`admin-city-icon level-${castle.level}`} x={castle.cx} y={castle.cy + 7}>{levelInfo[castle.level].icon}</text>
-                <text className={`admin-city-label level-${castle.level}`} x={castle.cx + (castle.level === 1 ? 17 : 15)} y={castle.cy + 6}>{castle.name}</text>
-              </g>
-            ))}
-          </g>
-
-          <text className="admin-force-label wei" x="590" y="68">위나라</text>
-          <text className="admin-force-label shu" x="360" y="680">촉나라</text>
-          <text className="admin-force-label wu" x="865" y="680">오나라</text>
+      <div className={`admin-map-wrap ${compact ? "compact" : ""}`}>
+        <svg id="map-viewer" className="map-svg-desktop" viewBox="0 0 1180 720" role="img" aria-label="플레이어용 삼국지 지도">
+          {renderMapLayers()}
+        </svg>
+        <svg className="map-svg-mobile" viewBox="36 176 1108 356" role="img" aria-label="모바일 플레이어용 삼국지 지도">
+          {renderMapLayers()}
         </svg>
       </div>
+
+      <p className="map-disclaimer">
+        본 지도는 시청자의 이해를 돕기 위해 재구성한 것으로, 실제 서버 내 성 위치와는 무관합니다.
+      </p>
     </section>
   );
 }
