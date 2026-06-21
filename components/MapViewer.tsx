@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { RefreshCcw } from "lucide-react";
 
-type ForceId = "위" | "촉" | "오";
+type ForceId = "위나라" | "촉나라" | "오나라";
 type CastleLevel = 1 | 2 | 3;
 
 type CastleSource = {
@@ -16,6 +17,10 @@ type CastleSource = {
 
 type CastleData = {
   forces: Record<ForceId, CastleSource[]>;
+};
+
+type RawCastleData = {
+  forces?: Record<string, CastleSource[] | undefined>;
 };
 
 type Tile = {
@@ -39,26 +44,34 @@ type Castle = {
   cells: Tile[];
 };
 
-const forceIds: ForceId[] = ["위", "촉", "오"];
+const forceIds: ForceId[] = ["위나라", "촉나라", "오나라"];
+
+const emptyCastleData: CastleData = {
+  forces: {
+    위나라: [],
+    촉나라: [],
+    오나라: []
+  }
+};
 
 const forceThemeClass: Record<ForceId, "wei" | "shu" | "wu"> = {
-  위: "wei",
-  촉: "shu",
-  오: "wu"
+  위나라: "wei",
+  촉나라: "shu",
+  오나라: "wu"
 };
 
 const forceLayouts: Record<ForceId, { label: string; polygon: number[][]; markerSeeds: number[][] }> = {
-  위: {
+  위나라: {
     label: "위나라",
     polygon: [[318, 132], [422, 86], [584, 88], [736, 116], [842, 168], [818, 270], [704, 352], [520, 362], [374, 306], [286, 234]],
     markerSeeds: [[370, 162], [494, 154], [618, 156], [742, 182], [432, 226], [565, 220], [690, 244], [540, 292], [761, 270]]
   },
-  촉: {
+  촉나라: {
     label: "촉나라",
     polygon: [[176, 330], [334, 302], [494, 322], [606, 374], [604, 476], [520, 588], [352, 616], [196, 562], [144, 436]],
     markerSeeds: [[240, 354], [362, 326], [490, 346], [560, 408], [250, 456], [386, 444], [510, 488], [314, 548], [452, 560]]
   },
-  오: {
+  오나라: {
     label: "오나라",
     polygon: [[606, 304], [760, 278], [900, 304], [1030, 372], [1042, 512], [946, 604], [786, 624], [638, 556], [570, 420]],
     markerSeeds: [[668, 354], [790, 342], [918, 374], [700, 448], [834, 438], [966, 466], [662, 544], [802, 550], [936, 552]]
@@ -73,6 +86,34 @@ const levelInfo: Record<CastleLevel, { label: string; weight: number; icon: stri
 
 const tileSize = 24;
 const tileGap = 2;
+const minimumLoadingMs = 1600;
+
+function normalizeForceId(force: string | undefined): ForceId {
+  if (force === "위나라" || force === "위") return "위나라";
+  if (force === "촉나라" || force === "촉") return "촉나라";
+  return "오나라";
+}
+
+function normalizeCastleSources(castles: CastleSource[] | undefined) {
+  return (castles ?? []).map((castle) => ({
+    ...castle,
+    owner: normalizeForceId(castle.owner),
+    x: Number.isFinite(castle.x) ? castle.x : undefined,
+    y: Number.isFinite(castle.y) ? castle.y : undefined
+  }));
+}
+
+function normalizeCastleData(data: RawCastleData): CastleData {
+  const forces = data.forces ?? {};
+
+  return {
+    forces: {
+      위나라: normalizeCastleSources(forces["위나라"] ?? forces["위"]),
+      촉나라: normalizeCastleSources(forces["촉나라"] ?? forces["촉"]),
+      오나라: normalizeCastleSources(forces["오나라"] ?? forces["오"])
+    }
+  };
+}
 
 function pointInPolygon(x: number, y: number, polygon: number[][]) {
   let inside = false;
@@ -216,33 +257,53 @@ function buildCastles(data: CastleData) {
 }
 
 export function MapViewer({ compact = false }: { compact?: boolean }) {
-  const [castleData, setCastleData] = useState<CastleData>({ forces: { 위: [], 촉: [], 오: [] } });
+  const [castleData, setCastleData] = useState<CastleData>(emptyCastleData);
   const [selectedCityId, setSelectedCityId] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadCastles = useCallback(async () => {
+    setIsLoading(true);
+    const loadingDelay = new Promise((resolve) => setTimeout(resolve, minimumLoadingMs));
+
+    try {
+      const responsePromise = fetch("/api/castles", { cache: "no-store" });
+      const [response] = await Promise.all([responsePromise, loadingDelay]);
+      const data = await response.json() as RawCastleData;
+      const normalized = normalizeCastleData(data);
+
+      setCastleData(normalized);
+
+      const allCastles = [
+        ...normalized.forces.위나라,
+        ...normalized.forces.촉나라,
+        ...normalized.forces.오나라
+      ];
+
+      setSelectedCityId((current) => {
+        if (current && allCastles.some((castle) => castle.castleKey === current)) {
+          return current;
+        }
+        return allCastles[0]?.castleKey ?? "";
+      });
+    } catch {
+      await loadingDelay;
+      setCastleData(emptyCastleData);
+      setSelectedCityId("");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    fetch("/api/castles", { cache: "no-store" })
-      .then((response) => response.json() as Promise<CastleData>)
-      .then((data) => {
-        setCastleData({
-          forces: {
-            위: data.forces.위 ?? [],
-            촉: data.forces.촉 ?? [],
-            오: data.forces.오 ?? []
-          }
-        });
-
-        const firstCastle = data.forces.위?.[0] ?? data.forces.촉?.[0] ?? data.forces.오?.[0];
-        if (firstCastle) setSelectedCityId(firstCastle.castleKey);
-      })
-      .catch(() => undefined);
-  }, []);
+    void loadCastles();
+  }, [loadCastles]);
 
   const castles = useMemo(() => buildCastles(castleData), [castleData]);
 
   const summary = forceIds.reduce<Record<ForceId, number>>((acc, force) => {
     acc[force] = castles.filter((castle) => castle.owner === force).length;
     return acc;
-  }, { 위: 0, 촉: 0, 오: 0 });
+  }, { 위나라: 0, 촉나라: 0, 오나라: 0 });
 
   const renderMapLayers = () => (
     <>
@@ -288,9 +349,21 @@ export function MapViewer({ compact = false }: { compact?: boolean }) {
   return (
     <section className={`map-viewer-shell pixel-frame overflow-hidden ${compact ? "compact p-3 md:p-4" : "p-4 md:p-6"}`}>
       <div className={`flex flex-col gap-3 md:mb-4 md:flex-row md:items-end md:justify-between ${compact ? "mb-3" : "mb-4"}`}>
-        <div>
+        <div className="map-viewer-heading">
           <h2 className="text-2xl font-black text-[#f3e7d0]">삼국지 점령 지도</h2>
+          <button
+            type="button"
+            onClick={() => void loadCastles()}
+            disabled={isLoading}
+            className="map-refresh-button"
+            aria-label="점령 지도 새로고침"
+            title="점령 지도 새로고침"
+          >
+            <RefreshCcw size={15} className={isLoading ? "animate-spin" : ""} />
+            <span>새로고침</span>
+          </button>
         </div>
+
         <div className="admin-top-summary" aria-label="세력별 보유 성 수">
           {forceIds.map((force) => (
             <div key={force} className={`admin-top-summary-card ${forceThemeClass[force]}`}>
@@ -302,12 +375,31 @@ export function MapViewer({ compact = false }: { compact?: boolean }) {
       </div>
 
       <div className={`admin-map-wrap ${compact ? "compact" : ""}`}>
-        <svg id="map-viewer" className="map-svg-desktop" viewBox="0 0 1180 720" role="img" aria-label="플레이어용 삼국지 지도">
+        <svg id="map-viewer" className="map-svg-desktop" viewBox="0 0 1180 720" role="img" aria-label="플레이어 삼국지 지도">
           {renderMapLayers()}
         </svg>
-        <svg className="map-svg-mobile" viewBox="36 176 1108 356" role="img" aria-label="모바일 플레이어용 삼국지 지도">
+        <svg className="map-svg-mobile" viewBox="36 176 1108 356" role="img" aria-label="모바일 플레이어 삼국지 지도">
           {renderMapLayers()}
         </svg>
+
+        {isLoading ? (
+          <div className="map-loading-overlay" aria-live="polite" aria-busy="true">
+            <div className="map-loading-swords" aria-hidden="true">
+              <img
+                src="/assets/loading-spear-2.png"
+                alt=""
+                className="map-loading-weapon map-loading-weapon-left"
+              />
+              <div className="map-loading-spark" />
+               <img
+                src="/assets/loading-spear-1.png"
+                alt=""
+                className="map-loading-weapon map-loading-weapon-right"
+              />
+            </div>
+            <div className="map-loading-text">지도를 불러오는 중입니다.</div>
+          </div>
+        ) : null}
       </div>
 
       <p className="map-disclaimer">

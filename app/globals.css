@@ -110,6 +110,39 @@ button, input, select { font: inherit; }
   flex-direction: column;
 }
 
+.map-viewer-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.map-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(212, 167, 86, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #dbc292;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease, opacity .16s ease;
+}
+
+.map-refresh-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f3e7d0;
+}
+
+.map-refresh-button:disabled {
+  opacity: .72;
+  cursor: wait;
+}
+
 .map-viewer-shell.compact {
   min-height: 0;
 }
@@ -212,6 +245,7 @@ button, input, select { font: inherit; }
   flex: 1;
   min-height: 590px;
   overflow: hidden;
+  position: relative;
   border: 1px solid rgba(122, 87, 45, .42);
   background: #d8bd8b;
   box-shadow: inset 0 0 0 1px rgba(255, 244, 220, .24), 0 18px 32px rgba(51, 31, 14, .18);
@@ -227,6 +261,104 @@ button, input, select { font: inherit; }
   font-size: 13px;
   line-height: 1.7;
   text-align: center;
+}
+
+.map-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background:
+    linear-gradient(180deg, rgba(11, 11, 11, .72), rgba(11, 11, 11, .78)),
+    radial-gradient(circle at center, rgba(212, 167, 86, .12), transparent 40%);
+  backdrop-filter: blur(2px);
+}
+
+.map-loading-text {
+  color: #f3e7d0;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+}
+
+.map-loading-swords {
+  position: relative;
+  width: 320px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-loading-weapon {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .42));
+  user-select: none;
+  pointer-events: none;
+}
+
+.map-loading-weapon-left {
+  animation: sword-clash-left 1.1s ease-in-out infinite;
+}
+
+.map-loading-weapon-right {
+  animation: sword-clash-right 1.1s ease-in-out infinite;
+}
+
+.map-loading-spark {
+  position: absolute;
+  left: 50%;
+  top: 152px;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%) scale(.7);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(255, 245, 215, .95) 0 18%, rgba(255, 207, 92, .9) 19% 38%, rgba(255, 168, 44, .32) 39% 64%, transparent 65%),
+    conic-gradient(from 0deg, transparent 0 10%, rgba(255, 229, 161, .95) 10% 18%, transparent 18% 32%, rgba(255, 229, 161, .95) 32% 40%, transparent 40% 60%, rgba(255, 229, 161, .95) 60% 68%, transparent 68% 82%, rgba(255, 229, 161, .95) 82% 90%, transparent 90% 100%);
+  filter: blur(.2px) drop-shadow(0 0 10px rgba(255, 194, 76, .5));
+  animation: sword-clash-spark 1.1s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes sword-clash-left {
+  0%, 20%, 100% {
+    transform: translate(-90%, 0) rotate(8deg);
+  }
+  50% {
+    transform: translate(-90%, 0) rotate(36deg);
+  }
+}
+
+@keyframes sword-clash-right {
+  0%, 20%, 100% {
+    transform: translate(-10%, 0) rotate(-8deg);
+  }
+  50% {
+    transform: translate(-10%, 0) rotate(-36deg);
+  }
+}
+
+@keyframes sword-clash-spark {
+  0%, 34%, 66%, 100% {
+    opacity: 0;
+    transform: translate(-52%, -52%) scale(.55);
+  }
+  42%, 58% {
+    opacity: 1;
+    transform: translate(-52%, -52%) scale(1);
+  }
 }
 
 .admin-map-wrap svg {
