@@ -86,7 +86,7 @@ const levelInfo: Record<CastleLevel, { label: string; weight: number; icon: stri
 
 const tileSize = 24;
 const tileGap = 2;
-const minimumLoadingMs = 1600;
+const minimumLoadingMs = 1000;
 
 function normalizeForceId(force: string | undefined): ForceId {
   if (force === "위나라" || force === "위") return "위나라";

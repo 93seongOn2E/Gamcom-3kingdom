@@ -5,6 +5,7 @@ import { HomeOverview, type ChronicleEntry } from "@/components/HomeOverview";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
 
+
 const baseCards = [
   { href: "/factions", title: "세력 정보", desc: "위, 촉, 오 세력의 특징과 운영 정보를 관리합니다.", icon: Swords },
   { href: "/broadcast", title: "지통실", desc: "방송, 공지, 전달 정보를 시각적으로 관리합니다.", icon: Radio }

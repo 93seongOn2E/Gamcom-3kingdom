@@ -6,6 +6,7 @@ import "./globals.css";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNavbar } from "@/components/SiteNavbar";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
   title: "감컴퍼니 삼국지서버",
@@ -58,6 +59,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           </div>
         </div>
       </body>
+      <SpeedInsights />
     </html>
   );
 }

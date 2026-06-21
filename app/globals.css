@@ -758,7 +758,7 @@ button, input, select { font: inherit; }
 .chronicle-item::before {
   content: "";
   position: absolute;
-  left: -18px;
+  left: -17px;
   top: 8px;
   width: 9px;
   height: 9px;
