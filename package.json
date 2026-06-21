@@ -2,6 +2,7 @@
   "name": "gc-threekingdom",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.12.4",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +12,6 @@
     "dev:clean": "npm run clean && next dev"
   },
   "dependencies": {
-    "20": "^3.1.9",
     "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/postcss": "4.1.12",
     "lucide-react": "0.487.0",
