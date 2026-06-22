@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, MonitorPlay, Search, X } from "lucide-react";
 import { crewBadgeClassMap, nationConfigs } from "@/lib/factions-config";
+import { BroadcastRefreshButton } from "@/components/BroadcastRefreshButton";
 
 export type MultiViewMemberRow = {
   id: string;
@@ -11,9 +12,12 @@ export type MultiViewMemberRow = {
   nickname: string;
   soop_id: string;
   profile_image_url: string | null;
+  is_live: boolean;
+  viewer_count: number | null;
 };
 
 const nationOrder = ["위나라", "촉나라", "오나라"] as const;
+const maxSelectedMembers = 4;
 
 const nationBadgeClassMap = Object.fromEntries(
   nationConfigs.map((nation) => [
@@ -41,6 +45,19 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
   const [selectedCrew, setSelectedCrew] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [toastMessage, setToastMessage] = useState("");
+
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    const timer = window.setTimeout(() => {
+      setToastMessage("");
+    }, 2200);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [toastMessage]);
 
   const crewOptions = useMemo(
     () => [...new Set(initialMembers.map((member) => member.crew_name))].sort((left, right) => left.localeCompare(right, "ko")),
@@ -58,15 +75,26 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
 
   const selectedMembers = useMemo(() => {
     const selectedSet = new Set(selectedIds);
-    return initialMembers.filter((member) => selectedSet.has(member.id));
+    return initialMembers.filter((member) => member.is_live && selectedSet.has(member.id));
   }, [initialMembers, selectedIds]);
 
-  function toggleMember(id: string) {
-    setSelectedIds((current) => (
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
-    ));
+  const liveCount = useMemo(() => filteredMembers.filter((member) => member.is_live).length, [filteredMembers]);
+
+  function toggleMember(member: MultiViewMemberRow) {
+    if (!member.is_live) return;
+
+    setSelectedIds((current) => {
+      if (current.includes(member.id)) {
+        return current.filter((item) => item !== member.id);
+      }
+
+      if (current.length >= maxSelectedMembers) {
+        setToastMessage(`멀티뷰는 최대 ${maxSelectedMembers}명까지만 선택할 수 있습니다.`);
+        return current;
+      }
+
+      return [...current, member.id];
+    });
   }
 
   function openMultiView() {
@@ -176,9 +204,17 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
         </div>
       </section>
 
+      <section className="mt-4 flex items-center gap-3">
+        <div className="text-sm font-bold text-[#dbc292]">
+          총 {filteredMembers.length}명 중 {liveCount}명 방송 중
+        </div>
+        <BroadcastRefreshButton />
+      </section>
+
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {filteredMembers.map((member) => {
-          const active = selectedIds.includes(member.id);
+          const active = member.is_live && selectedIds.includes(member.id);
+          const disabled = !member.is_live;
           const nationBadgeClass = nationBadgeClassMap[member.nation] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
           const crewBadgeClass = crewBadgeClassMap[member.crew_name] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
           const profileUrl = getProfileImageUrl(member.soop_id, member.profile_image_url);
@@ -187,11 +223,15 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
             <button
               key={member.id}
               type="button"
-              onClick={() => toggleMember(member.id)}
+              onClick={() => toggleMember(member)}
+              disabled={disabled}
+              aria-disabled={disabled}
               className={`pixel-frame multiview-member-card overflow-hidden p-4 text-left transition ${
                 active
                   ? "border-[rgba(212,167,86,0.65)] bg-[rgba(212,167,86,0.12)]"
-                  : "hover:border-[rgba(212,167,86,0.3)]"
+                  : disabled
+                    ? "cursor-not-allowed opacity-60 grayscale"
+                    : "hover:border-[rgba(212,167,86,0.3)]"
               }`}
             >
               <div className="flex items-start gap-3">
@@ -199,7 +239,7 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
                   src={profileUrl}
                   alt={`${member.nickname} 프로필`}
                   loading="lazy"
-                  className="h-16 w-16 rounded-full border border-[rgba(212,167,86,0.24)] bg-black object-cover"
+                      className="h-16 w-16 rounded-full border border-[rgba(212,167,86,0.24)] bg-black object-cover"
                 />
 
                 <div className="min-w-0 flex-1">
@@ -211,7 +251,9 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
                       className={`mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
                         active
                           ? "border-[rgba(212,167,86,0.48)] bg-[rgba(212,167,86,0.2)] text-[#ffecbf]"
-                          : "border-white/10 bg-white/5 text-transparent"
+                          : disabled
+                            ? "border-white/5 bg-white/5 text-transparent"
+                            : "border-white/10 bg-white/5 text-transparent"
                       }`}
                     >
                       <Check size={14} strokeWidth={3} />
@@ -261,7 +303,7 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
               <button
                 key={`floating-${member.id}`}
                 type="button"
-                onClick={() => toggleMember(member.id)}
+                onClick={() => toggleMember(member)}
                 className="inline-flex items-center gap-2 rounded-full border border-[rgba(212,167,86,0.24)] bg-white/5 px-3 py-1.5 text-sm font-bold text-[#f3e7d0]"
               >
                 <span>{member.nickname}</span>
@@ -285,6 +327,12 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
           멀티뷰 보기
         </button>
       </aside>
+
+      {toastMessage ? (
+        <div className="multiview-toast-alert">
+          {toastMessage}
+        </div>
+      ) : null}
     </>
   );
 }

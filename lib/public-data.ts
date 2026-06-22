@@ -87,7 +87,7 @@ export async function getChronicleData(): Promise<ChroniclePayload[]> {
     SELECT
       nation,
       content,
-      to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD') AS event_at
+      to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI') AS event_at
     FROM public.chronicle
     WHERE is_deleted = FALSE
     ORDER BY event_at ASC, id ASC

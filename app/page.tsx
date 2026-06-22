@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Radio, ScrollText, Swords } from "lucide-react";
+import { Monitor, Radio, Swords } from "lucide-react";
 import { HomeOverview } from "@/components/HomeOverview";
 import { getCachedCastleData, getCachedChronicleData } from "@/lib/public-data";
 
@@ -17,7 +17,7 @@ export default async function HomePage() {
 
   const cards = [
     ...baseCards,
-    { href: "/admin/login", title: "관리자 로그인", desc: "로그인한 경우에만 영토 관리자 메뉴가 활성화됩니다.", icon: ScrollText }
+    { href: "/multiview", title: "멀티뷰", desc: "방송 중인 멤버를 선택해 여러 방송을 한 번에 확인합니다.", icon: Monitor }
   ];
 
   return (

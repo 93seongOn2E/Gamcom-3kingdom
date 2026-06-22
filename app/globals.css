@@ -199,6 +199,45 @@ button, input, select { font: inherit; }
   opacity: .4;
 }
 
+.multiview-toast-alert {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 90;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 159, 148, .58);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(185, 43, 35, .98), rgba(113, 18, 18, .98));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, .48),
+    0 0 26px rgba(221, 57, 48, .24),
+    inset 0 1px 0 rgba(255, 255, 255, .16);
+  color: #fff4ef;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 12px 22px;
+  animation: multiview-toast-pop .18s ease-out, multiview-toast-vibrate .18s linear .16s 2;
+}
+
+@keyframes multiview-toast-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 10px)) scale(.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes multiview-toast-vibrate {
+  0%, 100% { transform: translate(-50%, -50%); }
+  20% { transform: translate(calc(-50% - 3px), -50%); }
+  40% { transform: translate(calc(-50% + 3px), -50%); }
+  60% { transform: translate(calc(-50% - 2px), -50%); }
+  80% { transform: translate(calc(-50% + 2px), -50%); }
+}
+
 .site-header-left-logo {
   height: calc(var(--desktop-header-height) - 28px);
   width: auto;
@@ -1035,5 +1074,11 @@ button, input, select { font: inherit; }
 
   .multiview-floating-action {
     width: 100%;
+  }
+
+  .multiview-toast-alert {
+    width: calc(100vw - 32px);
+    max-width: 420px;
+    text-align: center;
   }
 }

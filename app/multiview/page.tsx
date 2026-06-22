@@ -10,24 +10,24 @@ export default async function MultiViewPage() {
       crew_name,
       nickname,
       soop_id,
-      profile_image_url
+      profile_image_url,
+      is_live,
+      viewer_count
     FROM public.member
     WHERE soop_id IS NOT NULL
       AND soop_id <> ''
     ORDER BY
-      CASE nation
-        WHEN '위나라' THEN 1
-        WHEN '촉나라' THEN 2
-        WHEN '오나라' THEN 3
-        ELSE 9
-      END,
-      CASE role_name
-        WHEN '군주' THEN 1
-        WHEN '장군' THEN 2
-        ELSE 3
-      END,
-      nickname
+      is_live DESC,
+      nickname ASC
   `) as MultiViewMemberRow[];
+
+  members.sort((left, right) => {
+    if (left.is_live !== right.is_live) {
+      return left.is_live ? -1 : 1;
+    }
+
+    return left.nickname.localeCompare(right.nickname, "ko");
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-36 pt-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">

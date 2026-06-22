@@ -19,7 +19,7 @@ function SidebarContent({ pathname, onNavigate, adminAuthenticated }: { pathname
     ...baseNavItems,
     adminAuthenticated
       ? { href: "/admin/map", label: "관리자", icon: ScrollText }
-      : { href: "/admin/login", label: "관리자 로그인", icon: ScrollText }
+      : { href: "/admin/login", label: "관리자", icon: ScrollText }
   ];
 
   return (

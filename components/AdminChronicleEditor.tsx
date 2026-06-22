@@ -16,6 +16,8 @@ type ChronicleForm = {
   year: string;
   month: string;
   day: string;
+  hour: string;
+  minute: string;
   nations: string[];
   content: string;
 };
@@ -30,14 +32,16 @@ const nationBadgeClassMap: Record<string, string> = {
 
 const fixedCreateYear = "2026";
 const fixedCreateMonth = "08";
-const yearOptions = Array.from({ length: 11 }, (_, index) => String(2021 + index));
-const monthOptions = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, "0"));
 const dayOptions = Array.from({ length: 31 }, (_, index) => String(index + 1).padStart(2, "0"));
+const hourOptions = Array.from({ length: 24 }, (_, index) => String(index).padStart(2, "0"));
+const minuteOptions = Array.from({ length: 12 }, (_, index) => String(index * 5).padStart(2, "0"));
 
 const emptyForm: ChronicleForm = {
   year: fixedCreateYear,
   month: fixedCreateMonth,
   day: "",
+  hour: "00",
+  minute: "00",
   nations: [],
   content: ""
 };
@@ -51,24 +55,28 @@ function parseNations(value: string) {
 
 function parseDateParts(value: string) {
   const date = value.slice(0, 10);
+  const time = value.slice(11, 16);
   const [year = "", month = "", day = ""] = date.split("-");
-  return { year, month, day };
+  const [hour = "00", minute = "00"] = time.split(":");
+  return { year, month, day, hour, minute };
 }
 
 function toChronicleForm(entry: ChronicleRow): ChronicleForm {
-  const { year, month, day } = parseDateParts(entry.event_at);
+  const { day, hour, minute } = parseDateParts(entry.event_at);
   return {
-    year,
-    month,
+    year: fixedCreateYear,
+    month: fixedCreateMonth,
     day,
+    hour,
+    minute,
     nations: parseNations(entry.nation),
     content: entry.content
   };
 }
 
 function buildDateString(form: ChronicleForm) {
-  if (!form.year || !form.month || !form.day) return "";
-  return `${form.year}-${form.month}-${form.day}`;
+  if (!form.day) return "";
+  return `${fixedCreateYear}-${fixedCreateMonth}-${form.day} ${form.hour || "00"}:${form.minute || "00"}`;
 }
 
 function sortEntriesAscending(entries: ChronicleRow[]) {
@@ -84,35 +92,21 @@ function DateSelectGroup({
   onChange
 }: {
   form: ChronicleForm;
-  onChange: (field: "year" | "month" | "day", value: string) => void;
+  onChange: (field: "day" | "hour" | "minute", value: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2">
-      <select
-        value={form.year}
-        onChange={(event) => onChange("year", event.target.value)}
-        className="h-11 rounded-lg border border-[var(--border)] bg-black/40 px-3 text-[#f3e7d0] outline-none"
-      >
-        <option value="">연도</option>
-        {yearOptions.map((year) => (
-          <option key={year} value={year}>
-            {year}
-          </option>
-        ))}
-      </select>
+    <div className="grid grid-cols-5 gap-2">
+      <input
+        value={fixedCreateYear}
+        disabled
+        className="h-11 rounded-lg border border-[var(--border)] bg-black/20 px-3 text-[#bca57a] outline-none"
+      />
 
-      <select
-        value={form.month}
-        onChange={(event) => onChange("month", event.target.value)}
-        className="h-11 rounded-lg border border-[var(--border)] bg-black/40 px-3 text-[#f3e7d0] outline-none"
-      >
-        <option value="">월</option>
-        {monthOptions.map((month) => (
-          <option key={month} value={month}>
-            {month}
-          </option>
-        ))}
-      </select>
+      <input
+        value={fixedCreateMonth}
+        disabled
+        className="h-11 rounded-lg border border-[var(--border)] bg-black/20 px-3 text-[#bca57a] outline-none"
+      />
 
       <select
         value={form.day}
@@ -123,6 +117,30 @@ function DateSelectGroup({
         {dayOptions.map((day) => (
           <option key={day} value={day}>
             {day}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={form.hour}
+        onChange={(event) => onChange("hour", event.target.value)}
+        className="h-11 rounded-lg border border-[var(--border)] bg-black/40 px-3 text-[#f3e7d0] outline-none"
+      >
+        {hourOptions.map((hour) => (
+          <option key={hour} value={hour}>
+            {hour}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={form.minute}
+        onChange={(event) => onChange("minute", event.target.value)}
+        className="h-11 rounded-lg border border-[var(--border)] bg-black/40 px-3 text-[#f3e7d0] outline-none"
+      >
+        {minuteOptions.map((minute) => (
+          <option key={minute} value={minute}>
+            {minute}
           </option>
         ))}
       </select>
@@ -163,7 +181,7 @@ export function AdminChronicleEditor() {
     [createForm.nations]
   );
 
-  function updateCreateDate(field: "year" | "month" | "day", value: string) {
+  function updateCreateDate(field: "day" | "hour" | "minute", value: string) {
     setCreateForm((current) => ({ ...current, [field]: value }));
   }
 
@@ -171,7 +189,7 @@ export function AdminChronicleEditor() {
     setCreateForm((current) => ({ ...current, content: value }));
   }
 
-  function updateEditDate(id: number, field: "year" | "month" | "day", value: string) {
+  function updateEditDate(id: number, field: "day" | "hour" | "minute", value: string) {
     setEditForms((current) => ({
       ...current,
       [id]: {
@@ -338,10 +356,10 @@ export function AdminChronicleEditor() {
       <section className="pixel-frame p-5">
         <h2 className="mb-5 text-lg font-black text-[#f3e7d0]">연대기 추가</h2>
 
-        <div className="grid gap-4 xl:grid-cols-[280px_240px_minmax(0,1fr)_140px]">
+        <div className="grid gap-4 xl:grid-cols-[420px_240px_minmax(0,1fr)_140px]">
           <label className="grid gap-2">
             <span className="text-sm font-bold text-[#dbc292]">발생일</span>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               <input
                 value={fixedCreateYear}
                 disabled
@@ -361,6 +379,28 @@ export function AdminChronicleEditor() {
                 {dayOptions.map((day) => (
                   <option key={day} value={day}>
                     {day}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={createForm.hour}
+                onChange={(event) => updateCreateDate("hour", event.target.value)}
+                className="h-11 rounded-lg border border-[var(--border)] bg-black/40 px-3 text-[#f3e7d0] outline-none"
+              >
+                {hourOptions.map((hour) => (
+                  <option key={hour} value={hour}>
+                    {hour}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={createForm.minute}
+                onChange={(event) => updateCreateDate("minute", event.target.value)}
+                className="h-11 rounded-lg border border-[var(--border)] bg-black/40 px-3 text-[#f3e7d0] outline-none"
+              >
+                {minuteOptions.map((minute) => (
+                  <option key={minute} value={minute}>
+                    {minute}
                   </option>
                 ))}
               </select>

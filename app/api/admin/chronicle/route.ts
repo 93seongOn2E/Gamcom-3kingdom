@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getSql } from "@/lib/db";
 import { getAdminSessionFromRequest } from "@/lib/admin-request";
 
@@ -22,7 +23,15 @@ function normalizeDateTime(value: string) {
   const normalized = value.trim();
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
-    return `${normalized} 00:00:00`;
+    return `${normalized} 00:00:00+09:00`;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(normalized)) {
+    return `${normalized.replace("T", " ")}:00+09:00`;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(normalized)) {
+    return `${normalized}:00+09:00`;
   }
 
   return normalized;
@@ -38,7 +47,7 @@ export async function GET(request: Request) {
     const entries = (await sql.query(`
       SELECT
         id,
-        to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI:SS') AS event_at,
+        to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI') AS event_at,
         nation,
         content,
         is_deleted,
@@ -83,13 +92,15 @@ export async function POST(request: Request) {
       VALUES (${eventAt}, ${nation}, ${content}, FALSE, ${session.displayName})
       RETURNING
         id,
-        to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI:SS') AS event_at,
+        to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI') AS event_at,
         nation,
         content,
         is_deleted,
         author_name,
         to_char(created_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI:SS') AS created_at
     `) as ChronicleRow[];
+
+    revalidateTag("public-chronicle");
 
     return NextResponse.json({ entry: rows[0] });
   } catch (error) {
@@ -130,7 +141,7 @@ export async function PATCH(request: Request) {
       WHERE id = ${id} AND is_deleted = FALSE
       RETURNING
         id,
-        to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI:SS') AS event_at,
+        to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI') AS event_at,
         nation,
         content,
         is_deleted,
@@ -141,6 +152,8 @@ export async function PATCH(request: Request) {
     if (!rows[0]) {
       return NextResponse.json({ message: "수정할 연대기를 찾을 수 없습니다." }, { status: 404 });
     }
+
+    revalidateTag("public-chronicle");
 
     return NextResponse.json({ entry: rows[0] });
   } catch (error) {
@@ -173,6 +186,8 @@ export async function DELETE(request: Request) {
     if (!rows[0]) {
       return NextResponse.json({ message: "삭제할 연대기를 찾을 수 없습니다." }, { status: 404 });
     }
+
+    revalidateTag("public-chronicle");
 
     return NextResponse.json({ ok: true });
   } catch (error) {
