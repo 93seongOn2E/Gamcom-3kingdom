@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ADMIN_SESSION_COOKIE, createSessionToken, getAdminCookieOptions, verifyPassword } from "@/lib/admin-auth";
+import { ADMIN_HINT_COOKIE, ADMIN_SESSION_COOKIE, createSessionToken, getAdminCookieOptions, verifyPassword } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -51,6 +51,13 @@ export async function POST(request: Request) {
       }),
       getAdminCookieOptions()
     );
+    response.cookies.set(ADMIN_HINT_COOKIE, "1", {
+      httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7
+    });
 
     return response;
   } catch (error) {

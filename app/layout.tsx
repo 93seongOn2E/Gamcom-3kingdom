@@ -1,11 +1,9 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { cookies } from "next/headers";
 import "./globals.css";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNavbar } from "@/components/SiteNavbar";
-import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
@@ -14,9 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const cookieStore = await cookies();
-  const session = verifySessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
-
   return (
     <html lang="ko">
       <body>
@@ -27,7 +22,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
               <div className="flex h-full items-center justify-center overflow-hidden">
                 <Image
-                  src="/assets/gamst-three-kingdoms-banner-source.png"
+                  src="/assets/gamst-three-kingdoms-banner-source.webp"
                   alt="감컴퍼니 삼국지서버"
                   width={2048}
                   height={749}
@@ -36,18 +31,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 />
               </div>
 
-              <div className="flex items-center justify-end">
-                {session ? (
-                  <form action="/api/admin/logout" method="post">
-                    <button
-                      type="submit"
-                      className="rounded-lg border border-[rgba(212,167,86,0.28)] bg-[#111111] px-4 py-2 text-sm font-bold text-[#f3e7d0] transition hover:bg-[#1a1a1a]"
-                    >
-                      로그아웃
-                    </button>
-                  </form>
-                ) : null}
-              </div>
+              <div />
             </div>
           </div>
 

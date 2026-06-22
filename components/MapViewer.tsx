@@ -10,7 +10,7 @@ type CastleSource = {
   castleKey: string;
   name: string;
   level: CastleLevel;
-  owner: ForceId;
+  owner: string;
   x?: number;
   y?: number;
 };
@@ -86,7 +86,6 @@ const levelInfo: Record<CastleLevel, { label: string; weight: number; icon: stri
 
 const tileSize = 24;
 const tileGap = 2;
-const minimumLoadingMs = 1000;
 
 function normalizeForceId(force: string | undefined): ForceId {
   if (force === "위나라" || force === "위") return "위나라";
@@ -94,7 +93,7 @@ function normalizeForceId(force: string | undefined): ForceId {
   return "오나라";
 }
 
-function normalizeCastleSources(castles: CastleSource[] | undefined) {
+function normalizeCastleSources(castles: CastleSource[] | undefined): CastleSource[] {
   return (castles ?? []).map((castle) => ({
     ...castle,
     owner: normalizeForceId(castle.owner),
@@ -203,7 +202,7 @@ function generateForceCastles(force: ForceId, sourceCastles: CastleSource[]) {
       name: source.name,
       level: source.level,
       origin: force,
-      owner: source.owner,
+      owner: normalizeForceId(source.owner),
       cx: cityX,
       cy: cityY,
       territoryCx: cityX,
@@ -256,18 +255,25 @@ function buildCastles(data: CastleData) {
   return castles;
 }
 
-export function MapViewer({ compact = false }: { compact?: boolean }) {
-  const [castleData, setCastleData] = useState<CastleData>(emptyCastleData);
-  const [selectedCityId, setSelectedCityId] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+function getFirstCastleId(data: CastleData) {
+  return [
+    ...data.forces.위나라,
+    ...data.forces.촉나라,
+    ...data.forces.오나라
+  ][0]?.castleKey ?? "";
+}
+
+export function MapViewer({ compact = false, initialData }: { compact?: boolean; initialData?: RawCastleData }) {
+  const initialCastleData = useMemo(() => initialData ? normalizeCastleData(initialData) : emptyCastleData, [initialData]);
+  const [castleData, setCastleData] = useState<CastleData>(initialCastleData);
+  const [selectedCityId, setSelectedCityId] = useState(() => getFirstCastleId(initialCastleData));
+  const [isLoading, setIsLoading] = useState(!initialData);
 
   const loadCastles = useCallback(async () => {
     setIsLoading(true);
-    const loadingDelay = new Promise((resolve) => setTimeout(resolve, minimumLoadingMs));
 
     try {
-      const responsePromise = fetch("/api/castles", { cache: "no-store" });
-      const [response] = await Promise.all([responsePromise, loadingDelay]);
+      const response = await fetch("/api/castles?fresh=1", { cache: "no-store" });
       const data = await response.json() as RawCastleData;
       const normalized = normalizeCastleData(data);
 
@@ -286,7 +292,6 @@ export function MapViewer({ compact = false }: { compact?: boolean }) {
         return allCastles[0]?.castleKey ?? "";
       });
     } catch {
-      await loadingDelay;
       setCastleData(emptyCastleData);
       setSelectedCityId("");
     } finally {
@@ -295,8 +300,10 @@ export function MapViewer({ compact = false }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
-    void loadCastles();
-  }, [loadCastles]);
+    if (!initialData) {
+      void loadCastles();
+    }
+  }, [initialData, loadCastles]);
 
   const castles = useMemo(() => buildCastles(castleData), [castleData]);
 
@@ -308,7 +315,7 @@ export function MapViewer({ compact = false }: { compact?: boolean }) {
   const renderMapLayers = () => (
     <>
       <rect x="0" y="0" width="1180" height="720" fill="#d8bd8b" />
-      <image className="admin-map-art" href="/assets/three-kingdoms-scroll-map.png" x="0" y="0" width="1180" height="720" preserveAspectRatio="xMidYMid slice" />
+      <image className="admin-map-art" href="/assets/three-kingdoms-scroll-map.webp" x="0" y="0" width="1180" height="720" preserveAspectRatio="xMidYMid slice" />
 
       <g id="territories">
         {castles.map((castle) => (

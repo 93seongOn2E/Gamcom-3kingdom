@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MapViewer } from "@/components/MapViewer";
+import type { CastleDataPayload } from "@/lib/public-data";
 
 export type ChronicleEntry = {
   nations: string[];
@@ -16,7 +17,7 @@ function getNationThemeClass(nation: string) {
   return "neutral";
 }
 
-export function HomeOverview({ chronicle }: { chronicle: ChronicleEntry[] }) {
+export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEntry[]; castleData: CastleDataPayload }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
 
@@ -48,7 +49,7 @@ export function HomeOverview({ chronicle }: { chronicle: ChronicleEntry[] }) {
   return (
     <section className="home-overview grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.6fr)_340px]">
       <div ref={mapRef} className="home-overview-map flex h-full flex-col">
-        <MapViewer compact />
+        <MapViewer compact initialData={castleData} />
       </div>
 
       <aside className="pixel-frame chronicle-panel p-5 md:p-6" style={mapHeight ? { height: `${mapHeight}px` } : undefined}>

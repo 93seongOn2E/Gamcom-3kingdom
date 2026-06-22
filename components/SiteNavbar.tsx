@@ -77,6 +77,12 @@ export function SiteNavbar() {
 
   useEffect(() => {
     let mounted = true;
+    const shouldCheckSession = pathname.startsWith("/admin") || document.cookie.includes("gc_admin_hint=1");
+
+    if (!shouldCheckSession) {
+      setAdminAuthenticated(false);
+      return;
+    }
 
     fetch("/api/admin/session", { cache: "no-store" })
       .then((response) => response.json())
@@ -102,9 +108,20 @@ export function SiteNavbar() {
         <SidebarContent pathname={pathname} adminAuthenticated={adminAuthenticated} />
       </aside>
 
+      {adminAuthenticated ? (
+        <form action="/api/admin/logout" method="post" className="fixed right-6 top-[calc((var(--desktop-header-height)-40px)/2)] z-50 hidden md:block">
+          <button
+            type="submit"
+            className="rounded-lg border border-[rgba(212,167,86,0.28)] bg-[#111111] px-4 py-2 text-sm font-bold text-[#f3e7d0] transition hover:bg-[#1a1a1a]"
+          >
+            로그아웃
+          </button>
+        </form>
+      ) : null}
+
       <header className="site-chrome-bg fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between border-b border-[var(--border)] px-4 md:hidden">
         <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/assets/gamst-three-kingdoms-banner-source.png" alt="감컴퍼니 삼국지서버" width={2048} height={749} className="h-9 w-auto object-contain" priority />
+          <Image src="/assets/gamst-three-kingdoms-banner-source.webp" alt="감컴퍼니 삼국지서버" width={2048} height={749} className="h-9 w-auto object-contain" priority />
           <span className="text-sm font-bold text-[#f4e0bc]">감컴퍼니 삼국지서버</span>
         </Link>
         <button type="button" onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center text-[#f0c98b]" aria-label="메뉴 열기">

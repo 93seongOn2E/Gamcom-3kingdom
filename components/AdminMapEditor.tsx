@@ -360,7 +360,7 @@ export function AdminMapEditor() {
         <div className="admin-map-wrap">
           <svg id="map" viewBox="0 0 1180 720" role="img" aria-label="위촉오 영역으로 구분된 삼국지 지도">
             <rect x="0" y="0" width="1180" height="720" fill="#d8bd8b" />
-            <image className="admin-map-art" href="/assets/three-kingdoms-scroll-map.png" x="0" y="0" width="1180" height="720" preserveAspectRatio="xMidYMid slice" />
+            <image className="admin-map-art" href="/assets/three-kingdoms-scroll-map.webp" x="0" y="0" width="1180" height="720" preserveAspectRatio="xMidYMid slice" />
 
             <g id="territories">
               {castles.map((castle) => (

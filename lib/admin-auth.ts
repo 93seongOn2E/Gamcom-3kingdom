@@ -1,6 +1,7 @@
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
 export const ADMIN_SESSION_COOKIE = "gc_admin_session";
+export const ADMIN_HINT_COOKIE = "gc_admin_hint";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
 export type AdminSession = {

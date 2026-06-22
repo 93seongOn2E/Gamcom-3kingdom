@@ -1,77 +1,16 @@
-import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { getCachedCastleData, getCastleData } from "@/lib/public-data";
 
-export const dynamic = "force-dynamic";
-
-type ForceId = "위" | "촉" | "오";
-
-type CastleRow = {
-  castle_key: string;
-  name: string;
-  kingdom: ForceId;
-  level: number;
-  map_x: string | null;
-  map_y: string | null;
-};
-
-type CastlePayload = {
-  castleKey: string;
-  name: string;
-  level: 1 | 2 | 3;
-  owner: ForceId;
-  x?: number;
-  y?: number;
-  areaScale: number;
-};
-
-const emptyForces: Record<ForceId, CastlePayload[]> = { 위: [], 촉: [], 오: [] };
-
-function getOriginForce(castleKey: string): ForceId | null {
-  if (castleKey.startsWith("위-")) return "위";
-  if (castleKey.startsWith("촉-")) return "촉";
-  if (castleKey.startsWith("오-")) return "오";
-  return null;
-}
-
-export async function GET() {
-  const databaseUrl = process.env.DATABASE_URL;
-
-  if (!databaseUrl) {
-    return NextResponse.json({ message: "DATABASE_URL이 설정되지 않았습니다." }, { status: 500 });
-  }
-
+export async function GET(request: Request) {
   try {
-    const sql = neon(databaseUrl);
-    const rows = await sql`
-      SELECT castle_key, name, kingdom, level, map_x, map_y
-      FROM public.castle
-      WHERE is_use = TRUE
-      ORDER BY sort_order, id
-    ` as CastleRow[];
+    const { searchParams } = new URL(request.url);
+    const data = searchParams.get("fresh") === "1"
+      ? await getCastleData()
+      : await getCachedCastleData();
 
-    const forces: Record<ForceId, CastlePayload[]> = {
-      위: [],
-      촉: [],
-      오: []
-    };
-
-    rows.forEach((row) => {
-      const origin = getOriginForce(row.castle_key);
-      if (!origin) return;
-
-      forces[origin].push({
-        castleKey: row.castle_key,
-        name: row.name,
-        level: row.level as 1 | 2 | 3,
-        owner: row.kingdom,
-        ...(row.map_x === null ? {} : { x: Number(row.map_x) }),
-        ...(row.map_y === null ? {} : { y: Number(row.map_y) }),
-        areaScale: 1
-      });
-    });
-
-    return NextResponse.json({ forces });
+    return NextResponse.json(data);
   } catch (error) {
     console.error("Failed to load castles from Neon", error);
     return NextResponse.json({ message: "성 데이터를 불러오지 못했습니다." }, { status: 500 });
@@ -133,6 +72,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ message: "세력을 확인해주세요." }, { status: 400 });
     }
 
+    const { neon } = await import("@neondatabase/serverless");
     const sql = neon(databaseUrl);
     const rows = await sql`
       UPDATE public.castle
@@ -150,6 +90,8 @@ export async function PATCH(request: Request) {
     if (rows.length === 0) {
       return NextResponse.json({ message: "해당 성을 찾을 수 없습니다." }, { status: 404 });
     }
+
+    revalidateTag("public-castles");
 
     return NextResponse.json({
       castleKey: rows[0].castle_key,
