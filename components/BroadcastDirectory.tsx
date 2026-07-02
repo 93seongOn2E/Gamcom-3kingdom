@@ -12,7 +12,6 @@ export type MemberBroadcastRow = {
   soop_id: string;
   is_live: boolean;
   thumbnail_image_url: string | null;
-  profile_image_url: string | null;
   broadcast_title: string | null;
   viewer_count: number | null;
   job: string | null;
@@ -39,8 +38,7 @@ function getPlayUrl(soopId: string) {
   return `https://play.sooplive.com/${soopId}`;
 }
 
-function getProfileImageUrl(soopId: string, profileImageUrl: string | null) {
-  if (profileImageUrl) return profileImageUrl;
+function getProfileImageUrl(soopId: string) {
   const prefix = soopId.slice(0, 2).toLowerCase();
   return `https://stimg.sooplive.com/LOGO/${prefix}/${soopId}/${soopId}.jpg`;
 }
@@ -184,7 +182,7 @@ export function BroadcastDirectory({ initialMembers }: { initialMembers: MemberB
           const nationBadgeClass = nationBadgeClassMap[member.nation] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
           const crewBadgeClass = crewBadgeClassMap[member.crew_name] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
           const thumbnailUrl = getThumbnailUrl(member);
-          const profileUrl = getProfileImageUrl(member.soop_id, member.profile_image_url);
+          const profileUrl = getProfileImageUrl(member.soop_id);
           const broadcastTitle = member.broadcast_title?.trim() || `${member.nickname} 방송국`;
           const viewerCount = member.viewer_count ?? 0;
           const hiddenJob = getHiddenJobBadge(member.job);

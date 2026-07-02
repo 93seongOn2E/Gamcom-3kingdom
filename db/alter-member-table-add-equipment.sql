@@ -12,9 +12,6 @@ CREATE TABLE public.member_new (
   armor INTEGER,
   shoes INTEGER,
   soop_id VARCHAR(100) NOT NULL UNIQUE,
-  is_live BOOLEAN NOT NULL DEFAULT FALSE,
-  thumbnail_image_url TEXT,
-  profile_image_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -31,9 +28,6 @@ INSERT INTO public.member_new (
   armor,
   shoes,
   soop_id,
-  is_live,
-  thumbnail_image_url,
-  profile_image_url,
   created_at,
   updated_at
 )
@@ -53,9 +47,6 @@ SELECT
   armor,
   shoes,
   soop_id,
-  is_live,
-  thumbnail_image_url,
-  profile_image_url,
   created_at,
   updated_at
 FROM public.member
