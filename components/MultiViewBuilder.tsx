@@ -11,7 +11,6 @@ export type MultiViewMemberRow = {
   crew_name: string;
   nickname: string;
   soop_id: string;
-  profile_image_url: string | null;
   is_live: boolean;
   viewer_count: number | null;
 };
@@ -30,8 +29,7 @@ const nationBadgeClassMap = Object.fromEntries(
   ])
 ) as Record<string, string>;
 
-function getProfileImageUrl(soopId: string, profileImageUrl: string | null) {
-  if (profileImageUrl) return profileImageUrl;
+function getProfileImageUrl(soopId: string) {
   const prefix = soopId.slice(0, 2).toLowerCase();
   return `https://stimg.sooplive.com/LOGO/${prefix}/${soopId}/${soopId}.jpg`;
 }
@@ -217,7 +215,7 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
           const disabled = !member.is_live;
           const nationBadgeClass = nationBadgeClassMap[member.nation] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
           const crewBadgeClass = crewBadgeClassMap[member.crew_name] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
-          const profileUrl = getProfileImageUrl(member.soop_id, member.profile_image_url);
+          const profileUrl = getProfileImageUrl(member.soop_id);
 
           return (
             <button

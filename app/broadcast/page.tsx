@@ -1,41 +1,32 @@
-import { getSql } from "@/lib/db";
 import { BroadcastDirectory, type MemberBroadcastRow } from "@/components/BroadcastDirectory";
+import { getSoopLiveSnapshot } from "@/lib/soop-live-cache";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function BroadcastPage() {
-  const sql = getSql();
-  const members = await sql.query(`
-    SELECT
-      id,
-      nation,
-      crew_name,
-      nickname,
-      soop_id,
-      is_live,
-      thumbnail_image_url,
-      profile_image_url,
-      broadcast_title,
-      viewer_count,
-      job
-    FROM public.member
-    ORDER BY
-      is_live DESC,
-      viewer_count DESC NULLS LAST,
-      CASE nation
-        WHEN '위나라' THEN 1
-        WHEN '촉나라' THEN 2
-        WHEN '오나라' THEN 3
-        ELSE 9
-      END,
-      CASE role_name
-        WHEN '군주' THEN 1
-        WHEN '장군' THEN 2
-        ELSE 3
-      END,
-      nickname
-  `) as MemberBroadcastRow[];
+  const snapshot = await getSoopLiveSnapshot();
+  const members = snapshot.members
+    .map((member) => ({
+      id: String(member.memberId),
+      nation: member.nation,
+      crew_name: member.crewName,
+      nickname: member.nickname,
+      soop_id: member.soopId,
+      is_live: member.isLive,
+      thumbnail_image_url: member.thumbnailImageUrl,
+      broadcast_title: member.broadcastTitle,
+      viewer_count: member.viewerCount,
+      job: member.job
+    }) satisfies MemberBroadcastRow)
+    .sort((left, right) => {
+      if (left.is_live !== right.is_live) return left.is_live ? -1 : 1;
+      if ((left.viewer_count ?? 0) !== (right.viewer_count ?? 0)) {
+        return (right.viewer_count ?? 0) - (left.viewer_count ?? 0);
+      }
+
+      return left.nickname.localeCompare(right.nickname, "ko");
+    });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
