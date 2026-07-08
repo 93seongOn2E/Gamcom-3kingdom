@@ -3,12 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Monitor, Home, Menu, Radio, ScrollText, Swords, Video, X } from "lucide-react";
+import { BookOpen, Home, Menu, Monitor, Radio, ScrollText, Swords, Video, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const baseNavItems = [
   { href: "/", label: "홈", icon: Home },
-  { href: "/about", label: "티저영상", icon: Video },
+  { href: "/about", label: "영상", icon: Video },
+  { href: "/jobs", label: "직업소개", icon: BookOpen },
   { href: "/factions", label: "장비현황", icon: Swords },
   { href: "/broadcast", label: "지통실", icon: Radio },
   { href: "/multiview", label: "멀티뷰", icon: Monitor }
@@ -28,7 +29,7 @@ function SidebarContent({ pathname, onNavigate, adminAuthenticated }: { pathname
       <Link href="/" onClick={onNavigate} className="block px-5 py-5">
         <Image
           src="/assets/gamst-company-logo-aside.png"
-          alt="삼국지 Gamst Company"
+          alt="감컴퍼니 Gamst Company"
           width={1400}
           height={1122}
           priority

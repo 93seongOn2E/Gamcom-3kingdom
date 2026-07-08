@@ -1,0 +1,52 @@
+[
+  {
+    "key": "eumpung-sword",
+    "label": "음풍검",
+    "path": "/assets/icons/weapons/eumpung-sword.webp"
+  },
+  {
+    "key": "hyeolyeong-blade",
+    "label": "혈영도",
+    "path": "/assets/icons/weapons/hyeolyeong-blade.webp"
+  },
+  {
+    "key": "chamwol-twin-sword",
+    "label": "참월검",
+    "path": "/assets/icons/weapons/chamwol-twin-sword.webp"
+  },
+  {
+    "key": "byeokcheon-greatsword",
+    "label": "벽천검",
+    "path": "/assets/icons/weapons/byeokcheon-greatsword.webp"
+  },
+  {
+    "key": "bihwa-spear",
+    "label": "비화창",
+    "path": "/assets/icons/weapons/bihwa-spear.webp"
+  },
+  {
+    "key": "changryong-polearm",
+    "label": "창룡극",
+    "path": "/assets/icons/weapons/changryong-polearm.webp"
+  },
+  {
+    "key": "jimun-fan",
+    "label": "지모선",
+    "path": "/assets/icons/weapons/jimun-fan.webp"
+  },
+  {
+    "key": "hwiun-feather-fan",
+    "label": "휘운선",
+    "path": "/assets/icons/weapons/hwiun-feather-fan.webp"
+  },
+  {
+    "key": "baegyeong-bow",
+    "label": "백영궁",
+    "path": "/assets/icons/weapons/baegyeong-bow.webp"
+  },
+  {
+    "key": "yuun-bow",
+    "label": "유운궁",
+    "path": "/assets/icons/weapons/yuun-bow.webp"
+  }
+]
