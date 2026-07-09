@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 const baseNavItems = [
   { href: "/", label: "홈", icon: Home },
-  { href: "/about", label: "영상", icon: Video },
+  { href: "/about", label: "티저영상", icon: Video },
   { href: "/jobs", label: "직업소개", icon: BookOpen },
   { href: "/factions", label: "장비현황", icon: Swords },
   { href: "/broadcast", label: "지통실", icon: Radio },
