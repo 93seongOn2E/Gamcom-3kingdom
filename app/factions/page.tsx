@@ -1,5 +1,5 @@
 import { getSql } from "@/lib/db";
-import { crewBadgeClassMap, getHiddenJobBadge, nationConfigs } from "@/lib/factions-config";
+import { crewBadgeClassMap, getHiddenJobBadge, hiddenJobConfig, nationConfigs } from "@/lib/factions-config";
 
 export const revalidate = 15;
 const nationMemberSlotCount = 30;
@@ -60,23 +60,17 @@ export default async function FactionsPage() {
         <div className="pixel-frame px-4 py-3">
           <div className="mb-2 text-[12px] font-extrabold tracking-[-0.01em] text-[#dbc292]">히든 직업 배지</div>
           <div className="flex flex-wrap gap-2 text-[12px] font-bold">
-            <span className="inline-flex items-center rounded-full bg-[#f4d35e]/20 px-2.5 py-1 text-[#ffe79a] ring-1 ring-[#f4d35e]/40">
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig.군주.badgeClass}`}>
               👑군주
             </span>
-            <span className="inline-flex items-center rounded-full bg-[#b58cff]/20 px-2.5 py-1 text-[#eadcff] ring-1 ring-[#b58cff]/40">
-              도적계열
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig.영객.badgeClass}`}>
+              영객
             </span>
-            <span className="inline-flex items-center rounded-full bg-[#ffb86c]/20 px-2.5 py-1 text-[#ffe6c7] ring-1 ring-[#ffb86c]/40">
-              전사계열
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["패왕 + 창수"].badgeClass}`}>
+              패왕 + 창수
             </span>
-            <span className="inline-flex items-center rounded-full bg-[#8fa86b]/20 px-2.5 py-1 text-[#eef7dd] ring-1 ring-[#8fa86b]/40">
-              궁수계열
-            </span>
-            <span className="inline-flex items-center rounded-full bg-[#7d8cff]/20 px-2.5 py-1 text-[#e6e9ff] ring-1 ring-[#7d8cff]/40">
-              법사계열
-            </span>
-            <span className="inline-flex items-center rounded-full bg-[#73e0cf]/20 px-2.5 py-1 text-[#dcfffa] ring-1 ring-[#73e0cf]/40">
-              힐러계열
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig.책사.badgeClass}`}>
+              책사
             </span>
           </div>
         </div>
@@ -129,7 +123,7 @@ export default async function FactionsPage() {
                           <td className="whitespace-nowrap px-2 py-3 text-center font-medium">
                             {hiddenJob ? (
                               <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-extrabold ring-1 ${hiddenJob.className}`}>
-                                👑{member.job}
+                                {hiddenJob.label === "군주" ? "👑" : ""}{member.job}
                               </span>
                             ) : (
                               <span>{member.job ?? "-"}</span>

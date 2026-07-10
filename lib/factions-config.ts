@@ -35,27 +35,19 @@ export const crewBadgeClassMap: Record<string, string> = {
 export const hiddenJobConfig = {
   군주: {
     jobs: ["조조", "유비", "손권"],
-    badgeClass: "bg-[#f4d35e]/20 text-[#ffe79a] ring-[#f4d35e]/40"
+    badgeClass: "bg-[#d4a017]/24 text-[#ffe0a3] ring-[#d4a756]/40"
   },
-  전사: {
-    jobs: [] as string[],
-    badgeClass: "bg-[#ffb86c]/20 text-[#ffe6c7] ring-[#ffb86c]/40"
+  영객: {
+    jobs: ["영객", "하후돈", "조자룡", "감녕"],
+    badgeClass: "bg-[#6d28d9]/30 text-[#ede9fe] ring-[#a78bfa]/34"
   },
-  도적: {
-    jobs: [] as string[],
-    badgeClass: "bg-[#b58cff]/20 text-[#eadcff] ring-[#b58cff]/40"
+  "패왕 + 창수": {
+    jobs: ["패왕", "창수", "장료", "전위", "관우", "장비", "여몽", "태사자"],
+    badgeClass: "bg-[#172554]/38 text-[#bfdbfe] ring-[#3b82f6]/28"
   },
-  힐러: {
-    jobs: [] as string[],
-    badgeClass: "bg-[#73e0cf]/20 text-[#dcfffa] ring-[#73e0cf]/40"
-  },
-  법사: {
-    jobs: [] as string[],
-    badgeClass: "bg-[#7d8cff]/20 text-[#e6e9ff] ring-[#7d8cff]/40"
-  },
-  궁수: {
-    jobs: [] as string[],
-    badgeClass: "bg-[#8fa86b]/20 text-[#eef7dd] ring-[#8fa86b]/40"
+  책사: {
+    jobs: ["책사", "사마의", "제갈량", "주유"],
+    badgeClass: "bg-[#9a3412]/32 text-[#fed7aa] ring-[#fb923c]/30"
   }
 } as const;
 

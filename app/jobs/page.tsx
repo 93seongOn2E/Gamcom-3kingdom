@@ -59,9 +59,9 @@ const jobGroups: JobGroup[] = [
     ]
   },
   {
-    title: "패월",
+    title: "패왕",
     role: "전사",
-    id: "job-paewol",
+    id: "job-paewang",
     description: "높은 공격력과 체력을 바탕으로 전면 교전을 담당하는 근접 직업군입니다. 무기에 따라 연속 공격과 한 방 위력이 갈립니다.",
     variants: [
       {
@@ -165,7 +165,7 @@ const hiddenJobGroups: HiddenJobGroup[] = [
     entries: [
       { role: "군주", names: ["조조"], highlight: true },
       { role: "영객", names: ["하후돈"] },
-      { role: "패월 + 창수", names: ["장료", "전위"] },
+      { role: "패왕 + 창수", names: ["장료", "전위"] },
       { role: "책사", names: ["사마의"] }
     ]
   },
@@ -175,7 +175,7 @@ const hiddenJobGroups: HiddenJobGroup[] = [
     entries: [
       { role: "군주", names: ["유비"], highlight: true },
       { role: "영객", names: ["조자룡"] },
-      { role: "패월 + 창수", names: ["관우", "장비"] },
+      { role: "패왕 + 창수", names: ["관우", "장비"] },
       { role: "책사", names: ["제갈량"] }
     ]
   },
@@ -185,7 +185,7 @@ const hiddenJobGroups: HiddenJobGroup[] = [
     entries: [
       { role: "군주", names: ["손권"], highlight: true },
       { role: "영객", names: ["감녕"] },
-      { role: "패월 + 창수", names: ["여몽", "태사자"] },
+      { role: "패왕 + 창수", names: ["여몽", "태사자"] },
       { role: "책사", names: ["주유"] }
     ]
   }
@@ -197,15 +197,15 @@ function hiddenRoleBadgeClass(role: string, highlight?: boolean) {
   }
 
   if (role === "영객") {
-    return "bg-[#7c2d12]/34 text-[#ffc7a8] ring-1 ring-[#fb923c]/24";
+    return "bg-[#6d28d9]/30 text-[#ede9fe] ring-1 ring-[#a78bfa]/34";
   }
 
-  if (role === "패월 + 창수") {
-    return "bg-[#14532d]/34 text-[#bbf7d0] ring-1 ring-[#4ade80]/22";
+  if (role === "패왕 + 창수") {
+    return "bg-[#172554]/38 text-[#bfdbfe] ring-1 ring-[#3b82f6]/28";
   }
 
   if (role === "책사") {
-    return "bg-[#1e3a8a]/34 text-[#bfdbfe] ring-1 ring-[#60a5fa]/22";
+    return "bg-[#9a3412]/32 text-[#fed7aa] ring-1 ring-[#fb923c]/30";
   }
 
   return "bg-[#17324d]/60 text-[#d8e9ff] ring-1 ring-white/10";
@@ -216,8 +216,8 @@ function hiddenRoleHref(role: string) {
     return "#job-yeonggaek";
   }
 
-  if (role === "패월 + 창수") {
-    return "#job-paewol-changsu";
+  if (role === "패왕 + 창수") {
+    return "#job-paewang-changsu";
   }
 
   if (role === "책사") {
@@ -350,7 +350,7 @@ export default function JobsPage() {
                 <p className="mt-3 text-sm font-semibold leading-7 text-[#aa9a82]">{group.description}</p>
               </div>
 
-              {group.id === "job-paewol" ? <div id="job-paewol-changsu" className="-mt-[18px] scroll-mt-35" /> : null}
+              {group.id === "job-paewang" ? <div id="job-paewang-changsu" className="-mt-[18px] scroll-mt-35" /> : null}
 
               <div className="grid gap-4 p-4 md:grid-cols-2 md:p-5">
                 {group.variants.map((job) => (
