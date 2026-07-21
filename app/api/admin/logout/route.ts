@@ -3,8 +3,7 @@ import { ADMIN_HINT_COOKIE, ADMIN_SESSION_COOKIE } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
-  const response = NextResponse.redirect(new URL("/", request.url));
+function clearAdminCookies(response: NextResponse) {
   response.cookies.set(ADMIN_SESSION_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
@@ -19,5 +18,16 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: 0
   });
+}
+
+export async function POST(request: Request) {
+  const response = NextResponse.redirect(new URL("/", request.url), { status: 303 });
+  clearAdminCookies(response);
+  return response;
+}
+
+export async function GET(request: Request) {
+  const response = NextResponse.redirect(new URL("/", request.url), { status: 303 });
+  clearAdminCookies(response);
   return response;
 }
