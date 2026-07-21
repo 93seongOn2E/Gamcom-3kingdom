@@ -37,19 +37,76 @@ export const hiddenJobConfig = {
     jobs: ["조조", "유비", "손권"],
     badgeClass: "bg-[#d4a017]/24 text-[#ffe0a3] ring-[#d4a756]/40"
   },
+  "히든 영객": {
+    jobs: ["하후돈", "조자룡", "감녕"],
+    badgeClass: "bg-[#581c87]/42 text-[#f5d0fe] ring-[#d946ef]/34",
+    prefix: "✦"
+  },
+  "히든 패왕+창수": {
+    jobs: ["장료", "전위", "관우", "장비", "여몽", "태사자"],
+    badgeClass: "bg-[#1e3a2f]/44 text-[#d9f99d] ring-[#84cc16]/32",
+    prefix: "✦"
+  },
+  "히든 책사": {
+    jobs: ["사마의", "제갈량", "주유"],
+    badgeClass: "bg-[#7c2d12]/42 text-[#fed7aa] ring-[#fb923c]/34",
+    prefix: "✦"
+  },
   영객: {
-    jobs: ["영객", "하후돈", "조자룡", "감녕"],
+    jobs: ["영객", "야운", "적령"],
     badgeClass: "bg-[#6d28d9]/30 text-[#ede9fe] ring-[#a78bfa]/34"
   },
-  "패왕 + 창수": {
-    jobs: ["패왕", "창수", "장료", "전위", "관우", "장비", "여몽", "태사자"],
+  패왕: {
+    jobs: ["패왕", "패월", "노월", "천강"],
     badgeClass: "bg-[#172554]/38 text-[#bfdbfe] ring-[#3b82f6]/28"
   },
+  창수: {
+    jobs: ["창수", "창화", "룡격"],
+    badgeClass: "bg-[#14532d]/34 text-[#bbf7d0] ring-[#4ade80]/22"
+  },
+  궁장: {
+    jobs: ["궁장", "백현", "운시"],
+    badgeClass: "bg-[#0f766e]/30 text-[#ccfbf1] ring-[#2dd4bf]/28"
+  },
   책사: {
-    jobs: ["책사", "사마의", "제갈량", "주유"],
+    jobs: ["책사", "운책", "지명"],
     badgeClass: "bg-[#9a3412]/32 text-[#fed7aa] ring-[#fb923c]/30"
   }
 } as const;
+
+export const hiddenJobNames = [
+  ...hiddenJobConfig["히든 영객"].jobs,
+  ...hiddenJobConfig["히든 패왕+창수"].jobs,
+  ...hiddenJobConfig["히든 책사"].jobs
+];
+
+export const baseJobOptions = [
+  { value: "야운", group: "영객" },
+  { value: "적령", group: "영객" },
+  { value: "노월", group: "패왕" },
+  { value: "천강", group: "패왕" },
+  { value: "창화", group: "창수" },
+  { value: "룡격", group: "창수" },
+  { value: "운책", group: "책사" },
+  { value: "지명", group: "책사" },
+  { value: "백현", group: "궁장" },
+  { value: "운시", group: "궁장" }
+] as const;
+
+export const hiddenJobOptionsByNation: Record<string, string[]> = {
+  위나라: ["하후돈", "장료", "전위", "사마의"],
+  촉나라: ["조자룡", "관우", "장비", "제갈량"],
+  오나라: ["감녕", "여몽", "태사자", "주유"]
+};
+
+export function formatJobDisplayName(job: string | null) {
+  if (!job) {
+    return "-";
+  }
+
+  const baseJob = baseJobOptions.find((option) => option.value === job);
+  return baseJob ? `${baseJob.group}-${job}` : job;
+}
 
 export function getHiddenJobBadge(job: string | null) {
   if (!job) {
@@ -60,7 +117,8 @@ export function getHiddenJobBadge(job: string | null) {
     if ((config.jobs as readonly string[]).includes(job)) {
       return {
         label,
-        className: config.badgeClass
+        className: config.badgeClass,
+        prefix: "prefix" in config ? config.prefix : ""
       };
     }
   }

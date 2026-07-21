@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getSql } from "@/lib/db";
 import { getAdminSessionFromRequest } from "@/lib/admin-request";
 import { writeAdminAuditLog } from "@/lib/admin-audit";
+import { hiddenJobNames } from "@/lib/factions-config";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export async function GET(request: Request) {
 
   try {
     const sql = getSql();
+    const hiddenJobSqlList = hiddenJobNames.map((job) => `'${job.replaceAll("'", "''")}'`).join(", ");
     const members = (await sql.query(`
       SELECT id, nation, crew_name, nickname, job, weapon, helmet, armor, shoes
       FROM public.member
@@ -39,12 +41,23 @@ export async function GET(request: Request) {
           WHEN '오나라' THEN 3
           ELSE 9
         END,
-        CASE role_name
-          WHEN '군주' THEN 1
-          WHEN '장군' THEN 2
+        CASE
+          WHEN role_name = '군주' THEN 1
+          WHEN job IN (${hiddenJobSqlList}) THEN 2
           ELSE 3
         END,
         weapon DESC NULLS LAST,
+        CASE crew_name
+          WHEN '버컴퍼니' THEN 1
+          WHEN '버인협회' THEN 2
+          WHEN '지력사무소' THEN 3
+          WHEN '꾸한성' THEN 4
+          WHEN '버블란' THEN 5
+          WHEN '홍피스' THEN 6
+          WHEN '로스타시티' THEN 7
+          WHEN '가무소' THEN 8
+          ELSE 99
+        END,
         nickname
     `)) as MemberRow[];
 

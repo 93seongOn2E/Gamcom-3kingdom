@@ -1,5 +1,6 @@
 "use client";
 
+import { baseJobOptions, formatJobDisplayName, getHiddenJobBadge, hiddenJobOptionsByNation } from "@/lib/factions-config";
 import { useEffect, useMemo, useState } from "react";
 
 type MemberRow = {
@@ -19,6 +20,11 @@ type EditableMember = MemberRow & {
   helmetInput: string;
   armorInput: string;
   shoesInput: string;
+};
+
+type NoticeState = {
+  message: string;
+  type: "success" | "error";
 };
 
 function toEditable(member: MemberRow): EditableMember {
@@ -45,11 +51,22 @@ const nationSaveButtonClassMap: Record<string, string> = {
   오나라: "admin-btn-save-wu"
 };
 
+function hasSelectableJob(member: EditableMember) {
+  if (!member.job) {
+    return true;
+  }
+
+  return [
+    ...baseJobOptions.map((option) => option.value),
+    ...(hiddenJobOptionsByNation[member.nation] ?? [])
+  ].includes(member.job);
+}
+
 export function AdminFactionsEditor() {
   const [members, setMembers] = useState<EditableMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<number | null>(null);
-  const [status, setStatus] = useState("");
+  const [notice, setNotice] = useState<NoticeState | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/members", { cache: "no-store" })
@@ -62,7 +79,10 @@ export function AdminFactionsEditor() {
         setMembers(data.members.map(toEditable));
       })
       .catch((error) => {
-        setStatus(error instanceof Error ? error.message : "세력 정보를 불러오지 못했습니다.");
+        setNotice({
+          type: "error",
+          message: error instanceof Error ? error.message : "세력 정보를 불러오지 못했습니다."
+        });
       })
       .finally(() => {
         setLoading(false);
@@ -93,7 +113,6 @@ export function AdminFactionsEditor() {
 
   async function saveMember(member: EditableMember) {
     setSavingId(member.id);
-    setStatus("");
 
     try {
       const response = await fetch("/api/admin/members", {
@@ -117,9 +136,12 @@ export function AdminFactionsEditor() {
 
       const updated = data.member as MemberRow;
       setMembers((current) => current.map((item) => (item.id === updated.id ? toEditable(updated) : item)));
-      setStatus(`${updated.nickname} 정보를 저장했습니다.`);
+      setNotice({ type: "success", message: `${updated.nickname} 정보를 저장했습니다.` });
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "세력 정보를 저장하지 못했습니다.");
+      setNotice({
+        type: "error",
+        message: error instanceof Error ? error.message : "세력 정보를 저장하지 못했습니다."
+      });
     } finally {
       setSavingId(null);
     }
@@ -131,7 +153,27 @@ export function AdminFactionsEditor() {
 
   return (
     <div className="grid gap-4 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif] xl:grid-cols-3">
-      {status ? <p className="pixel-frame p-4 text-sm text-[#f3e7d0] xl:col-span-3">{status}</p> : null}
+      {notice ? (
+        <div className="fixed inset-0 z-[90] grid place-items-center bg-black/45 px-4 backdrop-blur-sm">
+          <div className="pixel-frame w-full max-w-sm bg-[#101010] p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.42)]">
+            <div className={`mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full text-lg font-black ring-1 ${
+              notice.type === "success"
+                ? "bg-[#d4a017]/18 text-[#ffe0a3] ring-[#d4a756]/34"
+                : "bg-[#7f1d1d]/28 text-[#fecaca] ring-[#ef4444]/34"
+            }`}>
+              {notice.type === "success" ? "✓" : "!"}
+            </div>
+            <p className="text-sm font-bold leading-6 text-[#f3e7d0]">{notice.message}</p>
+            <button
+              type="button"
+              onClick={() => setNotice(null)}
+              className="mt-4 rounded-lg border border-[rgba(212,167,86,0.34)] bg-[#d4a017]/16 px-5 py-2 text-sm font-black text-[#ffe0a3] transition hover:bg-[#d4a017]/24"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {groupedMembers.map((group) => (
         <section key={group.nation} className="pixel-frame overflow-hidden">
@@ -145,7 +187,7 @@ export function AdminFactionsEditor() {
                 <tr className="bg-white/[0.03] text-[#dbc292]">
                   <th className="w-[84px] whitespace-nowrap px-1 py-2 text-center font-bold">크루</th>
                   <th className="whitespace-nowrap px-1 py-2 text-center font-bold">이름</th>
-                  <th className="whitespace-nowrap px-1 py-2 text-center font-bold">직업</th>
+                  <th className="whitespace-nowrap px-1 py-2 text-center font-bold">무기</th>
                   <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">무기</th>
                   <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">투구</th>
                   <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">갑옷</th>
@@ -154,61 +196,91 @@ export function AdminFactionsEditor() {
                 </tr>
               </thead>
               <tbody>
-                {group.members.map((member) => (
-                  <tr key={member.id} className="border-t border-[rgba(212,167,86,0.14)] text-[#f3e7d0]">
-                    <td className="px-1 py-2 text-center text-[10px] text-[#cdb487]">{member.crew_name}</td>
-                    <td className="whitespace-nowrap px-1 py-2 text-center text-[13px] font-bold">{member.nickname}</td>
-                    <td className="px-1 py-2 text-center">
-                      <input
-                        value={member.job ?? ""}
-                        onChange={(event) => updateField(member.id, "job", event.target.value)}
-                        className="h-8 w-[68px] rounded-md border border-[var(--border)] bg-black/40 px-1.5 text-[11px] text-[#f3e7d0] outline-none"
-                      />
-                    </td>
-                    <td className="px-1.5 py-2">
-                      <input
-                        value={member.weaponInput}
-                        onChange={(event) => updateField(member.id, "weaponInput", event.target.value)}
-                        className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
-                        inputMode="numeric"
-                      />
-                    </td>
-                    <td className="px-1.5 py-2">
-                      <input
-                        value={member.helmetInput}
-                        onChange={(event) => updateField(member.id, "helmetInput", event.target.value)}
-                        className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
-                        inputMode="numeric"
-                      />
-                    </td>
-                    <td className="px-1.5 py-2">
-                      <input
-                        value={member.armorInput}
-                        onChange={(event) => updateField(member.id, "armorInput", event.target.value)}
-                        className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
-                        inputMode="numeric"
-                      />
-                    </td>
-                    <td className="px-1.5 py-2">
-                      <input
-                        value={member.shoesInput}
-                        onChange={(event) => updateField(member.id, "shoesInput", event.target.value)}
-                        className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
-                        inputMode="numeric"
-                      />
-                    </td>
-                    <td className="px-1.5 py-2">
-                      <button
-                        type="button"
-                        onClick={() => saveMember(member)}
-                        disabled={savingId === member.id}
-                        className={`${nationSaveButtonClassMap[group.nation] ?? "admin-btn-save"} min-w-0 rounded-md px-2 py-1.5 text-[11px]`}
-                      >
-                        {savingId === member.id ? "중..." : "저장"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {group.members.map((member) => {
+                  const selectedBadge = getHiddenJobBadge(member.job);
+
+                  return (
+                    <tr key={member.id} className="border-t border-[rgba(212,167,86,0.14)] text-[#f3e7d0]">
+                      <td className="px-1 py-2 text-center text-[10px] text-[#cdb487]">{member.crew_name}</td>
+                      <td className="whitespace-nowrap px-1 py-2 text-center text-[13px] font-bold">{member.nickname}</td>
+                      <td className="px-1 py-2 text-center">
+                        <div className="grid min-w-[118px] gap-1.5">
+                          <select
+                            value={member.job ?? ""}
+                            onChange={(event) => updateField(member.id, "job", event.target.value)}
+                            className="h-8 rounded-md border border-[var(--border)] bg-black/60 px-2 text-[11px] font-bold text-[#f3e7d0] outline-none"
+                          >
+                            <option value="">미선택</option>
+                            {!hasSelectableJob(member) && member.job ? (
+                              <option value={member.job}>현재값 - {member.job}</option>
+                            ) : null}
+                            <optgroup label="일반 무기">
+                              {baseJobOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.group} - {option.value}
+                                </option>
+                              ))}
+                            </optgroup>
+                            <optgroup label={`${member.nation} 히든`}>
+                              {(hiddenJobOptionsByNation[member.nation] ?? []).map((option) => (
+                                <option key={option} value={option}>
+                                  히든 - {option}
+                                </option>
+                              ))}
+                            </optgroup>
+                          </select>
+                          {member.job ? (
+                            <span className={`inline-flex justify-center rounded-full px-2 py-0.5 text-[10px] font-extrabold ring-1 ${selectedBadge ? selectedBadge.className : "bg-white/5 text-[#dbc292] ring-white/10"}`}>
+                              {selectedBadge?.label === "군주" ? "👑" : selectedBadge?.prefix ? <span className="mr-1 text-white">{selectedBadge.prefix}</span> : null}{formatJobDisplayName(member.job)}
+                            </span>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td className="px-1.5 py-2">
+                        <input
+                          value={member.weaponInput}
+                          onChange={(event) => updateField(member.id, "weaponInput", event.target.value)}
+                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          inputMode="numeric"
+                        />
+                      </td>
+                      <td className="px-1.5 py-2">
+                        <input
+                          value={member.helmetInput}
+                          onChange={(event) => updateField(member.id, "helmetInput", event.target.value)}
+                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          inputMode="numeric"
+                        />
+                      </td>
+                      <td className="px-1.5 py-2">
+                        <input
+                          value={member.armorInput}
+                          onChange={(event) => updateField(member.id, "armorInput", event.target.value)}
+                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          inputMode="numeric"
+                        />
+                      </td>
+                      <td className="px-1.5 py-2">
+                        <input
+                          value={member.shoesInput}
+                          onChange={(event) => updateField(member.id, "shoesInput", event.target.value)}
+                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          inputMode="numeric"
+                        />
+                      </td>
+                      <td className="px-1.5 py-2">
+                        <button
+                          type="button"
+                          onClick={() => saveMember(member)}
+                          disabled={savingId === member.id}
+                          className={`${nationSaveButtonClassMap[group.nation] ?? "admin-btn-save"} min-w-0 rounded-md px-2 py-1.5 text-[11px]`}
+                        >
+                          {savingId === member.id ? "중..." : "저장"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
