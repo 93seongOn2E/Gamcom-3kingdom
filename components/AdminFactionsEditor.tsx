@@ -185,7 +185,6 @@ export function AdminFactionsEditor() {
             <table className="w-full table-auto border-collapse text-[12px] leading-4">
               <thead>
                 <tr className="bg-white/[0.03] text-[#dbc292]">
-                  <th className="w-[84px] whitespace-nowrap px-1 py-2 text-center font-bold">크루</th>
                   <th className="whitespace-nowrap px-1 py-2 text-center font-bold">이름</th>
                   <th className="whitespace-nowrap px-1 py-2 text-center font-bold">무기</th>
                   <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">무기</th>
@@ -201,7 +200,6 @@ export function AdminFactionsEditor() {
 
                   return (
                     <tr key={member.id} className="border-t border-[rgba(212,167,86,0.14)] text-[#f3e7d0]">
-                      <td className="px-1 py-2 text-center text-[10px] text-[#cdb487]">{member.crew_name}</td>
                       <td className="whitespace-nowrap px-1 py-2 text-center text-[13px] font-bold">{member.nickname}</td>
                       <td className="px-1 py-2 text-center">
                         <div className="grid min-w-[118px] gap-1.5">
