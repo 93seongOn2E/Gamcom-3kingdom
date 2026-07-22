@@ -15,7 +15,7 @@ export const nationConfigs = [
     key: "오나라",
     short: "오",
     color: "#d63d35",
-    description: "지피티의 지력사무소, 홍타쿠의 홍피스, 가습기의 가무소 연합으로 균형감 있게 버티는 연합 세력"
+    description: "지피티의 지력사무소, 홍타쿠의 홍피스, 황원태의 가무소 연합으로 균형감 있게 버티는 연합 세력"
   }
 ] as const;
 

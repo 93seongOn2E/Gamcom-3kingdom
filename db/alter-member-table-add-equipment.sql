@@ -38,7 +38,7 @@ SELECT
   nickname,
   CASE
     WHEN nickname IN ('감스트', '조경훈', '지피티') THEN '군주'
-    WHEN nickname IN ('꾸티뉴', '박재박', '로기다', '홍타쿠', '가습기') THEN '장군'
+    WHEN nickname IN ('꾸티뉴', '박재박', '로기다', '홍타쿠', '황원태') THEN '장군'
     ELSE '일반 병사'
   END AS role_name,
   job,
