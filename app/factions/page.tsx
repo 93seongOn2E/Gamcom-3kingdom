@@ -46,7 +46,7 @@ export default async function FactionsPage() {
         WHEN '버블란' THEN 5
         WHEN '홍피스' THEN 6
         WHEN '로스타시티' THEN 7
-        WHEN '가무소' THEN 8
+        WHEN '원더독' THEN 8
         ELSE 99
       END,
       nickname

@@ -15,7 +15,7 @@ export const nationConfigs = [
     key: "오나라",
     short: "오",
     color: "#d63d35",
-    description: "지피티의 지력사무소, 홍타쿠의 홍피스, 황원태의 가무소 연합으로 균형감 있게 버티는 연합 세력"
+    description: "지피티의 지력사무소, 홍타쿠의 홍피스, 황원태의 원더독 연합으로 균형감 있게 버티는 연합 세력"
   }
 ] as const;
 
@@ -28,7 +28,7 @@ export const crewBadgeClassMap: Record<string, string> = {
   "꾸한성": "bg-[#2fae63]/24 text-[#e1ffec] ring-[#2fae63]/48",
 
   "지력사무소": "bg-[#ffc1c1]/28 text-[#fff1f1] ring-[#ffc1c1]/50",
-  "가무소": "bg-[#ff8f8f]/24 text-[#fff0f0] ring-[#ff8f8f]/48",
+  "원더독": "bg-[#ff8f8f]/24 text-[#fff0f0] ring-[#ff8f8f]/48",
   "홍피스": "bg-[#e04444]/24 text-[#ffe4e4] ring-[#e04444]/48"
 };
 
