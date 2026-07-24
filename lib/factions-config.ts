@@ -42,7 +42,7 @@ export const hiddenJobConfig = {
     badgeClass: "bg-[#581c87]/42 text-[#f5d0fe] ring-[#d946ef]/34",
     prefix: "✦"
   },
-  "히든 패월+창수": {
+  "히든 창수": {
     jobs: ["장료", "전위", "관우", "장비", "여몽", "태사자"],
     badgeClass: "bg-[#1e3a2f]/44 text-[#d9f99d] ring-[#84cc16]/32",
     prefix: "✦"
@@ -76,7 +76,7 @@ export const hiddenJobConfig = {
 
 export const hiddenJobNames = [
   ...hiddenJobConfig["히든 영객"].jobs,
-  ...hiddenJobConfig["히든 패월+창수"].jobs,
+  ...hiddenJobConfig["히든 창수"].jobs,
   ...hiddenJobConfig["히든 책사"].jobs
 ];
 

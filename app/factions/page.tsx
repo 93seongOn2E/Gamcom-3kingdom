@@ -83,8 +83,8 @@ export default async function FactionsPage() {
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 영객"].badgeClass}`}>
               <span className="mr-1 text-white">✦</span>히든 영객
             </span>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 패월+창수"].badgeClass}`}>
-              <span className="mr-1 text-white">✦</span>히든 패월+창수
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 창수"].badgeClass}`}>
+              <span className="mr-1 text-white">✦</span>히든 창수
             </span>
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 책사"].badgeClass}`}>
               <span className="mr-1 text-white">✦</span>히든 책사

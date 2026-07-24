@@ -225,7 +225,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
   {
     kingdom: "촉나라",
     name: "관우",
-    role: "패월 + 창수",
+    role: "창수",
     skills: [
       { name: "격연참", description: "정면을 향해 크게 두 번 베어냅니다." },
       { name: "파뢰창", description: "창을 바닥에 내리찍어 사방으로 퍼지는 파동으로 주변 일대의 적을 두 차례 강타합니다." },
@@ -235,7 +235,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
   {
     kingdom: "촉나라",
     name: "장비",
-    role: "패월 + 창수",
+    role: "창수",
     skills: [
       { name: "선풍각", description: "창을 회전시키며 주변의 적을 단숨에 베어냅니다." },
       { name: "유성강", description: "하늘의 기운을 끌어내려, 바라보는 지점에 별똥별처럼 내리꽂아 강타합니다." },
@@ -278,7 +278,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
   {
     kingdom: "위나라",
     name: "장료",
-    role: "패월 + 창수",
+    role: "창수",
     skills: [
       { name: "선풍참", description: "좌우로 엇갈린 십자 검격을 일으켜 주변 일대의 적을 베어넘깁니다." },
       { name: "와류참", description: "회오리치듯 좌우 사선으로 크게 베어내며, 휩쓸린 적을 자신 쪽으로 살짝 끌어당깁니다.", controlEffects: ["끌어당김"] },
@@ -288,7 +288,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
   {
     kingdom: "위나라",
     name: "전위",
-    role: "패월 + 창수",
+    role: "창수",
     skills: [
       { name: "만천검격", description: "여러 갈래에서 정면을 향해 동시에 베어냅니다." },
       { name: "낙성진", description: "잠시 기운을 모은 뒤 주변 일대에 하늘에서 장렬한 에너지를 내리꽂아 강타합니다." },
@@ -331,7 +331,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
   {
     kingdom: "오나라",
     name: "여몽",
-    role: "패월 + 창수",
+    role: "창수",
     skills: [
       { name: "나선격", description: "소용돌이치는 검격을 넓게 퍼뜨려 주변 일대의 적을 몰아쳐 베어냅니다." },
       { name: "삼연낙성", description: "정면을 향해 하늘에서 강렬한 에너지를 연달아 세 번 내리꽂고, 그 충격파를 직선으로 뻗어 보내 적을 강타합니다." },
@@ -341,7 +341,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
   {
     kingdom: "오나라",
     name: "태사자",
-    role: "패월 + 창수",
+    role: "창수",
     skills: [
       { name: "광류무", description: "거세게 휘몰아치는 회오리 검격으로 주변의 적을 단숨에 휩쓸어 버립니다." },
       { name: "회무승격", description: "주변 일대를 원을 그리며 훑어 벤 뒤, 검을 아래에서 위로 올려쳐 휩쓸린 적을 공중으로 띄웁니다.", controlEffects: ["에어본"] },
@@ -382,7 +382,7 @@ function hiddenRoleBadgeClass(role: string, highlight?: boolean) {
     return "bg-[#6d28d9]/30 text-[#ede9fe] ring-1 ring-[#a78bfa]/34";
   }
 
-  if (role === "패월 + 창수") {
+  if (role === "창수") {
     return "bg-[#172554]/38 text-[#bfdbfe] ring-1 ring-[#3b82f6]/28";
   }
 
