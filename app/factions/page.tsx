@@ -34,10 +34,15 @@ export default async function FactionsPage() {
       END,
       CASE
         WHEN role_name = '군주' THEN 1
-        WHEN job IN (${hiddenJobSqlList}) THEN 2
-        ELSE 3
+        WHEN nickname IN ('박재박', '로기다', '꾸티뉴', '황원태', '홍타쿠') THEN 2
+        WHEN job IN (${hiddenJobSqlList}) THEN 3
+        ELSE 4
       END,
+      (COALESCE(weapon, 0) + COALESCE(helmet, 0) + COALESCE(armor, 0) + COALESCE(shoes, 0)) DESC,
       weapon DESC NULLS LAST,
+      helmet DESC NULLS LAST,
+      armor DESC NULLS LAST,
+      shoes DESC NULLS LAST,
       CASE crew_name
         WHEN '버컴퍼니' THEN 1
         WHEN '버인협회' THEN 2
@@ -78,8 +83,8 @@ export default async function FactionsPage() {
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 영객"].badgeClass}`}>
               <span className="mr-1 text-white">✦</span>히든 영객
             </span>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 패왕+창수"].badgeClass}`}>
-              <span className="mr-1 text-white">✦</span>히든 패왕+창수
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 패월+창수"].badgeClass}`}>
+              <span className="mr-1 text-white">✦</span>히든 패월+창수
             </span>
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig["히든 책사"].badgeClass}`}>
               <span className="mr-1 text-white">✦</span>히든 책사
@@ -87,8 +92,8 @@ export default async function FactionsPage() {
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig.영객.badgeClass}`}>
               영객
             </span>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig.패왕.badgeClass}`}>
-              패왕
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig.패월.badgeClass}`}>
+              패월
             </span>
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 ring-1 ${hiddenJobConfig.창수.badgeClass}`}>
               창수

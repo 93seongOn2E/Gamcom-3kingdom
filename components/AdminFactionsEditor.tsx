@@ -42,7 +42,7 @@ const nationOrder = ["위나라", "촉나라", "오나라"];
 const nationTitleClassMap: Record<string, string> = {
   위나라: "text-[#6aa6ff]",
   촉나라: "text-[#5fd48c]",
-  오나라: "text-[#ff6b5f]"
+  오나라: "text-[#f0c34a]"
 };
 
 const nationSaveButtonClassMap: Record<string, string> = {

@@ -25,7 +25,7 @@ const nationBadgeClassMap = Object.fromEntries(
       ? "bg-[#2f73c8]/22 text-[#dcecff] ring-[#2f73c8]/45"
       : nation.key === "촉나라"
         ? "bg-[#2f9b5f]/22 text-[#ddffea] ring-[#2f9b5f]/45"
-        : "bg-[#d63d35]/22 text-[#ffe0dd] ring-[#d63d35]/45"
+        : "bg-[#d4a017]/24 text-[#fff0b8] ring-[#d4a017]/48"
   ])
 ) as Record<string, string>;
 

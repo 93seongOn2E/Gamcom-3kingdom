@@ -14,7 +14,7 @@ export const nationConfigs = [
   {
     key: "오나라",
     short: "오",
-    color: "#d63d35",
+    color: "#d4a017",
     description: "지피티의 지력사무소, 홍타쿠의 홍피스, 황원태의 원더독 연합으로 균형감 있게 버티는 연합 세력"
   }
 ] as const;
@@ -27,9 +27,9 @@ export const crewBadgeClassMap: Record<string, string> = {
   "버컴퍼니": "bg-[#a8efc8]/28 text-[#effff5] ring-[#a8efc8]/50",
   "꾸한성": "bg-[#2fae63]/24 text-[#e1ffec] ring-[#2fae63]/48",
 
-  "지력사무소": "bg-[#ffc1c1]/28 text-[#fff1f1] ring-[#ffc1c1]/50",
-  "원더독": "bg-[#ff8f8f]/24 text-[#fff0f0] ring-[#ff8f8f]/48",
-  "홍피스": "bg-[#e04444]/24 text-[#ffe4e4] ring-[#e04444]/48"
+  "지력사무소": "bg-[#ffe08a]/28 text-[#fff4c7] ring-[#ffe08a]/50",
+  "원더독": "bg-[#d4a017]/24 text-[#ffe8a3] ring-[#d4a017]/48",
+  "홍피스": "bg-[#b7791f]/24 text-[#ffe4a8] ring-[#b7791f]/48"
 };
 
 export const hiddenJobConfig = {
@@ -42,7 +42,7 @@ export const hiddenJobConfig = {
     badgeClass: "bg-[#581c87]/42 text-[#f5d0fe] ring-[#d946ef]/34",
     prefix: "✦"
   },
-  "히든 패왕+창수": {
+  "히든 패월+창수": {
     jobs: ["장료", "전위", "관우", "장비", "여몽", "태사자"],
     badgeClass: "bg-[#1e3a2f]/44 text-[#d9f99d] ring-[#84cc16]/32",
     prefix: "✦"
@@ -56,8 +56,8 @@ export const hiddenJobConfig = {
     jobs: ["영객", "야운", "적령"],
     badgeClass: "bg-[#6d28d9]/30 text-[#ede9fe] ring-[#a78bfa]/34"
   },
-  패왕: {
-    jobs: ["패왕", "패월", "노월", "천강"],
+  패월: {
+    jobs: ["패월", "노월", "천강"],
     badgeClass: "bg-[#172554]/38 text-[#bfdbfe] ring-[#3b82f6]/28"
   },
   창수: {
@@ -76,15 +76,15 @@ export const hiddenJobConfig = {
 
 export const hiddenJobNames = [
   ...hiddenJobConfig["히든 영객"].jobs,
-  ...hiddenJobConfig["히든 패왕+창수"].jobs,
+  ...hiddenJobConfig["히든 패월+창수"].jobs,
   ...hiddenJobConfig["히든 책사"].jobs
 ];
 
 export const baseJobOptions = [
   { value: "야운", group: "영객" },
   { value: "적령", group: "영객" },
-  { value: "노월", group: "패왕" },
-  { value: "천강", group: "패왕" },
+  { value: "노월", group: "패월" },
+  { value: "천강", group: "패월" },
   { value: "창화", group: "창수" },
   { value: "룡격", group: "창수" },
   { value: "운책", group: "책사" },

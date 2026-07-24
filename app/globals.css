@@ -756,7 +756,7 @@ button, input, select { font: inherit; }
 
 .admin-top-summary-card.wei { background: linear-gradient(180deg, #3f6797, #26405e); }
 .admin-top-summary-card.shu { background: linear-gradient(180deg, #3f8153, #28553a); }
-.admin-top-summary-card.wu { background: linear-gradient(180deg, #b43d2f, #86271f); }
+.admin-top-summary-card.wu { background: linear-gradient(180deg, #f0c34a, #b7791f); color: #1f1600; }
 
 .admin-map-wrap {
   flex: 1;
@@ -908,7 +908,7 @@ button, input, select { font: inherit; }
 
 .admin-territory[data-owner="wei"] { fill: #2f78d8; }
 .admin-territory[data-owner="shu"] { fill: #22a457; }
-.admin-territory[data-owner="wu"] { fill: #d8322d; }
+.admin-territory[data-owner="wu"] { fill: #d4a017; }
 .admin-territory[data-level="1"] { stroke-width: 1.5; }
 .admin-territory[data-level="2"] { stroke-width: 1.25; }
 .admin-territory[data-level="3"] { stroke-width: 1; }
@@ -967,7 +967,7 @@ button, input, select { font: inherit; }
 
 .admin-force-label.wei { fill: #1e59a6; }
 .admin-force-label.shu { fill: #14763b; }
-.admin-force-label.wu { fill: #a91f1a; }
+.admin-force-label.wu { fill: #b7791f; }
 
 .admin-control-panel {
   border-left: 1px solid #b69061;
@@ -1059,7 +1059,7 @@ button, input, select { font: inherit; }
 
 .admin-segmented button[data-force="wei"].active { background: #365a84; color: white; }
 .admin-segmented button[data-force="shu"].active { background: #356f49; color: white; }
-.admin-segmented button[data-force="wu"].active { background: #d63d35; color: white; }
+.admin-segmented button[data-force="wu"].active { background: #d4a017; color: #1f1600; }
 
 .admin-capture,
 .admin-secondary {
@@ -1129,7 +1129,8 @@ button, input, select { font: inherit; }
 }
 
 .admin-btn-save-wu {
-  background: linear-gradient(180deg, #b43d2f, #86271f);
+  background: linear-gradient(180deg, #f0c34a, #b7791f);
+  color: #1f1600;
 }
 
 .admin-btn-edit {
@@ -1287,7 +1288,7 @@ button, input, select { font: inherit; }
 
 .admin-summary .wei { background: #2f73c8; }
 .admin-summary .shu { background: #2f9b5f; }
-.admin-summary .wu { background: #d63d35; }
+.admin-summary .wu { background: #d4a017; color: #1f1600; }
 .admin-summary b { font-size: 18px; }
 
 .admin-city-list {
@@ -1332,7 +1333,7 @@ button, input, select { font: inherit; }
 
 .admin-badge.wei { background: #2f73c8; }
 .admin-badge.shu { background: #2f9b5f; }
-.admin-badge.wu { background: #d63d35; }
+.admin-badge.wu { background: #d4a017; color: #1f1600; }
 
 .chronicle-panel {
   display: flex;
@@ -1412,7 +1413,7 @@ button, input, select { font: inherit; }
 
 .chronicle-force.wei { background: linear-gradient(180deg, #3f6797, #26405e); }
 .chronicle-force.shu { background: linear-gradient(180deg, #3f8153, #28553a); }
-.chronicle-force.wu { background: linear-gradient(180deg, #b43d2f, #86271f); }
+.chronicle-force.wu { background: linear-gradient(180deg, #f0c34a, #b7791f); color: #1f1600; }
 
 .chronicle-date {
   color: #dbc292;

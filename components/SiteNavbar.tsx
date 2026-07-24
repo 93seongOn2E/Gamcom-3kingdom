@@ -6,19 +6,35 @@ import { usePathname } from "next/navigation";
 import { BookOpen, Home, Menu, Monitor, Radio, ScrollText, Swords, Video, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const baseNavItems = [
+type NavLinkItem = {
+  href: string;
+  label: string;
+  icon: typeof Home;
+};
+
+type NavSeparatorItem = {
+  type: "separator";
+  label: string;
+};
+
+type NavItem = NavLinkItem | NavSeparatorItem;
+
+const baseNavItems: NavLinkItem[] = [
   { href: "/", label: "홈", icon: Home },
   { href: "/about", label: "티저영상", icon: Video },
   { href: "/jobs", label: "직업소개", icon: BookOpen },
-  { href: "/factions", label: "장비현황", icon: Swords },
   { href: "/broadcast", label: "지통실", icon: Radio },
   { href: "/multiview", label: "멀티뷰", icon: Monitor }
 ];
 
+const streamerWarningNavItem: NavLinkItem = { href: "/factions", label: "장비현황", icon: Swords };
+
 function SidebarContent({ pathname, onNavigate, adminAuthenticated }: { pathname: string; onNavigate?: () => void; adminAuthenticated: boolean }) {
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
-  const navItems = [
+  const navItems: NavItem[] = [
     ...baseNavItems,
+    { type: "separator" as const, label: "-스트리머클릭주의-" },
+    streamerWarningNavItem,
     adminAuthenticated
       ? { href: "/admin/map", label: "관리자", icon: ScrollText }
       : { href: "/admin/login", label: "관리자", icon: ScrollText }
@@ -39,6 +55,16 @@ function SidebarContent({ pathname, onNavigate, adminAuthenticated }: { pathname
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-5" aria-label="주 메뉴">
         {navItems.map((item, index) => {
+          if (!("href" in item)) {
+            return (
+              <div key={item.label} className="mb-2 mt-5 flex items-center gap-2 px-3 text-[12px] font-black tracking-[0.12em] text-[#ffd27a] drop-shadow-[0_0_8px_rgba(212,160,23,0.35)]">
+                <span className="h-px flex-1 bg-[rgba(255,210,122,0.38)]" />
+                <span className="whitespace-nowrap">- 스트리머 클릭주의 -</span>
+                <span className="h-px flex-1 bg-[rgba(255,210,122,0.38)]" />
+              </div>
+            );
+          }
+
           const Icon = item.icon;
           const active = isActive(item.href);
           const isAdmin = item.href.startsWith("/admin");
