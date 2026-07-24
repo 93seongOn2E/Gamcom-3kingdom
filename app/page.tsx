@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Monitor, Radio, Swords } from "lucide-react";
+import { BookOpen, Monitor, Radio } from "lucide-react";
 import { HomeOverview } from "@/components/HomeOverview";
 import { TeaserVideoModal } from "@/components/TeaserVideoModal";
 import { getCachedCastleData, getCachedChronicleData } from "@/lib/public-data";
 
 
 const baseCards = [
-  { href: "/factions", title: "장비현황", desc: "위, 촉, 오 멤버의 직업과 장비 현황을 확인합니다.", icon: Swords },
+  { href: "/jobs", title: "직업소개", desc: "일반 직업과 히든 직업의 스킬 정보를 확인합니다.", icon: BookOpen },
   { href: "/broadcast", title: "지통실", desc: "방송, 공지, 전달 정보를 시각적으로 관리합니다.", icon: Radio }
 ];
 
