@@ -1,16 +1,6 @@
-"use client";
-
-const contactUrl = "https://note.sooplive.com/app/index.php?page=write&id_list=lsw5332";
+import { ContactButton } from "@/components/ContactButton";
 
 export function SiteFooter() {
-  const openContactPopup = () => {
-    window.open(
-      contactUrl,
-      "soop-contact",
-      "popup=yes,width=720,height=760,resizable=yes,scrollbars=yes"
-    );
-  };
-
   return (
     <footer className="mt-12 border-t border-[var(--border)]">
       <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#c0392b] to-transparent" />
@@ -22,13 +12,9 @@ export function SiteFooter() {
             사이트에 표시되는 정보는 편의를 위해 정리한 참고용 자료이며, 실제 서버 내 정보와 다를 수 있습니다.
             <br />
           </p>
-          <button
-            type="button"
-            onClick={openContactPopup}
-            className="mt-4 rounded-lg border border-[rgba(212,167,86,0.35)] bg-[#15120e] px-4 py-2.5 font-bold text-[#f0c98b] transition-colors hover:border-[#d4a756] hover:bg-[#211b13] hover:text-[#fff2df]"
-          >
+          <ContactButton className="mt-4 rounded-lg border border-[rgba(212,167,86,0.35)] bg-[#15120e] px-4 py-2.5 font-bold text-[#f0c98b] transition-colors hover:border-[#d4a756] hover:bg-[#211b13] hover:text-[#fff2df]">
             오류정보 및 개선사항 문의하기
-          </button>
+          </ContactButton>
         </div>
       </div>
     </footer>

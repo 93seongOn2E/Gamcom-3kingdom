@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 
 const statScoreMap = {
   "매우낮음": 1,
@@ -485,6 +488,8 @@ function kingdomPanelClass(kingdom: HiddenSkillProfile["kingdom"]) {
 }
 
 export default function JobsPage() {
+  const [selectedHiddenProfile, setSelectedHiddenProfile] = useState<HiddenSkillProfile | null>(null);
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
       <section className="pixel-frame overflow-hidden p-6 md:p-8">
@@ -530,31 +535,27 @@ export default function JobsPage() {
 
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {profiles.map((profile) => (
-                    <details
+                    <button
                       key={`${profile.kingdom}-${profile.name}`}
                       id={profile.role === "군주" ? undefined : `hidden-${profile.name}`}
-                      className="group rounded-xl border border-[rgba(212,167,86,0.18)] bg-black/34 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] open:border-[#d4a756]/36 open:bg-black/44"
+                      type="button"
+                      onClick={() => setSelectedHiddenProfile(profile)}
+                      className="group rounded-xl border border-[rgba(212,167,86,0.18)] bg-black/34 p-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:border-[#d4a756]/42 hover:bg-black/44"
                     >
-                      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="text-lg font-black tracking-[-0.02em] text-[#f3e7d0]">{profile.name}</div>
-                            <div className="mt-1 text-xs font-bold text-[#aa9a82]">전용 스킬 {profile.skills.length}개 · 클릭해서 상세 보기</div>
-                          </div>
-                          <div className="flex shrink-0 items-center gap-2">
-                            <span className={`rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${hiddenRoleBadgeClass(profile.role, profile.role === "군주")}`}>
-                              {profile.role === "군주" ? "👑" : ""}{profile.role}
-                            </span>
-                            <span className="text-xs font-black text-[#d4a756] transition group-open:rotate-180">⌄</span>
-                          </div>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-lg font-black tracking-[-0.02em] text-[#f3e7d0]">{profile.name}</div>
+                          <div className="mt-1 text-xs font-bold text-[#aa9a82]">전용 스킬 {profile.skills.length}개 · 클릭해서 상세 보기</div>
                         </div>
-                        <SkillNameChips skills={profile.skills} />
-                      </summary>
-
-                      <div className="mt-3 border-t border-white/8 pt-3">
-                        <SkillList skills={profile.skills} />
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className={`rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${hiddenRoleBadgeClass(profile.role, profile.role === "군주")}`}>
+                            {profile.role === "군주" ? "👑" : ""}{profile.role}
+                          </span>
+                          <span className="rounded-full bg-[#d4a017]/14 px-2 py-1 text-xs font-black text-[#f0c98b] ring-1 ring-[#d4a756]/24">보기</span>
+                        </div>
                       </div>
-                    </details>
+                      <SkillNameChips skills={profile.skills} />
+                    </button>
                   ))}
                 </div>
               </section>
@@ -562,6 +563,39 @@ export default function JobsPage() {
           })}
         </div>
       </section>
+
+      {selectedHiddenProfile ? (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/78 px-4 py-8 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="hidden-skill-modal-title">
+          <button type="button" className="absolute inset-0 cursor-default" aria-label="히든 직업 설명 닫기" onClick={() => setSelectedHiddenProfile(null)} />
+          <section className="relative z-10 max-h-[min(720px,88vh)] w-full max-w-3xl overflow-hidden rounded-2xl border border-[#d4a756]/45 bg-[#11100d] p-0 shadow-[0_28px_90px_rgba(0,0,0,0.76),0_0_0_1px_rgba(240,201,139,0.08),0_0_34px_rgba(212,167,86,0.16)]">
+            <div className="flex items-start justify-between gap-4 border-b border-[#d4a756]/32 bg-[linear-gradient(90deg,rgba(212,167,86,0.2),rgba(20,17,12,0.98),rgba(212,167,86,0.12))] px-5 py-4 md:px-6">
+              <div>
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <span className={`h-3 w-3 rounded-full ${kingdomDotClass(selectedHiddenProfile.kingdom)}`} />
+                  <span className="text-xs font-black tracking-[0.14em] text-[#d4a756]">{selectedHiddenProfile.kingdom}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${hiddenRoleBadgeClass(selectedHiddenProfile.role, selectedHiddenProfile.role === "군주")}`}>
+                    {selectedHiddenProfile.role === "군주" ? "👑" : ""}{selectedHiddenProfile.role}
+                  </span>
+                </div>
+                <h2 id="hidden-skill-modal-title" className="text-2xl font-black tracking-[-0.02em] text-[#f7e8c5]">{selectedHiddenProfile.name} 스킬</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedHiddenProfile(null)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[rgba(212,167,86,0.26)] bg-black/48 text-lg font-black text-[#f0c98b] transition hover:bg-[#d4a017]/15"
+                aria-label="닫기"
+              >
+                ×
+              </button>
+            </div>
+            <div className="max-h-[calc(min(720px,88vh)-96px)] overflow-y-auto bg-[#17140f] p-5 md:p-6">
+              <div className="rounded-xl border border-[#d4a756]/24 bg-[#080808]/74 p-4 shadow-[inset_0_1px_0_rgba(255,244,216,0.08)]">
+                <SkillList skills={selectedHiddenProfile.skills} />
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <div className="mt-6 grid gap-6">
         {jobGroups.map((group) => (

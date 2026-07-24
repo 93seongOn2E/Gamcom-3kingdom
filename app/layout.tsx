@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { RecruitAdminPopup } from "@/components/RecruitAdminPopup";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNavbar } from "@/components/SiteNavbar";
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
           <SiteNavbar />
 
+          <RecruitAdminPopup />
           <div className="flex min-h-screen flex-col pt-14 md:pt-6">
             <main className="flex-1">{children}</main>
             <SiteFooter />

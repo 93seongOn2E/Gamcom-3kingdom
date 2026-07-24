@@ -399,6 +399,84 @@ button, input, select { font: inherit; }
   color: #dbc292;
 }
 
+.recruit-notice-bar {
+  position: relative;
+  z-index: 45;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  pointer-events: none;
+}
+
+.recruit-notice-inner {
+  pointer-events: auto;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 0;
+  border-bottom: 1px solid rgba(212, 167, 86, .32);
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, rgba(212, 167, 86, .16), rgba(7, 7, 7, .96) 28%, rgba(7, 7, 7, .96) 72%, rgba(212, 167, 86, .12)),
+    #080808;
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, .52),
+    0 0 24px rgba(212, 167, 86, .14),
+    inset 0 1px 0 rgba(255, 244, 214, .08);
+  padding: 8px 18px;
+}
+
+.recruit-notice-copy {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  color: #f3e7d0;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.recruit-notice-badge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe1a0, #c79235);
+  color: #130d07;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .04em;
+}
+
+.recruit-notice-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recruit-notice-desc {
+  flex: 0 0 auto;
+  color: #bda783;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.recruit-notice-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.recruit-notice-actions .recruit-popup-primary,
+.recruit-notice-actions .recruit-popup-secondary {
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 0 11px;
+  font-size: 12px;
+}
+
 .teaser-modal-layer {
   position: fixed;
   inset: 0;
@@ -1589,5 +1667,41 @@ button, input, select { font: inherit; }
 
   .recruit-popup-fields {
     grid-template-columns: 1fr;
+  }
+
+  .recruit-notice-bar {
+    padding: 0;
+  }
+
+  .recruit-notice-inner {
+    align-items: flex-start;
+    border-radius: 0;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .recruit-notice-copy {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 7px;
+    line-height: 1.45;
+  }
+
+  .recruit-notice-title {
+    white-space: normal;
+  }
+
+  .recruit-notice-desc {
+    width: 100%;
+  }
+
+  .recruit-notice-actions {
+    width: 100%;
+  }
+
+  .recruit-notice-actions .recruit-popup-primary,
+  .recruit-notice-actions .recruit-popup-secondary {
+    flex: 1;
   }
 }
