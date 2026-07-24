@@ -1,0 +1,2 @@
+ALTER TABLE public.member
+ADD COLUMN IF NOT EXISTS horse VARCHAR(50);

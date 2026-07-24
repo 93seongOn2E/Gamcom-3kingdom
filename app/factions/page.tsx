@@ -9,6 +9,7 @@ type MemberRow = {
   crew_name: string;
   nickname: string;
   job: string | null;
+  horse: string | null;
   weapon: number | null;
   helmet: number | null;
   armor: number | null;
@@ -19,11 +20,22 @@ function formatValue(value: number | null) {
   return value == null ? "-" : value;
 }
 
+function formatHorseName(horse: string | null) {
+  const value = horse?.trim();
+  return value ? value : "-";
+}
+
+function getHorseBadgeClass(horse: string | null) {
+  return horse?.trim() === "적토마"
+    ? "bg-[#b4312b] text-white ring-[#ff7a70]/45 shadow-[0_0_14px_rgba(180,49,43,0.24)]"
+    : "bg-white/[0.05] text-[#dbc292] ring-white/[0.10]";
+}
+
 export default async function FactionsPage() {
   const sql = getSql();
   const hiddenJobSqlList = hiddenJobNames.map((job) => `'${job.replaceAll("'", "''")}'`).join(", ");
   const members = await sql.query(`
-    SELECT nation, crew_name, nickname, job, weapon, helmet, armor, shoes
+    SELECT nation, crew_name, nickname, job, horse, weapon, helmet, armor, shoes
     FROM public.member
     ORDER BY
       CASE nation
@@ -133,6 +145,7 @@ export default async function FactionsPage() {
                       <th className="w-[76px] whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">크루</th>
                       <th className="whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">이름</th>
                       <th className="whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">직업</th>
+                      <th className="whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">말</th>
                       <th className="w-[42px] whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">무기</th>
                       <th className="w-[42px] whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">투구</th>
                       <th className="w-[42px] whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">갑옷</th>
@@ -161,6 +174,11 @@ export default async function FactionsPage() {
                               <span>{formatJobDisplayName(member.job)}</span>
                             )}
                           </td>
+                          <td className="whitespace-nowrap px-1 py-3 text-center font-medium">
+                            <span className={`inline-flex min-w-[42px] justify-center rounded-full px-2 py-1 text-[12px] font-extrabold ring-1 ${getHorseBadgeClass(member.horse)}`}>
+                              {formatHorseName(member.horse)}
+                            </span>
+                          </td>
                           <td className="whitespace-nowrap px-1 py-3 text-center font-medium text-[#cdb487]">{formatValue(member.weapon)}</td>
                           <td className="whitespace-nowrap px-1 py-3 text-center font-medium text-[#cdb487]">{formatValue(member.helmet)}</td>
                           <td className="whitespace-nowrap px-1 py-3 text-center font-medium text-[#cdb487]">{formatValue(member.armor)}</td>
@@ -177,6 +195,7 @@ export default async function FactionsPage() {
                           </span>
                         </td>
                         <td className="whitespace-nowrap px-1 py-3 text-center text-[14px] font-bold tracking-[-0.01em]">미입력</td>
+                        <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
                         <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
                         <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
                         <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>

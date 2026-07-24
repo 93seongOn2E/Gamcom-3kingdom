@@ -9,6 +9,7 @@ type MemberRow = {
   crew_name: string;
   nickname: string;
   job: string | null;
+  horse: string | null;
   weapon: number | null;
   helmet: number | null;
   armor: number | null;
@@ -16,6 +17,7 @@ type MemberRow = {
 };
 
 type EditableMember = MemberRow & {
+  horseInput: string;
   weaponInput: string;
   helmetInput: string;
   armorInput: string;
@@ -30,6 +32,7 @@ type NoticeState = {
 function toEditable(member: MemberRow): EditableMember {
   return {
     ...member,
+    horseInput: member.horse ?? "",
     weaponInput: member.weapon == null ? "" : String(member.weapon),
     helmetInput: member.helmet == null ? "" : String(member.helmet),
     armorInput: member.armor == null ? "" : String(member.armor),
@@ -121,6 +124,7 @@ export function AdminFactionsEditor() {
         body: JSON.stringify({
           id: member.id,
           job: member.job,
+          horse: member.horseInput.trim() || null,
           weapon: member.weaponInput === "" ? null : Number(member.weaponInput),
           helmet: member.helmetInput === "" ? null : Number(member.helmetInput),
           armor: member.armorInput === "" ? null : Number(member.armorInput),
@@ -176,22 +180,23 @@ export function AdminFactionsEditor() {
       ) : null}
 
       {groupedMembers.map((group) => (
-        <section key={group.nation} className="pixel-frame overflow-hidden">
+        <section key={group.nation} className="pixel-frame min-w-0 overflow-hidden">
           <div className="border-b border-[var(--border)] px-4 py-3">
             <h2 className={`text-lg font-black ${nationTitleClassMap[group.nation] ?? "text-[#f3e7d0]"}`}>{group.nation}</h2>
           </div>
 
           <div className="overflow-hidden">
-            <table className="w-full table-auto border-collapse text-[12px] leading-4">
+            <table className="w-full table-fixed border-collapse text-[11px] leading-4">
               <thead>
                 <tr className="bg-white/[0.03] text-[#dbc292]">
-                  <th className="whitespace-nowrap px-1 py-2 text-center font-bold">이름</th>
-                  <th className="whitespace-nowrap px-1 py-2 text-center font-bold">무기</th>
-                  <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">무기</th>
-                  <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">투구</th>
-                  <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">갑옷</th>
-                  <th className="w-[48px] whitespace-nowrap px-1 py-2 text-center text-[11px] font-bold">신발</th>
-                  <th className="whitespace-nowrap px-1 py-2 text-center font-bold">저장</th>
+                  <th className="w-[44px] whitespace-nowrap px-0 py-2 text-center font-bold">이름</th>
+                  <th className="w-[86px] whitespace-nowrap px-0.5 py-2 text-center font-bold">직업</th>
+                  <th className="w-[42px] whitespace-nowrap px-0.5 py-2 text-center font-bold">말</th>
+                  <th className="w-[30px] whitespace-nowrap px-0 py-2 text-center text-[10px] font-bold">무기</th>
+                  <th className="w-[30px] whitespace-nowrap px-0 py-2 text-center text-[10px] font-bold">투구</th>
+                  <th className="w-[30px] whitespace-nowrap px-0 py-2 text-center text-[10px] font-bold">갑옷</th>
+                  <th className="w-[30px] whitespace-nowrap px-0 py-2 text-center text-[10px] font-bold">신발</th>
+                  <th className="w-[54px] whitespace-nowrap px-0.5 py-2 text-center font-bold">저장</th>
                 </tr>
               </thead>
               <tbody>
@@ -200,13 +205,13 @@ export function AdminFactionsEditor() {
 
                   return (
                     <tr key={member.id} className="border-t border-[rgba(212,167,86,0.14)] text-[#f3e7d0]">
-                      <td className="whitespace-nowrap px-1 py-2 text-center text-[13px] font-bold">{member.nickname}</td>
-                      <td className="px-1 py-2 text-center">
-                        <div className="grid min-w-[118px] gap-1.5">
+                      <td className="truncate px-0 py-2 text-center text-[12px] font-bold" title={member.nickname}>{member.nickname}</td>
+                      <td className="px-0.5 py-2 text-center">
+                        <div className="grid gap-1.5">
                           <select
                             value={member.job ?? ""}
                             onChange={(event) => updateField(member.id, "job", event.target.value)}
-                            className="h-8 rounded-md border border-[var(--border)] bg-black/60 px-2 text-[11px] font-bold text-[#f3e7d0] outline-none"
+                            className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/60 px-1 text-[10px] font-bold text-[#f3e7d0] outline-none"
                           >
                             <option value="">미선택</option>
                             {!hasSelectableJob(member) && member.job ? (
@@ -228,50 +233,58 @@ export function AdminFactionsEditor() {
                             </optgroup>
                           </select>
                           {member.job ? (
-                            <span className={`inline-flex justify-center rounded-full px-2 py-0.5 text-[10px] font-extrabold ring-1 ${selectedBadge ? selectedBadge.className : "bg-white/5 text-[#dbc292] ring-white/10"}`}>
+                            <span className={`inline-flex max-w-full justify-center truncate rounded-full px-1.5 py-0.5 text-[9px] font-extrabold ring-1 ${selectedBadge ? selectedBadge.className : "bg-white/5 text-[#dbc292] ring-white/10"}`}>
                               {selectedBadge?.label === "군주" ? "👑" : selectedBadge?.prefix ? <span className="mr-1 text-white">{selectedBadge.prefix}</span> : null}{formatJobDisplayName(member.job)}
                             </span>
                           ) : null}
                         </div>
                       </td>
-                      <td className="px-1.5 py-2">
+                      <td className="px-0.5 py-2">
+                        <input
+                          value={member.horseInput}
+                          onChange={(event) => updateField(member.id, "horseInput", event.target.value)}
+                          className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/40 px-0.5 text-center text-[10px] text-[#f3e7d0] outline-none"
+                          placeholder="말"
+                        />
+                      </td>
+                      <td className="px-0.5 py-2">
                         <input
                           value={member.weaponInput}
                           onChange={(event) => updateField(member.id, "weaponInput", event.target.value)}
-                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/40 px-0 text-center text-[10px] text-[#f3e7d0] outline-none"
                           inputMode="numeric"
                         />
                       </td>
-                      <td className="px-1.5 py-2">
+                      <td className="px-0.5 py-2">
                         <input
                           value={member.helmetInput}
                           onChange={(event) => updateField(member.id, "helmetInput", event.target.value)}
-                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/40 px-0 text-center text-[10px] text-[#f3e7d0] outline-none"
                           inputMode="numeric"
                         />
                       </td>
-                      <td className="px-1.5 py-2">
+                      <td className="px-0.5 py-2">
                         <input
                           value={member.armorInput}
                           onChange={(event) => updateField(member.id, "armorInput", event.target.value)}
-                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/40 px-0 text-center text-[10px] text-[#f3e7d0] outline-none"
                           inputMode="numeric"
                         />
                       </td>
-                      <td className="px-1.5 py-2">
+                      <td className="px-0.5 py-2">
                         <input
                           value={member.shoesInput}
                           onChange={(event) => updateField(member.id, "shoesInput", event.target.value)}
-                          className="h-8 w-[42px] rounded-md border border-[var(--border)] bg-black/40 px-1 text-[11px] text-[#f3e7d0] outline-none"
+                          className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/40 px-0 text-center text-[10px] text-[#f3e7d0] outline-none"
                           inputMode="numeric"
                         />
                       </td>
-                      <td className="px-1.5 py-2">
+                      <td className="px-0.5 py-2 text-center">
                         <button
                           type="button"
                           onClick={() => saveMember(member)}
                           disabled={savingId === member.id}
-                          className={`${nationSaveButtonClassMap[group.nation] ?? "admin-btn-save"} min-w-0 rounded-md px-2 py-1.5 text-[11px]`}
+                          className={`${nationSaveButtonClassMap[group.nation] ?? "admin-btn-save"} mx-auto inline-flex min-w-[50px] rounded-md px-1 py-1 text-[10px]`}
                         >
                           {savingId === member.id ? "중..." : "저장"}
                         </button>

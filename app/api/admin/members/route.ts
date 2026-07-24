@@ -13,6 +13,7 @@ type MemberRow = {
   crew_name: string;
   nickname: string;
   job: string | null;
+  horse: string | null;
   weapon: number | null;
   helmet: number | null;
   armor: number | null;
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
     const sql = getSql();
     const hiddenJobSqlList = hiddenJobNames.map((job) => `'${job.replaceAll("'", "''")}'`).join(", ");
     const members = (await sql.query(`
-      SELECT id, nation, crew_name, nickname, job, weapon, helmet, armor, shoes
+      SELECT id, nation, crew_name, nickname, job, horse, weapon, helmet, armor, shoes
       FROM public.member
       ORDER BY
         CASE nation
@@ -79,6 +80,7 @@ export async function PATCH(request: Request) {
     const body = (await request.json()) as {
       id?: number;
       job?: string | null;
+      horse?: string | null;
       weapon?: number | null;
       helmet?: number | null;
       armor?: number | null;
@@ -87,6 +89,7 @@ export async function PATCH(request: Request) {
 
     const id = Number(body.id);
     const job = typeof body.job === "string" ? body.job.trim() : body.job ?? null;
+    const horse = typeof body.horse === "string" ? body.horse.trim() : body.horse ?? null;
     const weapon = body.weapon == null ? null : Number(body.weapon);
     const helmet = body.helmet == null ? null : Number(body.helmet);
     const armor = body.armor == null ? null : Number(body.armor);
@@ -104,7 +107,7 @@ export async function PATCH(request: Request) {
 
     const sql = getSql();
     const beforeRows = (await sql`
-      SELECT id, nation, crew_name, nickname, job, weapon, helmet, armor, shoes, updated_at
+      SELECT id, nation, crew_name, nickname, job, horse, weapon, helmet, armor, shoes, updated_at
       FROM public.member
       WHERE id = ${id}
       LIMIT 1
@@ -120,13 +123,14 @@ export async function PATCH(request: Request) {
       UPDATE public.member
       SET
         job = ${job || null},
+        horse = ${horse || null},
         weapon = ${weapon},
         helmet = ${helmet},
         armor = ${armor},
         shoes = ${shoes},
         updated_at = NOW()
       WHERE id = ${id}
-      RETURNING id, nation, crew_name, nickname, job, weapon, helmet, armor, shoes
+      RETURNING id, nation, crew_name, nickname, job, horse, weapon, helmet, armor, shoes
     `) as MemberRow[];
 
     if (!rows[0]) {
