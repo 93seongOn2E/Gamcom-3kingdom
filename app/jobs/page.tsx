@@ -45,6 +45,12 @@ type SkillInfo = {
   controlEffects?: string[];
 };
 
+type SkillVideo = {
+  ownerName: string;
+  skillName: string;
+  src: string;
+};
+
 type HiddenSkillProfile = {
   kingdom: "위나라" | "촉나라" | "오나라";
   name: string;
@@ -122,7 +128,7 @@ const jobGroups: JobGroup[] = [
       { name: "수호천", description: "창을 앞으로 곧게 뻗어, 닿는 자리의 적을 꿰뚫듯 관통하며 공격합니다." },
       { name: "호신철갑", description: "방패를 겸한 창대를 앞으로 밀어붙여, 부딪힌 적을 짧게 기절시키고 뒤로 밀쳐냅니다.", controlEffects: ["스턴", "넉백"] },
       { name: "속박관창", description: "창을 깊이 찔러 넣은 뒤, 찌른 지점부터 부채꼴로 충격파를 퍼뜨려 맞은 적을 둔화시킵니다.", controlEffects: ["둔화"] },
-      { name: "격통파", description: "창끝을 지면에 세게 내리찍어, 갈라진 땅을 따라 전방으로 긴 파동을 보내 피해를 줍니다." },
+      { name: "격동파", description: "창끝을 지면에 세게 내리찍어, 갈라진 땅을 따라 전방으로 긴 파동을 보내 피해를 줍니다." },
       { name: "철옹성", description: "거대한 수호 진형을 펼쳐, 일정 시간 동안 자신과 주변 아군이 받는 피해를 대폭 줄여줍니다." },
       { name: "천창격", description: "하늘 높이 떠올라 창을 내리찍고, 그 주변에 넓은 범위의 파동을 일으켜 적을 끌어당깁니다.", controlEffects: ["끌어당김"] }
     ],
@@ -412,17 +418,34 @@ function StatMeter({ label, value }: { label: keyof JobVariant["stats"]; value: 
   );
 }
 
-function SkillList({ skills }: { skills: SkillInfo[] }) {
+function normalizedSkillFileName(ownerName: string, skillName: string) {
+  const normalizedSkillName = skillName.replace(/\s+/g, "");
+
+  return normalizedSkillName;
+}
+
+function getSkillVideoSrc(ownerName: string, skillName: string) {
+  const fileSkillName = normalizedSkillFileName(ownerName, skillName);
+  return `/assets/skill-videos/${encodeURIComponent(ownerName)}/${encodeURIComponent(`${ownerName}_${fileSkillName}.mp4`)}`;
+}
+
+function SkillList({ skills, ownerName, onPlaySkill }: { skills: SkillInfo[]; ownerName: string; onPlaySkill: (video: SkillVideo) => void }) {
   return (
     <div className="grid gap-2">
       {skills.map((skill) => (
-        <div key={skill.name} className="rounded-lg border border-white/8 bg-black/20 px-3 py-2.5">
+        <button
+          key={skill.name}
+          type="button"
+          onClick={() => onPlaySkill({ ownerName, skillName: skill.name, src: getSkillVideoSrc(ownerName, skill.name) })}
+          className="rounded-lg border border-white/8 bg-black/20 px-3 py-2.5 text-left transition hover:border-[#d4a756]/42 hover:bg-[#d4a017]/8"
+        >
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-sm font-black text-[#f3e7d0]">{skill.name}</span>
             <ControlEffectBadges effects={skill.controlEffects} />
+            <span className="ml-auto rounded-full bg-[#d4a017]/14 px-2 py-0.5 text-[10px] font-black text-[#f0c98b] ring-1 ring-[#d4a756]/22">영상</span>
           </div>
           <p className="mt-1 text-[13px] font-semibold leading-6 text-[#aa9a82]">{skill.description}</p>
-        </div>
+        </button>
       ))}
     </div>
   );
@@ -489,6 +512,7 @@ function kingdomPanelClass(kingdom: HiddenSkillProfile["kingdom"]) {
 
 export default function JobsPage() {
   const [selectedHiddenProfile, setSelectedHiddenProfile] = useState<HiddenSkillProfile | null>(null);
+  const [selectedSkillVideo, setSelectedSkillVideo] = useState<SkillVideo | null>(null);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
@@ -590,8 +614,40 @@ export default function JobsPage() {
             </div>
             <div className="max-h-[calc(min(720px,88vh)-96px)] overflow-y-auto bg-[#17140f] p-5 md:p-6">
               <div className="rounded-xl border border-[#d4a756]/24 bg-[#080808]/74 p-4 shadow-[inset_0_1px_0_rgba(255,244,216,0.08)]">
-                <SkillList skills={selectedHiddenProfile.skills} />
+                <SkillList skills={selectedHiddenProfile.skills} ownerName={selectedHiddenProfile.name} onPlaySkill={setSelectedSkillVideo} />
               </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {selectedSkillVideo ? (
+        <div className="fixed inset-0 z-[95] flex items-center justify-center bg-black/84 px-4 py-8 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="skill-video-modal-title">
+          <button type="button" className="absolute inset-0 cursor-default" aria-label="스킬 영상 닫기" onClick={() => setSelectedSkillVideo(null)} />
+          <section className="relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl border border-[#d4a756]/42 bg-[#080808] shadow-[0_28px_90px_rgba(0,0,0,0.78),0_0_34px_rgba(212,167,86,0.14)]">
+            <div className="flex items-center justify-between gap-4 border-b border-[#d4a756]/26 bg-[linear-gradient(90deg,rgba(212,167,86,0.18),rgba(8,8,8,0.98),rgba(212,167,86,0.1))] px-5 py-4">
+              <div>
+                <p className="text-xs font-black tracking-[0.16em] text-[#d4a756]">{selectedSkillVideo.ownerName}</p>
+                <h2 id="skill-video-modal-title" className="text-xl font-black text-[#f7e8c5]">{selectedSkillVideo.skillName}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedSkillVideo(null)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[rgba(212,167,86,0.26)] bg-black/48 text-lg font-black text-[#f0c98b] transition hover:bg-[#d4a017]/15"
+                aria-label="닫기"
+              >
+                ×
+              </button>
+            </div>
+            <div className="bg-black p-3 md:p-4">
+              <video
+                key={selectedSkillVideo.src}
+                src={selectedSkillVideo.src}
+                className="aspect-video w-full rounded-xl bg-black"
+                controls
+                autoPlay
+                playsInline
+              />
             </div>
           </section>
         </div>
@@ -647,7 +703,7 @@ export default function JobsPage() {
                   </span>
                   <h3 className="text-lg font-black text-[#f3e7d0]">{group.title} 스킬</h3>
                 </div>
-                <SkillList skills={group.skills} />
+                <SkillList skills={group.skills} ownerName={group.title} onPlaySkill={setSelectedSkillVideo} />
               </div>
             </section>
           </div>
