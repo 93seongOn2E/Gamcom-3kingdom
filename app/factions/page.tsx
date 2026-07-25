@@ -135,7 +135,6 @@ export default async function FactionsPage() {
                     {Math.min(rows.length, nationMemberSlotCount)} / {nationMemberSlotCount}
                   </span>
                 </div>
-                <p className="text-sm font-medium leading-6 text-[#aa9a82]">{nation.description}</p>
               </div>
 
               <div className="overflow-x-auto">
