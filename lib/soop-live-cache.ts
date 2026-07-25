@@ -1,5 +1,4 @@
 import "server-only";
-import { unstable_cache } from "next/cache";
 
 export type SoopLiveCachedMember = {
   memberId: number;
@@ -30,12 +29,6 @@ type UpstashGetResponse = {
 };
 
 const DEFAULT_REDIS_KEY = "soop:live-status";
-const DEFAULT_CACHE_SECONDS = 60;
-
-function getCacheSeconds() {
-  const value = Number(process.env.SOOP_LIVE_CACHE_SECONDS);
-  return Number.isFinite(value) && value > 0 ? Math.floor(value) : DEFAULT_CACHE_SECONDS;
-}
 
 function getRedisConfig() {
   const restUrl = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
@@ -66,7 +59,7 @@ function assertSnapshot(value: unknown): asserts value is SoopLiveSnapshot {
   }
 }
 
-async function loadSoopLiveSnapshot() {
+export async function getSoopLiveSnapshot() {
   const { restUrl, token, key } = getRedisConfig();
   const response = await fetch(`${restUrl}/get/${encodeURIComponent(key)}`, {
     headers: {
@@ -99,11 +92,3 @@ async function loadSoopLiveSnapshot() {
   assertSnapshot(snapshot);
   return snapshot;
 }
-
-export const getSoopLiveSnapshot = unstable_cache(
-  loadSoopLiveSnapshot,
-  ["soop-live-snapshot"],
-  {
-    revalidate: getCacheSeconds()
-  }
-);

@@ -418,15 +418,21 @@ function StatMeter({ label, value }: { label: keyof JobVariant["stats"]; value: 
   );
 }
 
-function normalizedSkillFileName(ownerName: string, skillName: string) {
+const SKILL_VIDEO_BLOB_BASE_URL =
+  "https://lf574imwvsv2t9qw.public.blob.vercel-storage.com/skill-videos";
+
+function normalizedSkillFileName(skillName: string) {
   const normalizedSkillName = skillName.replace(/\s+/g, "");
 
   return normalizedSkillName;
 }
 
 function getSkillVideoSrc(ownerName: string, skillName: string) {
-  const fileSkillName = normalizedSkillFileName(ownerName, skillName);
-  return `/assets/skill-videos/${encodeURIComponent(ownerName)}/${encodeURIComponent(`${ownerName}_${fileSkillName}.mp4`)}`;
+  const fileSkillName = normalizedSkillFileName(skillName);
+  const ownerPath = encodeURIComponent(ownerName);
+  const filePath = encodeURIComponent(`${ownerName}_${fileSkillName}.mp4`);
+
+  return `${SKILL_VIDEO_BLOB_BASE_URL}/${ownerPath}/${filePath}`;
 }
 
 function SkillList({ skills, ownerName, onPlaySkill }: { skills: SkillInfo[]; ownerName: string; onPlaySkill: (video: SkillVideo) => void }) {
@@ -644,9 +650,10 @@ export default function JobsPage() {
                 key={selectedSkillVideo.src}
                 src={selectedSkillVideo.src}
                 className="aspect-video w-full rounded-xl bg-black"
-                controls
                 autoPlay
+                loop
                 playsInline
+                preload="auto"
               />
             </div>
           </section>

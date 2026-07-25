@@ -2,20 +2,17 @@ export const nationConfigs = [
   {
     key: "위나라",
     short: "위",
-    color: "#2f73c8",
-    description: "조경훈의 버인협회를 중심으로, 박재박의 버블란과 로기다의 로스타시티라는 변수를 품은 전통의 강호 세력"
+    color: "#2f73c8"
   },
   {
     key: "촉나라",
     short: "촉",
-    color: "#2f9b5f",
-    description: "감스트의 버컴퍼니의 자본력과 꾸티뉴의 꾸한성의 피지컬이 결집된 공격적인 신흥 세력"
+    color: "#2f9b5f"
   },
   {
     key: "오나라",
     short: "오",
-    color: "#d4a017",
-    description: "지피티의 지력사무소, 홍타쿠의 홍피스, 황원태의 원더독 연합으로 균형감 있게 버티는 연합 세력"
+    color: "#d4a017"
   }
 ] as const;
 
