@@ -651,9 +651,9 @@ export default function JobsPage() {
                 src={selectedSkillVideo.src}
                 className="aspect-video w-full rounded-xl bg-black"
                 autoPlay
-                loop
+                controls
                 playsInline
-                preload="auto"
+                preload="metadata"
               />
             </div>
           </section>

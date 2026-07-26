@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BookOpen, Monitor, Radio } from "lucide-react";
 import { HomeOverview } from "@/components/HomeOverview";
-import { TeaserVideoModal } from "@/components/TeaserVideoModal";
 import { getCachedCastleData, getCachedChronicleData } from "@/lib/public-data";
 
 
@@ -23,7 +22,6 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <TeaserVideoModal />
       <HomeOverview chronicle={chronicle} castleData={castleData} />
 
       <section className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
