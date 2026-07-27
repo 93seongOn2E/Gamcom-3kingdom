@@ -418,8 +418,7 @@ function StatMeter({ label, value }: { label: keyof JobVariant["stats"]; value: 
   );
 }
 
-const SKILL_VIDEO_BLOB_BASE_URL =
-  "https://lf574imwvsv2t9qw.public.blob.vercel-storage.com/skill-videos";
+const SKILL_VIDEO_BASE_URL = "/assets/skill-videos";
 
 function normalizedSkillFileName(skillName: string) {
   const normalizedSkillName = skillName.replace(/\s+/g, "");
@@ -432,7 +431,7 @@ function getSkillVideoSrc(ownerName: string, skillName: string) {
   const ownerPath = encodeURIComponent(ownerName);
   const filePath = encodeURIComponent(`${ownerName}_${fileSkillName}.mp4`);
 
-  return `${SKILL_VIDEO_BLOB_BASE_URL}/${ownerPath}/${filePath}`;
+  return `${SKILL_VIDEO_BASE_URL}/${ownerPath}/${filePath}`;
 }
 
 function SkillList({ skills, ownerName, onPlaySkill }: { skills: SkillInfo[]; ownerName: string; onPlaySkill: (video: SkillVideo) => void }) {

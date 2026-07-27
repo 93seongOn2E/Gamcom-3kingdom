@@ -10,9 +10,6 @@ out/
 dist/
 build/
 
-# large media served from Vercel Blob
-public/assets/skill-videos/
-
 # logs
 *.log
 npm-debug.log*
