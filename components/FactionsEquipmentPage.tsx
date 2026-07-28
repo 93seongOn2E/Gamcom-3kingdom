@@ -1,42 +1,17 @@
 import { getSql } from "@/lib/db";
-import { crewBadgeClassMap, formatJobDisplayName, getHiddenJobBadge, hiddenJobConfig, hiddenJobNames, nationConfigs } from "@/lib/factions-config";
+import { hiddenJobConfig, hiddenJobNames, nationConfigs } from "@/lib/factions-config";
+import { NationEquipmentTable, type EquipmentMemberRow } from "@/components/NationEquipmentTable";
 import Link from "next/link";
 
 const nationMemberSlotCount = 30;
 export type EquipmentNation = (typeof nationConfigs)[number]["key"];
 
-type MemberRow = {
-  nation: string;
-  crew_name: string;
-  nickname: string;
-  job: string | null;
-  horse: string | null;
-  weapon: number | null;
-  helmet: number | null;
-  armor: number | null;
-  shoes: number | null;
-};
-
-function formatValue(value: number | null) {
-  return value == null ? "-" : value;
-}
-
-function formatHorseName(horse: string | null) {
-  const value = horse?.trim();
-  return value ? value : "-";
-}
-
-function getHorseBadgeClass(horse: string | null) {
-  return horse?.trim() === "적토마"
-    ? "bg-[#b4312b] text-white ring-[#ff7a70]/45 shadow-[0_0_14px_rgba(180,49,43,0.24)]"
-    : "bg-white/[0.05] text-[#dbc292] ring-white/[0.10]";
-}
-
 export async function FactionsEquipmentPage({ selectedNation }: { selectedNation?: EquipmentNation }) {
   const sql = getSql();
   const hiddenJobSqlList = hiddenJobNames.map((job) => `'${job.replaceAll("'", "''")}'`).join(", ");
   const members = await sql.query(`
-    SELECT nation, crew_name, nickname, job, horse, weapon, helmet, armor, shoes
+    SELECT nation, crew_name, nickname, job, horse, horse_level, weapon, helmet, armor, shoes,
+           stat_strength, stat_agility, stat_vitality, stat_intelligence
     FROM public.member
     ${selectedNation ? "WHERE nation = $1" : ""}
     ORDER BY
@@ -52,9 +27,14 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
         WHEN job IN (${hiddenJobSqlList}) THEN 3
         ELSE 4
       END,
-      (COALESCE(weapon, 0) + COALESCE(helmet, 0) + COALESCE(armor, 0) + COALESCE(shoes, 0)) DESC,
+      (
+        COALESCE(weapon, 0)
+        + CASE WHEN job IN ('유비', '조조', '손권') THEN COALESCE(helmet, 0) ELSE 0 END
+        + COALESCE(armor, 0)
+        + COALESCE(shoes, 0)
+      ) DESC,
       weapon DESC NULLS LAST,
-      helmet DESC NULLS LAST,
+      CASE WHEN job IN ('유비', '조조', '손권') THEN helmet ELSE NULL END DESC NULLS LAST,
       armor DESC NULLS LAST,
       shoes DESC NULLS LAST,
       CASE crew_name
@@ -69,7 +49,7 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
         ELSE 99
       END,
       nickname
-  `, selectedNation ? [selectedNation] : []) as MemberRow[];
+  `, selectedNation ? [selectedNation] : []) as EquipmentMemberRow[];
 
   const visibleNationConfigs = selectedNation
     ? nationConfigs.filter((nation) => nation.key === selectedNation)
@@ -79,7 +59,7 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
       nation.key,
       members.filter((member) => member.nation === nation.key)
     ])
-  ) as Record<(typeof nationConfigs)[number]["key"], MemberRow[]>;
+  ) as Record<(typeof nationConfigs)[number]["key"], EquipmentMemberRow[]>;
   const selectedNationConfig = selectedNation
     ? nationConfigs.find((nation) => nation.key === selectedNation)
     : undefined;
@@ -89,7 +69,7 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-black" style={{ color: selectedNationConfig?.color ?? "#f3e7d0" }}>
-            {selectedNationConfig ? `${selectedNationConfig.short}나라 장비현황` : "장비현황"}
+            {selectedNationConfig ? `${selectedNationConfig.short}나라 내실현황` : "통합 내실현황"}
           </h1>
           <p className="mt-2 text-sm font-medium leading-6 text-[#aa9a82]">
             장비 정보는 관리자가 방송·제보 내용을 확인한 뒤 입력하므로 실제 실시간 정보와 다를 수 있습니다.
@@ -131,17 +111,18 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
       </div>
 
       {selectedNation ? (
-        <div className="mx-auto mb-5 flex w-full max-w-xl justify-end">
+        <div className="mx-auto mb-5 flex w-full max-w-[920px] justify-start">
           <Link
             href="/factions/nation"
-            className="rounded-lg border border-[rgba(212,167,86,0.28)] bg-black/25 px-3 py-2 text-sm font-bold text-[#dbc292] transition-colors hover:border-[#d4a756] hover:text-[#fff2df]"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#f0c978] bg-[#d4a756] px-4 py-2.5 text-sm font-black text-[#181108] shadow-[0_4px_16px_rgba(212,167,86,0.22)] transition hover:bg-[#edc56f] hover:shadow-[0_5px_20px_rgba(212,167,86,0.32)]"
           >
+            <span aria-hidden="true">←</span>
             국가 다시 선택
           </Link>
         </div>
       ) : null}
 
-      <div className={selectedNation ? "mx-auto grid w-full max-w-xl gap-6" : "grid gap-6 xl:grid-cols-3"}>
+      <div className={selectedNation ? "mx-auto grid w-full max-w-[920px] gap-6" : "grid gap-6 xl:grid-cols-3"}>
         {visibleNationConfigs.map((nation) => {
           const rows = membersByNation[nation.key] ?? [];
           const emptySlotCount = Math.max(0, nationMemberSlotCount - rows.length);
@@ -158,74 +139,7 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="min-w-full table-auto border-collapse text-[13px] leading-5">
-                  <thead>
-                    <tr className="bg-white/[0.03] text-[#dbc292]">
-                      <th className="w-[76px] whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">크루</th>
-                      <th className="whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">이름</th>
-                      <th className="whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">직업</th>
-                      <th className="whitespace-nowrap px-1 py-3 text-center text-[13px] font-extrabold tracking-[-0.01em]">말</th>
-                      <th className="w-[42px] whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">무기</th>
-                      <th className="w-[42px] whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">투구</th>
-                      <th className="w-[42px] whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">갑옷</th>
-                      <th className="w-[42px] whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">신발</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((member) => {
-                      const crewBadgeClass = crewBadgeClassMap[member.crew_name] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
-                      const hiddenJob = getHiddenJobBadge(member.job);
-
-                      return (
-                        <tr key={`${member.nation}-${member.nickname}`} className="border-t border-[rgba(212,167,86,0.14)] text-[#f3e7d0]">
-                          <td className="whitespace-nowrap px-1 py-3 text-center">
-                            <span className={`inline-flex items-center rounded-full px-1.5 py-1 text-[11px] font-bold ring-1 ${crewBadgeClass}`}>
-                              {member.crew_name}
-                            </span>
-                          </td>
-                          <td className="whitespace-nowrap px-1 py-3 text-center text-[14px] font-bold tracking-[-0.01em]">{member.nickname}</td>
-                          <td className="whitespace-nowrap px-1 py-3 text-center font-medium">
-                            {hiddenJob ? (
-                              <span className={`inline-flex items-center rounded-full px-2 py-1 text-[12px] font-extrabold ring-1 ${hiddenJob.className}`}>
-                                {hiddenJob.label === "군주" ? "👑" : hiddenJob.prefix ? <span className="mr-1 text-white">{hiddenJob.prefix}</span> : null}{formatJobDisplayName(member.job)}
-                              </span>
-                            ) : (
-                              <span>{formatJobDisplayName(member.job)}</span>
-                            )}
-                          </td>
-                          <td className="whitespace-nowrap px-1 py-3 text-center font-medium">
-                            <span className={`inline-flex min-w-[42px] justify-center rounded-full px-2 py-1 text-[12px] font-extrabold ring-1 ${getHorseBadgeClass(member.horse)}`}>
-                              {formatHorseName(member.horse)}
-                            </span>
-                          </td>
-                          <td className="whitespace-nowrap px-1 py-3 text-center font-medium text-[#cdb487]">{formatValue(member.weapon)}</td>
-                          <td className="whitespace-nowrap px-1 py-3 text-center font-medium text-[#cdb487]">{formatValue(member.helmet)}</td>
-                          <td className="whitespace-nowrap px-1 py-3 text-center font-medium text-[#cdb487]">{formatValue(member.armor)}</td>
-                          <td className="whitespace-nowrap px-1 py-3 text-center font-medium text-[#cdb487]">{formatValue(member.shoes)}</td>
-                        </tr>
-                      );
-                    })}
-
-                    {Array.from({ length: emptySlotCount }, (_, index) => (
-                      <tr key={`${nation.key}-empty-${index}`} className="border-t border-[rgba(212,167,86,0.10)] text-[#7f7059]">
-                        <td className="whitespace-nowrap px-1 py-3 text-center">
-                          <span className="inline-flex items-center rounded-full bg-white/[0.03] px-1.5 py-1 text-[11px] font-bold text-[#8f8068] ring-1 ring-white/[0.08]">
-                            미입력
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-1 py-3 text-center text-[14px] font-bold tracking-[-0.01em]">미입력</td>
-                        <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
-                        <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
-                        <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
-                        <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
-                        <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
-                        <td className="whitespace-nowrap px-1 py-3 text-center font-medium">-</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <NationEquipmentTable rows={rows} emptySlotCount={emptySlotCount} showStats={Boolean(selectedNation)} />
             </section>
           );
         })}

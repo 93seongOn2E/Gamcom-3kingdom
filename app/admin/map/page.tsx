@@ -23,7 +23,7 @@ export default async function AdminMapPage() {
         <div>
           <h1 className="text-2xl font-black text-[#f3e7d0]">영토 지도 관리자</h1>
           <p className="mt-1 text-sm text-[#aa9a82]">
-            Wiki 화면에 사용할 성 이름, 성 등급, 위치, 영역 배율, 점령 세력을 직접 편집합니다.
+            1번부터 60번까지 지역의 점령 세력을 편집합니다.
           </p>
         </div>
       </div>

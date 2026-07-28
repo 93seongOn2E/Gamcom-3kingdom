@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { getSql } from "@/lib/db";
+import type { TerritoryFacility, TerritoryOwnerShort } from "@/lib/territory-map-config";
 
 export type ForceIdShort = "위" | "촉" | "오";
 export type ForceIdFull = "위나라" | "촉나라" | "오나라";
@@ -8,7 +9,9 @@ export type CastlePayload = {
   castleKey: string;
   name: string;
   level: 1 | 2 | 3;
-  owner: ForceIdShort;
+  owner: TerritoryOwnerShort;
+  isCapital: boolean;
+  facilityType: TerritoryFacility;
   x?: number;
   y?: number;
   areaScale: number;
@@ -31,6 +34,9 @@ type CastleRow = {
   level: number;
   map_x: string | null;
   map_y: string | null;
+  is_occupied: boolean;
+  is_capital: boolean;
+  facility_type: TerritoryFacility;
 };
 
 type ChronicleRow = {
@@ -51,7 +57,7 @@ function getOriginForce(castleKey: string): ForceIdShort | null {
 export async function getCastleData(): Promise<CastleDataPayload> {
   const sql = getSql();
   const rows = await sql`
-    SELECT castle_key, name, kingdom, level, map_x, map_y
+    SELECT castle_key, name, kingdom, level, map_x, map_y, is_occupied, is_capital, facility_type
     FROM public.castle
     WHERE is_use = TRUE
     ORDER BY sort_order, id
@@ -71,7 +77,9 @@ export async function getCastleData(): Promise<CastleDataPayload> {
       castleKey: row.castle_key,
       name: row.name,
       level: row.level as 1 | 2 | 3,
-      owner: row.kingdom,
+      owner: row.is_occupied ? row.kingdom : "미점령",
+      isCapital: row.is_occupied && row.is_capital,
+      facilityType: row.is_occupied ? row.facility_type : "없음",
       ...(row.map_x === null ? {} : { x: Number(row.map_x) }),
       ...(row.map_y === null ? {} : { y: Number(row.map_y) }),
       areaScale: 1

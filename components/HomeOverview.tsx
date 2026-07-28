@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MapViewer } from "@/components/MapViewer";
 import type { CastleDataPayload } from "@/lib/public-data";
+import { getStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
 
 export type ChronicleEntry = {
   nations: string[];
@@ -20,6 +21,17 @@ function getNationThemeClass(nation: string) {
 export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEntry[]; castleData: CastleDataPayload }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
+  const [isStreamerModeOn, setIsStreamerModeOn] = useState(getStreamerMode);
+
+  useEffect(() => {
+    const handleStreamerModeChange = (event: Event) => {
+      setIsStreamerModeOn((event as CustomEvent<boolean>).detail);
+    };
+
+    setIsStreamerModeOn(getStreamerMode());
+    window.addEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
+    return () => window.removeEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
+  }, []);
 
   useEffect(() => {
     const element = mapRef.current;
@@ -47,37 +59,53 @@ export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEn
   }, []);
 
   return (
-    <section className="home-overview grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.6fr)_340px]">
-      <div ref={mapRef} className="home-overview-map flex h-full flex-col">
-        <MapViewer compact initialData={castleData} />
+    <div className="home-overview-container">
+      <div className="home-overview-stage">
+        <section
+          className="home-overview grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.6fr)_340px]"
+          aria-hidden={isStreamerModeOn}
+        >
+          <div ref={mapRef} className="home-overview-map flex h-full flex-col">
+            <MapViewer compact initialData={castleData} />
+          </div>
+
+          <aside className="pixel-frame chronicle-panel p-5 md:p-6" style={mapHeight ? { height: `${mapHeight}px` } : undefined}>
+            <div className="mb-5">
+              <h2 className="text-2xl font-black text-[#f3e7d0]">연대기</h2>
+            </div>
+
+            <div className="chronicle-list">
+              {chronicle.map((entry, index) => (
+                <article key={`${entry.date}-${entry.content}-${index}`} className="chronicle-item">
+                  <time className="chronicle-date">{entry.date}</time>
+
+                  <div className="chronicle-meta">
+                    {entry.nations.map((nation) => (
+                      <span
+                        key={`${entry.date}-${nation}-${index}`}
+                        className={`chronicle-force ${getNationThemeClass(nation)}`}
+                      >
+                        {nation}
+                      </span>
+                    ))}
+                  </div>
+
+                  <p className="chronicle-content">{entry.content}</p>
+                </article>
+              ))}
+            </div>
+          </aside>
+        </section>
+
+        {isStreamerModeOn ? (
+          <div className="home-streamer-cover" role="status" aria-live="polite">
+            <div className="home-streamer-cover-inner">
+              <span aria-hidden="true">⚔️</span>
+              <strong>스트리머 모드 적용 중입니다.</strong>
+            </div>
+          </div>
+        ) : null}
       </div>
-
-      <aside className="pixel-frame chronicle-panel p-5 md:p-6" style={mapHeight ? { height: `${mapHeight}px` } : undefined}>
-        <div className="mb-5">
-          <h2 className="text-2xl font-black text-[#f3e7d0]">연대기</h2>
-        </div>
-
-        <div className="chronicle-list">
-          {chronicle.map((entry, index) => (
-            <article key={`${entry.date}-${entry.content}-${index}`} className="chronicle-item">
-              <time className="chronicle-date">{entry.date}</time>
-
-              <div className="chronicle-meta">
-                {entry.nations.map((nation) => (
-                  <span
-                    key={`${entry.date}-${nation}-${index}`}
-                    className={`chronicle-force ${getNationThemeClass(nation)}`}
-                  >
-                    {nation}
-                  </span>
-                ))}
-              </div>
-
-              <p className="chronicle-content">{entry.content}</p>
-            </article>
-          ))}
-        </div>
-      </aside>
-    </section>
+    </div>
   );
 }

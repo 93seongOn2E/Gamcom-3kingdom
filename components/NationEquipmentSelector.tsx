@@ -27,7 +27,7 @@ export function NationEquipmentSelector() {
       <section className="pixel-frame mx-auto w-full max-w-xl overflow-hidden">
         <div className="border-b border-[var(--border)] px-5 py-5 text-center">
           <h2 className="text-xl font-extrabold text-[#f3e7d0]">확인할 국가를 선택해주세요</h2>
-          <p className="mt-2 text-sm font-medium text-[#aa9a82]">선택을 확인한 뒤 해당 국가의 장비현황만 불러옵니다.</p>
+          <p className="mt-2 text-sm font-medium text-[#aa9a82]">선택을 확인한 뒤 해당 국가의 내실현황만 불러옵니다.</p>
         </div>
         <div className="grid gap-3 p-5 sm:grid-cols-3">
           {nationOptions.map((nation) => (
@@ -60,9 +60,9 @@ export function NationEquipmentSelector() {
             <div className="border-b border-[var(--border)] px-6 py-5 text-center">
               <div className="mx-auto mb-3 h-2 w-16" style={{ backgroundColor: pendingNation.color }} />
               <h3 id="nation-confirm-title" className="text-xl font-black text-[#f3e7d0]">
-                {pendingNation.key} 장비현황
+                {pendingNation.key} 내실현황
               </h3>
-              <p className="mt-2 text-sm font-medium text-[#aa9a82]">이 국가의 장비현황을 확인하시겠습니까?</p>
+              <p className="mt-2 text-sm font-medium text-[#aa9a82]">이 국가의 내실현황을 확인하시겠습니까?</p>
             </div>
             <div className="grid grid-cols-2 gap-3 p-5">
               <button

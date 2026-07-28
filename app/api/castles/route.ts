@@ -4,6 +4,7 @@ import { getAdminSessionFromRequest } from "@/lib/admin-request";
 import { writeAdminAuditLog } from "@/lib/admin-audit";
 import { getSql } from "@/lib/db";
 import { getCachedCastleData, getCastleData } from "@/lib/public-data";
+import { territoryFacilityOptions, type TerritoryFacility } from "@/lib/territory-map-config";
 
 export async function GET(request: Request) {
   try {
@@ -38,6 +39,8 @@ export async function PATCH(request: Request) {
       x?: unknown;
       y?: unknown;
       kingdom?: unknown;
+      facilityType?: unknown;
+      isCapital?: unknown;
     };
 
     const castleKey = typeof body.castleKey === "string" ? body.castleKey : "";
@@ -46,6 +49,8 @@ export async function PATCH(request: Request) {
     const x = Number(body.x);
     const y = Number(body.y);
     const kingdom = body.kingdom;
+    const requestedFacility = typeof body.facilityType === "string" ? body.facilityType : "없음";
+    const requestedIsCapital = body.isCapital === true;
 
     if (!/^(위|촉|오)-\d{3}$/.test(castleKey)) {
       return NextResponse.json({ message: "올바르지 않은 성 ID입니다." }, { status: 400 });
@@ -63,13 +68,17 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ message: "좌표가 지도 범위를 벗어났습니다." }, { status: 400 });
     }
 
-    if (kingdom !== "위" && kingdom !== "촉" && kingdom !== "오") {
+    if (kingdom !== "위" && kingdom !== "촉" && kingdom !== "오" && kingdom !== "미점령") {
       return NextResponse.json({ message: "세력을 확인해주세요." }, { status: 400 });
+    }
+
+    if (!territoryFacilityOptions.includes(requestedFacility as TerritoryFacility)) {
+      return NextResponse.json({ message: "시설 종류를 확인해주세요." }, { status: 400 });
     }
 
     const sql = getSql();
     const beforeRows = await sql`
-      SELECT castle_key, name, level, map_x, map_y, area_scale, kingdom, updated_at
+      SELECT castle_key, name, level, map_x, map_y, area_scale, kingdom, is_occupied, is_capital, facility_type, updated_at
       FROM public.castle
       WHERE castle_key = ${castleKey}
       LIMIT 1
@@ -81,18 +90,73 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ message: "해당 성을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    const rows = await sql`
-      UPDATE public.castle
-      SET name = ${name},
-          level = ${level},
-          map_x = ${x},
-          map_y = ${y},
-          area_scale = 1,
-          kingdom = ${kingdom},
-          updated_at = now()
-      WHERE castle_key = ${castleKey}
-      RETURNING castle_key, name, level, map_x, map_y, kingdom
-    `;
+    const isOccupied = kingdom !== "미점령";
+    const persistedKingdom = isOccupied ? kingdom : before.kingdom;
+    const facilityType = (isOccupied ? requestedFacility : "없음") as TerritoryFacility;
+    const isCapital = isOccupied && requestedIsCapital;
+    let replacedCapitalRows: Record<string, unknown>[] = [];
+    let replacedCapitalAfterRows: Record<string, unknown>[] = [];
+    let rows: Record<string, unknown>[];
+
+    if (isCapital) {
+      replacedCapitalRows = await sql`
+        SELECT castle_key, name, level, map_x, map_y, area_scale, kingdom, is_occupied, is_capital, facility_type, updated_at
+        FROM public.castle
+        WHERE kingdom = ${persistedKingdom}
+          AND is_use = true
+          AND is_occupied = true
+          AND is_capital = true
+          AND castle_key <> ${castleKey}
+      ` as Record<string, unknown>[];
+
+      const transactionRows = await sql.transaction([
+        sql`
+          UPDATE public.castle
+          SET is_capital = false,
+              updated_at = now()
+          WHERE kingdom = ${persistedKingdom}
+            AND is_use = true
+            AND is_occupied = true
+            AND is_capital = true
+            AND castle_key <> ${castleKey}
+          RETURNING castle_key, name, level, map_x, map_y, area_scale, kingdom, is_occupied, is_capital, facility_type, updated_at
+        `,
+        sql`
+          UPDATE public.castle
+          SET name = ${name},
+              level = ${level},
+              map_x = ${x},
+              map_y = ${y},
+              area_scale = 1,
+              kingdom = ${persistedKingdom},
+              is_occupied = ${isOccupied},
+              is_capital = ${isCapital},
+              facility_type = ${facilityType},
+              updated_at = now()
+          WHERE castle_key = ${castleKey}
+          RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type
+        `
+      ]);
+
+      replacedCapitalAfterRows = transactionRows[0] as Record<string, unknown>[];
+      rows = transactionRows[1] as Record<string, unknown>[];
+    } else {
+      rows = await sql`
+        UPDATE public.castle
+        SET name = ${name},
+            level = ${level},
+            map_x = ${x},
+            map_y = ${y},
+            area_scale = 1,
+            kingdom = ${persistedKingdom},
+            is_occupied = ${isOccupied},
+            is_capital = ${isCapital},
+            facility_type = ${facilityType},
+            updated_at = now()
+        WHERE castle_key = ${castleKey}
+        RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type
+      ` as Record<string, unknown>[];
+    }
 
     if (rows.length === 0) {
       return NextResponse.json({ message: "해당 성을 찾을 수 없습니다." }, { status: 404 });
@@ -107,6 +171,20 @@ export async function PATCH(request: Request) {
       afterData: rows[0]
     });
 
+    for (const replacedCapital of replacedCapitalRows) {
+      const afterData = replacedCapitalAfterRows.find((row) => row.castle_key === replacedCapital.castle_key);
+      if (!afterData) continue;
+
+      await writeAdminAuditLog(sql, {
+        entityType: "castle",
+        entityId: String(replacedCapital.castle_key),
+        action: "update",
+        actor: session,
+        beforeData: replacedCapital,
+        afterData
+      });
+    }
+
     revalidateTag("public-castles");
 
     return NextResponse.json({
@@ -116,7 +194,9 @@ export async function PATCH(request: Request) {
       x: Number(rows[0].map_x),
       y: Number(rows[0].map_y),
       areaScale: 1,
-      kingdom: rows[0].kingdom
+      kingdom: rows[0].is_occupied ? rows[0].kingdom : "미점령",
+      isCapital: Boolean(rows[0].is_occupied && rows[0].is_capital),
+      facilityType: rows[0].is_occupied ? rows[0].facility_type : "없음"
     });
   } catch (error) {
     console.error("Failed to update castle in Neon", error);
