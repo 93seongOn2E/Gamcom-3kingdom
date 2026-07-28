@@ -27,14 +27,24 @@ const baseNavItems: NavLinkItem[] = [
   { href: "/multiview", label: "멀티뷰", icon: Monitor }
 ];
 
-const streamerWarningNavItem: NavLinkItem = { href: "/factions", label: "장비현황", icon: Swords };
+const integratedEquipmentNavItem: NavLinkItem = { href: "/factions", label: "통합 장비현황", icon: Swords };
+const nationEquipmentNavItem: NavLinkItem = { href: "/factions/nation", label: "국가별 장비현황", icon: Swords };
 
 function SidebarContent({ pathname, onNavigate, adminAuthenticated }: { pathname: string; onNavigate?: () => void; adminAuthenticated: boolean }) {
-  const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === "/" || href === "/factions") {
+      return pathname === href;
+    }
+    if (href === "/factions/nation") {
+      return pathname === href || (pathname.startsWith("/factions/") && pathname !== "/factions");
+    }
+    return pathname.startsWith(href);
+  };
   const navItems: NavItem[] = [
     ...baseNavItems,
+    nationEquipmentNavItem,
     { type: "separator" as const, label: "-스트리머클릭주의-" },
-    streamerWarningNavItem,
+    integratedEquipmentNavItem,
     adminAuthenticated
       ? { href: "/admin/map", label: "관리자", icon: ScrollText }
       : { href: "/admin/login", label: "관리자", icon: ScrollText }
@@ -53,7 +63,7 @@ function SidebarContent({ pathname, onNavigate, adminAuthenticated }: { pathname
         />
       </Link>
 
-      <nav className="flex flex-1 flex-col gap-1 px-3 py-5" aria-label="주 메뉴">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-5" aria-label="주 메뉴">
         {navItems.map((item, index) => {
           if (!("href" in item)) {
             return (

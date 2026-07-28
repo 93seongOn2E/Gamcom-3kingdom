@@ -147,6 +147,9 @@ export async function PATCH(request: Request) {
     });
 
     revalidatePath("/factions");
+    revalidatePath("/factions/위");
+    revalidatePath("/factions/촉");
+    revalidatePath("/factions/오");
 
     return NextResponse.json({ member: rows[0] });
   } catch (error) {
