@@ -456,7 +456,9 @@ export function MapViewer({
     const wrapRect = mapWrap.getBoundingClientRect();
     const relativeTop = tileRect.top - wrapRect.top;
     const relativeBottom = tileRect.bottom - wrapRect.top;
-    const estimatedPopoverHeight = wrapRect.width <= 520 ? 340 : 265;
+    // 수도/시설 설정까지 포함한 실제 높이를 넉넉하게 잡아 가운데 행에서도
+    // 아래쪽으로 잘못 배치되어 잘리지 않도록 합니다.
+    const estimatedPopoverHeight = wrapRect.width <= 520 ? 460 : 390;
     const placement = relativeTop >= estimatedPopoverHeight + 12
       ? "above"
       : wrapRect.height - relativeBottom >= estimatedPopoverHeight + 12
@@ -766,6 +768,13 @@ export function MapViewer({
             ) : selectedNationManorCount >= 10 && selectedCastle.facilityType !== "장원" ? (
               <p className="simulation-cell-facility-hint limit">{selectedCastle.owner} 장원 10개가 모두 설치되어 있습니다.</p>
             ) : null}
+            <button
+              type="button"
+              className="simulation-cell-close-button"
+              onClick={() => setSimulationPopover(null)}
+            >
+              닫기
+            </button>
           </div>
         ) : null}
 
