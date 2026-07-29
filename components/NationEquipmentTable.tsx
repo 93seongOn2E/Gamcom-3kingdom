@@ -58,8 +58,19 @@ function getHorseBadgeClass(horse: string | null) {
 }
 
 function EquipmentValue({ value }: { value: number | string }) {
+  const isNumber = typeof value === "number";
+  const isZero = value === 0;
+
   return (
-    <span className={typeof value === "number" ? "font-black text-[#fff1d3]" : "font-medium text-[#8f8068]"}>
+    <span
+      className={`inline-flex min-w-7 items-center justify-center rounded-md px-1.5 py-0.5 tabular-nums ${
+        isNumber
+          ? isZero
+            ? "bg-white/[0.025] font-bold text-[#9b8b71]"
+            : "bg-[#d4a756]/10 font-black text-[#fff1d3] ring-1 ring-[#d4a756]/20"
+          : "font-medium text-[#756a58]"
+      }`}
+    >
       {value}
     </span>
   );
@@ -109,16 +120,16 @@ function SortHeader({
   const nextDirection = isActive && direction === "asc" ? "내림차순" : "오름차순";
 
   return (
-    <th className={`whitespace-nowrap px-1 py-2.5 text-center text-[12px] font-extrabold tracking-[-0.01em] ${separated ? "border-l-2 border-[rgba(212,167,86,0.4)]" : ""}`}>
+    <th className={`whitespace-nowrap px-1 py-3 text-center text-[11px] font-extrabold tracking-[0.02em] ${separated ? "border-l border-[rgba(212,167,86,0.34)]" : ""}`}>
       <button
         type="button"
         title={`${label} ${nextDirection} 정렬`}
         aria-label={`${label} ${nextDirection} 정렬`}
-        className="inline-flex items-center justify-center gap-1 transition-colors hover:text-[#f0bd58]"
+        className={`inline-flex min-h-7 items-center justify-center gap-0.5 rounded-md px-1 transition-all hover:bg-white/[0.05] hover:text-[#f0bd58] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a756]/60 ${isActive ? "bg-[#d4a756]/10 text-[#f0bd58]" : ""}`}
         onClick={() => onSort(sortKey)}
       >
         <span>{label}</span>
-        <span className={`w-4 text-[12px] ${isActive ? "text-[#f0bd58]" : "text-[#aa9168]"}`}>{sortIcon}</span>
+        <span className={`w-3.5 text-[10px] ${isActive ? "text-[#f0bd58]" : "text-[#7f7059]"}`}>{sortIcon}</span>
       </button>
     </th>
   );
@@ -162,8 +173,8 @@ export function NationEquipmentTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className={`min-w-full border-collapse text-[13px] leading-5 ${showStats ? "table-fixed" : "table-auto"}`}>
+    <div className="equipment-table-scroll overflow-x-auto">
+      <table className={`equipment-table border-collapse text-[13px] leading-5 ${showStats ? "min-w-[900px] table-fixed" : "w-full min-w-full table-fixed"}`}>
         {showStats ? (
           <colgroup>
             <col className="w-[120px]" />
@@ -181,7 +192,7 @@ export function NationEquipmentTable({
           </colgroup>
         ) : null}
         <thead>
-          <tr className="bg-white/[0.03] text-[#dbc292]">
+          <tr className="border-b border-[rgba(212,167,86,0.2)] bg-[linear-gradient(180deg,rgba(212,167,86,0.09),rgba(212,167,86,0.025))] text-[#d9bd89]">
             {showStats ? (
               <>
                 <SortHeader label="크루" sortKey="crew_name" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
@@ -200,7 +211,7 @@ export function NationEquipmentTable({
             ) : (
               <>
                 {["크루", "이름", "직업", "말", "무기", "두갑", "흉갑", "각갑"].map((label) => (
-                  <th key={label} className="whitespace-nowrap px-1 py-3 text-center text-[12px] font-extrabold tracking-[-0.01em]">
+                  <th key={label} className="whitespace-nowrap px-1 py-3 text-center text-[11px] font-extrabold tracking-[0.02em]">
                     {label}
                   </th>
                 ))}
@@ -218,13 +229,13 @@ export function NationEquipmentTable({
 
             return (
               <Fragment key={`${member.nation}-${member.nickname}`}>
-                <tr className={`border-t border-[rgba(212,167,86,0.14)] text-[#f3e7d0] ${stripeClass}`}>
-                <td className="whitespace-nowrap px-1 py-3 text-center">
-                  <span className={`inline-flex items-center rounded-full px-1.5 py-1 text-[11px] font-bold ring-1 ${crewBadgeClass}`}>
+                <tr className={`equipment-member-row border-t border-[rgba(212,167,86,0.14)] text-[#f3e7d0] transition-colors ${stripeClass}`}>
+                <td className="whitespace-nowrap px-1 py-3.5 text-center">
+                  <span className={`inline-flex items-center rounded-full px-2 py-1 text-[10px] font-extrabold tracking-[-0.02em] ring-1 ${crewBadgeClass}`}>
                     {member.crew_name}
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-1 py-3 text-center text-[14px] font-bold tracking-[-0.01em]">{member.nickname}</td>
+                <td className="whitespace-nowrap px-1 py-3.5 text-center text-[14px] font-black tracking-[-0.02em] text-[#fff4df]">{member.nickname}</td>
                 <td className="whitespace-nowrap px-1 py-3 text-center font-medium">
                   {hiddenJob ? (
                     <span className={`inline-flex items-center rounded-full px-2 py-1 text-[12px] font-extrabold ring-1 ${hiddenJob.className}`}>
@@ -253,13 +264,13 @@ export function NationEquipmentTable({
                 ) : null}
                 </tr>
                 {!showStats ? (
-                  <tr className={`${stripeClass} text-[#dbc292]`}>
-                    <td colSpan={8} className="px-3 pb-2.5 pt-1">
-                      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[13px] font-extrabold">
-                        <span>무력 <b className="ml-0.5 font-black text-[#fff1d3]">{member.stat_strength}</b></span>
-                        <span>기민 <b className="ml-0.5 font-black text-[#fff1d3]">{member.stat_agility}</b></span>
-                        <span>기력 <b className="ml-0.5 font-black text-[#fff1d3]">{member.stat_vitality}</b></span>
-                        <span>지모 <b className="ml-0.5 font-black text-[#fff1d3]">{member.stat_intelligence}</b></span>
+                  <tr className={`equipment-stat-row ${stripeClass} text-[#bba47c]`}>
+                    <td colSpan={8} className="px-3 pb-3 pt-0">
+                      <div className="mx-auto flex w-fit flex-wrap items-center justify-center gap-1.5 rounded-full border border-white/[0.055] bg-black/20 px-2 py-1 text-[11px] font-bold">
+                        <span className="rounded-full px-2 py-0.5">무력 <b className="ml-1 font-black tabular-nums text-[#f6dfb2]">{member.stat_strength}</b></span>
+                        <span className="rounded-full px-2 py-0.5">기민 <b className="ml-1 font-black tabular-nums text-[#f6dfb2]">{member.stat_agility}</b></span>
+                        <span className="rounded-full px-2 py-0.5">기력 <b className="ml-1 font-black tabular-nums text-[#f6dfb2]">{member.stat_vitality}</b></span>
+                        <span className="rounded-full px-2 py-0.5">지모 <b className="ml-1 font-black tabular-nums text-[#f6dfb2]">{member.stat_intelligence}</b></span>
                       </div>
                     </td>
                   </tr>

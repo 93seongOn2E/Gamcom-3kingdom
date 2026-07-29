@@ -128,14 +128,37 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
           const emptySlotCount = Math.max(0, nationMemberSlotCount - rows.length);
 
           return (
-            <section key={nation.key} className="pixel-frame overflow-hidden">
-              <div className="border-b border-[var(--border)] px-5 py-5">
-                <div className="mb-3 h-2 w-16" style={{ background: nation.color }} />
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-[#f3e7d0]">{nation.short}나라</h2>
-                  <span className="rounded-full border border-[rgba(212,167,86,0.24)] bg-black/30 px-3 py-1 text-xs font-black text-[#dbc292]">
-                    {Math.min(rows.length, nationMemberSlotCount)} / {nationMemberSlotCount}
-                  </span>
+            <section
+              key={nation.key}
+              className="nation-equipment-card pixel-frame overflow-hidden"
+              style={{ "--nation-color": nation.color } as React.CSSProperties}
+            >
+              <div className="relative border-b border-[var(--border)] px-5 pb-4 pt-5">
+                <div className="absolute inset-x-0 top-0 h-[3px] opacity-90" style={{ background: nation.color }} />
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="h-1.5 w-8 rounded-full" style={{ background: nation.color }} />
+                      <span className="text-[10px] font-black tracking-[0.18em] text-[#8f8068]">내실 현황</span>
+                    </div>
+                    <h2 className="text-2xl font-black tracking-[-0.04em] text-[#f3e7d0]">{nation.short}나라</h2>
+                  </div>
+                  <div className="text-right">
+                    <span className="inline-flex items-baseline gap-1 rounded-full border border-[rgba(212,167,86,0.24)] bg-black/30 px-3 py-1 text-xs font-black text-[#dbc292] shadow-inner">
+                      <strong className="text-sm text-[#fff1d3]">{Math.min(rows.length, nationMemberSlotCount)}</strong>
+                      <span className="text-[#776a55]">/</span>
+                      {nationMemberSlotCount}
+                    </span>
+                    <div className="mt-2 h-1 w-16 overflow-hidden rounded-full bg-white/[0.06]">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.min(100, (rows.length / nationMemberSlotCount) * 100)}%`,
+                          background: nation.color
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 

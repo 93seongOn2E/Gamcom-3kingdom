@@ -82,6 +82,55 @@ button, input, select { font: inherit; }
     linear-gradient(315deg, rgba(255, 239, 205, .03), transparent 24%);
 }
 
+.nation-equipment-card {
+  isolation: isolate;
+}
+
+.nation-equipment-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 0 0, color-mix(in srgb, var(--nation-color) 12%, transparent), transparent 32%);
+}
+
+.equipment-table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 167, 86, 0.42) rgba(255, 255, 255, 0.03);
+}
+
+.equipment-table-scroll::-webkit-scrollbar {
+  height: 7px;
+}
+
+.equipment-table-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(212, 167, 86, 0.42);
+}
+
+.equipment-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+}
+
+.equipment-member-row:hover,
+.equipment-member-row:hover + .equipment-stat-row {
+  background: rgba(212, 167, 86, 0.12);
+}
+
+@media (max-width: 520px) {
+  .equipment-table {
+    font-size: 12px;
+  }
+
+  .equipment-table th {
+    letter-spacing: -0.02em;
+  }
+}
+
 .skeleton-card {
   min-height: 1px;
 }
