@@ -1,11 +1,9 @@
 import { MapViewer } from "@/components/MapViewer";
-import { getCachedCastleData } from "@/lib/public-data";
+import { simulationCastleSnapshot } from "@/lib/simulation-snapshot";
 
-export const revalidate = 15;
+export const dynamic = "force-static";
 
-export default async function SimulationPage() {
-  const castleData = await getCachedCastleData();
-
+export default function SimulationPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="mb-6">
@@ -16,7 +14,7 @@ export default async function SimulationPage() {
         </p>
       </div>
 
-      <MapViewer initialData={castleData} simulation />
+      <MapViewer initialData={simulationCastleSnapshot} simulation />
     </div>
   );
 }
