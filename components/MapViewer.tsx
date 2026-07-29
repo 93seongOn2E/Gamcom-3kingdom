@@ -1,7 +1,7 @@
 "use client";
 
-import { RefreshCcw } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { RefreshCcw, RotateCcw, Undo2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from "react";
 import {
   blockedTerritoryTiles,
   getTerritoryTilePosition,
@@ -45,6 +45,12 @@ type MapCastle = {
   cy: number;
 };
 
+type SimulationPopoverPosition = {
+  left: number;
+  top: number;
+  placement: "above" | "below" | "center";
+};
+
 const forceIds: ForceId[] = ["위나라", "촉나라", "오나라"];
 const viewerTerritoryTileSize = 53;
 const viewerTerritoryScale = 1.18;
@@ -78,6 +84,150 @@ const forceLabels: Record<ForceId, string> = {
   촉나라: "촉나라",
   오나라: "오나라"
 };
+
+const simulationStorageKey = "gc-territory-simulation-v1";
+const simulationCookieKey = "gc_territory_simulation";
+const simulationOwnerCodes: Record<TerritoryOwnerFull, string> = {
+  위나라: "w",
+  촉나라: "s",
+  오나라: "o",
+  미점령: "u"
+};
+const simulationCodeOwners: Record<string, TerritoryOwnerFull> = {
+  w: "위나라",
+  s: "촉나라",
+  o: "오나라",
+  u: "미점령"
+};
+const simulationFacilityCodes: Record<TerritoryFacility, string> = {
+  없음: "n",
+  병영: "b",
+  성채: "f",
+  장원: "m"
+};
+const simulationCodeFacilities: Record<string, TerritoryFacility> = {
+  n: "없음",
+  b: "병영",
+  f: "성채",
+  m: "장원"
+};
+const simulationFacilityIcons: Record<TerritoryFacility, string> = {
+  없음: "−",
+  병영: "⚔️",
+  성채: "🛡️",
+  장원: "🏠"
+};
+
+function serializeSimulationOwners(data: CastleData, baseline: CastleData) {
+  const baselineState = new Map(
+    forceIds
+      .flatMap((force) => baseline.forces[force])
+      .map((castle) => [
+        castle.name,
+        [
+          simulationOwnerCodes[normalizeOwner(castle.owner)],
+          castle.isCapital ? "1" : "0",
+          simulationFacilityCodes[normalizeFacility(castle.facilityType)]
+        ].join(":")
+      ])
+  );
+
+  return forceIds
+    .flatMap((force) => data.forces[force])
+    .filter((castle) => {
+      const state = [
+        simulationOwnerCodes[normalizeOwner(castle.owner)],
+        castle.isCapital ? "1" : "0",
+        simulationFacilityCodes[normalizeFacility(castle.facilityType)]
+      ].join(":");
+      return state !== baselineState.get(castle.name);
+    })
+    .map((castle) => [
+      castle.name,
+      simulationOwnerCodes[normalizeOwner(castle.owner)],
+      castle.isCapital ? "1" : "0",
+      simulationFacilityCodes[normalizeFacility(castle.facilityType)]
+    ].join(":"))
+    .join(",");
+}
+
+function applySimulationOwners(data: CastleData, serialized: string) {
+  const states = new Map(
+    serialized
+      .split(",")
+      .map((entry) => entry.split(":"))
+      .filter((entry) => entry.length >= 2 && Boolean(simulationCodeOwners[entry[1]]))
+      .map(([number, ownerCode, capitalOrLegacyCode, facilityCode]) => {
+        const isNewFormat = capitalOrLegacyCode === "0" || capitalOrLegacyCode === "1";
+        const legacyFacility = simulationCodeFacilities[capitalOrLegacyCode];
+
+        return [
+          number,
+          {
+            owner: simulationCodeOwners[ownerCode],
+            isCapital: isNewFormat ? capitalOrLegacyCode === "1" : capitalOrLegacyCode === "c",
+            facility: isNewFormat ? simulationCodeFacilities[facilityCode] : legacyFacility
+          }
+        ];
+      })
+  );
+
+  return {
+    forces: Object.fromEntries(
+      forceIds.map((force) => [
+        force,
+        data.forces[force].map((castle) => {
+          const state = states.get(castle.name);
+          if (!state?.owner) return castle;
+
+          const keepsExistingDetails = state.owner === normalizeOwner(castle.owner);
+          const isCapital = state.isCapital ?? (keepsExistingDetails ? Boolean(castle.isCapital) : false);
+          const facility = state.facility ?? (keepsExistingDetails ? normalizeFacility(castle.facilityType) : "없음");
+
+          return {
+            ...castle,
+            owner: state.owner,
+            isCapital: state.owner !== "미점령" && isCapital,
+            facilityType: state.owner === "미점령" ? "없음" : facility
+          };
+        })
+      ])
+    ) as CastleData["forces"]
+  };
+}
+
+function getSimulationCookie() {
+  const prefix = `${simulationCookieKey}=`;
+  const value = document.cookie.split("; ").find((entry) => entry.startsWith(prefix));
+  return value ? decodeURIComponent(value.slice(prefix.length)) : null;
+}
+
+function getPersistedSimulation() {
+  try {
+    return window.sessionStorage.getItem(simulationStorageKey) ?? getSimulationCookie();
+  } catch {
+    return getSimulationCookie();
+  }
+}
+
+function persistSimulation(data: CastleData, baseline: CastleData) {
+  const serialized = serializeSimulationOwners(data, baseline);
+  try {
+    window.sessionStorage.setItem(simulationStorageKey, serialized);
+  } catch {
+    // 세션 저장소를 차단한 브라우저에서는 세션 쿠키만 사용합니다.
+  }
+  document.cookie = `${simulationCookieKey}=${encodeURIComponent(serialized)}; Path=/; SameSite=Lax`;
+}
+
+function clearSimulation() {
+  try {
+    window.sessionStorage.removeItem(simulationStorageKey);
+  } catch {
+    // 세션 쿠키 초기화는 계속 진행합니다.
+  }
+  document.cookie = `${simulationCookieKey}=; Path=/; Max-Age=0; SameSite=Lax`;
+}
 
 function normalizeOwner(force: string | undefined): TerritoryOwnerFull {
   if (force === "위나라" || force === "위") return "위나라";
@@ -141,11 +291,21 @@ function buildMapCastles(data: CastleData): MapCastle[] {
     .sort((left, right) => left.number - right.number);
 }
 
-export function MapViewer({ compact = false, initialData }: { compact?: boolean; initialData?: RawCastleData }) {
+export function MapViewer({
+  compact = false,
+  initialData,
+  simulation = false
+}: {
+  compact?: boolean;
+  initialData?: RawCastleData;
+  simulation?: boolean;
+}) {
   const initialCastleData = useMemo(() => initialData ? normalizeCastleData(initialData) : emptyCastleData, [initialData]);
   const [castleData, setCastleData] = useState<CastleData>(initialCastleData);
   const [selectedCityId, setSelectedCityId] = useState("");
   const [isLoading, setIsLoading] = useState(!initialData);
+  const [simulationHistory, setSimulationHistory] = useState<CastleData[]>([]);
+  const [simulationPopover, setSimulationPopover] = useState<SimulationPopoverPosition | null>(null);
 
   const loadCastles = useCallback(async () => {
     setIsLoading(true);
@@ -175,7 +335,183 @@ export function MapViewer({ compact = false, initialData }: { compact?: boolean;
     }
   }, [initialData, loadCastles]);
 
+  useEffect(() => {
+    if (!simulation) return;
+
+    try {
+      const stored = getPersistedSimulation();
+      if (stored) {
+        setCastleData(applySimulationOwners(initialCastleData, stored));
+      }
+    } catch {
+      clearSimulation();
+    }
+  }, [initialCastleData, simulation]);
+
+  const updateSimulatedOwner = useCallback((castleId: string, owner: TerritoryOwnerFull) => {
+    const next: CastleData = {
+      forces: Object.fromEntries(
+        forceIds.map((force) => [
+          force,
+          castleData.forces[force].map((castle) => castle.castleKey === castleId
+            ? {
+                ...castle,
+                owner,
+                isCapital: owner === normalizeOwner(castle.owner) ? castle.isCapital : false,
+                facilityType: owner === normalizeOwner(castle.owner) ? castle.facilityType : "없음"
+              }
+            : castle)
+        ])
+      ) as CastleData["forces"]
+    };
+
+    setSimulationHistory((history) => [...history.slice(-29), castleData]);
+    setCastleData(next);
+    persistSimulation(next, initialCastleData);
+    setSelectedCityId(castleId);
+    if (owner === "미점령") {
+      setSimulationPopover(null);
+    }
+  }, [castleData, initialCastleData]);
+
+  const toggleSimulatedCapital = useCallback((castleId: string) => {
+    const selectedSource = forceIds
+      .flatMap((force) => castleData.forces[force])
+      .find((castle) => castle.castleKey === castleId);
+    if (!selectedSource || normalizeOwner(selectedSource.owner) === "미점령") return;
+
+    const selectedOwner = normalizeOwner(selectedSource.owner);
+    const nextIsCapital = !selectedSource.isCapital;
+    const next: CastleData = {
+      forces: Object.fromEntries(
+        forceIds.map((force) => [
+          force,
+          castleData.forces[force].map((castle) => {
+            if (castle.castleKey === castleId) {
+              return { ...castle, isCapital: nextIsCapital };
+            }
+
+            if (nextIsCapital && normalizeOwner(castle.owner) === selectedOwner && castle.isCapital) {
+              return { ...castle, isCapital: false };
+            }
+
+            return castle;
+          })
+        ])
+      ) as CastleData["forces"]
+    };
+
+    setSimulationHistory((history) => [...history.slice(-29), castleData]);
+    setCastleData(next);
+    persistSimulation(next, initialCastleData);
+  }, [castleData, initialCastleData]);
+
+  const updateSimulatedFacility = useCallback((castleId: string, facility: TerritoryFacility) => {
+    const selectedSource = forceIds
+      .flatMap((force) => castleData.forces[force])
+      .find((castle) => castle.castleKey === castleId);
+    if (!selectedSource || normalizeOwner(selectedSource.owner) === "미점령") return;
+
+    const selectedOwner = normalizeOwner(selectedSource.owner);
+    const manorCount = forceIds
+      .flatMap((force) => castleData.forces[force])
+      .filter((castle) => normalizeOwner(castle.owner) === selectedOwner && normalizeFacility(castle.facilityType) === "장원")
+      .length;
+    if (facility === "장원" && normalizeFacility(selectedSource.facilityType) !== "장원" && manorCount >= 10) {
+      return;
+    }
+
+    const next: CastleData = {
+      forces: Object.fromEntries(
+        forceIds.map((force) => [
+          force,
+          castleData.forces[force].map((castle) => {
+            if (castle.castleKey === castleId) {
+              return { ...castle, facilityType: facility };
+            }
+
+            return castle;
+          })
+        ])
+      ) as CastleData["forces"]
+    };
+
+    setSimulationHistory((history) => [...history.slice(-29), castleData]);
+    setCastleData(next);
+    persistSimulation(next, initialCastleData);
+    setSimulationPopover(null);
+  }, [castleData, initialCastleData]);
+
+  const handleTerritoryClick = useCallback((
+    event: ReactMouseEvent<SVGRectElement>,
+    castleId: string
+  ) => {
+    setSelectedCityId(castleId);
+    if (!simulation) return;
+
+    const mapWrap = event.currentTarget.closest(".admin-map-wrap");
+    if (!(mapWrap instanceof HTMLElement)) return;
+
+    const tileRect = event.currentTarget.getBoundingClientRect();
+    const wrapRect = mapWrap.getBoundingClientRect();
+    const relativeTop = tileRect.top - wrapRect.top;
+    const relativeBottom = tileRect.bottom - wrapRect.top;
+    const estimatedPopoverHeight = wrapRect.width <= 520 ? 340 : 265;
+    const placement = relativeTop >= estimatedPopoverHeight + 12
+      ? "above"
+      : wrapRect.height - relativeBottom >= estimatedPopoverHeight + 12
+        ? "below"
+        : "center";
+
+    const left = ((tileRect.left + tileRect.width / 2 - wrapRect.left) / wrapRect.width) * 100;
+
+    setSimulationPopover({
+      left: Math.min(82, Math.max(18, left)),
+      top: placement === "center"
+        ? 50
+        : (((placement === "above" ? tileRect.top : tileRect.bottom) - wrapRect.top) / wrapRect.height) * 100,
+      placement
+    });
+  }, [simulation]);
+
+  const undoSimulation = useCallback(() => {
+    const previous = simulationHistory.at(-1);
+    if (!previous) return;
+
+    setCastleData(previous);
+    setSimulationHistory((history) => history.slice(0, -1));
+    persistSimulation(previous, initialCastleData);
+    setSimulationPopover(null);
+  }, [initialCastleData, simulationHistory]);
+
+  const resetSimulation = useCallback(() => {
+    setCastleData(initialCastleData);
+    setSimulationHistory([]);
+    setSelectedCityId("");
+    setSimulationPopover(null);
+    clearSimulation();
+  }, [initialCastleData]);
+
   const castles = useMemo(() => buildMapCastles(castleData), [castleData]);
+  const selectedCastle = castles.find((castle) => castle.id === selectedCityId);
+  const selectedNationManorCount = selectedCastle?.owner === "미점령" || !selectedCastle
+    ? 0
+    : castles.filter((castle) => castle.owner === selectedCastle.owner && castle.facilityType === "장원").length;
+  const selectedAdjacentCastles = useMemo(() => {
+    if (!selectedCastle || selectedCastle.owner === "미점령") return [];
+
+    const selectedTile = getTerritoryTilePosition(selectedCastle.number);
+    if (!selectedTile) return [];
+
+    return castles.filter((castle) => {
+      if (castle.owner !== "미점령") return false;
+
+      const tile = getTerritoryTilePosition(castle.number);
+      if (!tile) return false;
+
+      return Math.abs(tile.row - selectedTile.row) + Math.abs(tile.column - selectedTile.column) === 1;
+    });
+  }, [castles, selectedCastle]);
   const summary = forceIds.reduce<Record<ForceId, number>>((acc, force) => {
     acc[force] = castles.filter((castle) => castle.owner === force).length;
     return acc;
@@ -219,7 +555,7 @@ export function MapViewer({ compact = false, initialData }: { compact?: boolean;
                 y={castle.cy - viewerTerritoryTileSize / 2}
                 width={viewerTerritoryTileSize}
                 height={viewerTerritoryTileSize}
-                onClick={() => setSelectedCityId(castle.id)}
+                onClick={(event) => handleTerritoryClick(event, castle.id)}
               />
               <text
                 className={`map-territory-number ${hasFacility ? "has-facility" : ""} ${isUnclaimedSpecial ? "is-special-unclaimed" : ""}`}
@@ -244,15 +580,65 @@ export function MapViewer({ compact = false, initialData }: { compact?: boolean;
           );
         })}
       </g>
+
+      {selectedCastle && selectedCastle.owner !== "미점령" ? (
+        <g
+          className="map-territory-selection-neighbors"
+          data-owner={forceThemeClass[selectedCastle.owner]}
+          transform={viewerTerritoryTransform}
+          aria-hidden="true"
+        >
+          {selectedAdjacentCastles.map((castle) => (
+            <rect
+              key={castle.id}
+              className="map-territory-selection-neighbor"
+              data-territory-number={castle.number}
+              x={castle.cx - viewerTerritoryTileSize / 2}
+              y={castle.cy - viewerTerritoryTileSize / 2}
+              width={viewerTerritoryTileSize}
+              height={viewerTerritoryTileSize}
+              rx="3"
+              ry="3"
+            />
+          ))}
+        </g>
+      ) : null}
+
     </>
   );
 
   return (
     <section className={`map-viewer-shell pixel-frame overflow-hidden ${compact ? "compact p-3 md:p-4" : "p-4 md:p-6"}`}>
+      {simulation ? (
+        <div className="simulation-toolbar" aria-label="점령 시뮬레이터 도구">
+          <div className="simulation-toolbar-main">
+            <div className="simulation-toolbar-title-row">
+              <span className="simulation-toolbar-guide">
+                <b>사용 방법</b>
+                <span>지도에서 영지 클릭</span>
+                <i>→</i>
+                <span>나타난 버튼에서 상태 선택</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="simulation-toolbar-actions">
+            <button type="button" onClick={undoSimulation} disabled={simulationHistory.length === 0}>
+              <Undo2 size={15} />
+              실행 취소
+            </button>
+            <button type="button" onClick={resetSimulation}>
+              <RotateCcw size={15} />
+              초기화
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <div className={`flex flex-col gap-3 md:mb-4 md:flex-row md:items-end md:justify-between ${compact ? "mb-3" : "mb-4"}`}>
         <div className="map-viewer-heading">
-          <h2 className="text-2xl font-black text-[#f3e7d0]">삼국지 점령 지도</h2>
-          <button
+          <h2 className="text-2xl font-black text-[#f3e7d0]">{simulation ? "점령 시뮬레이터" : "삼국지 점령 지도"}</h2>
+          {!simulation ? <button
             type="button"
             onClick={() => void loadCastles()}
             disabled={isLoading}
@@ -262,7 +648,7 @@ export function MapViewer({ compact = false, initialData }: { compact?: boolean;
           >
             <RefreshCcw size={15} className={isLoading ? "animate-spin" : ""} />
             <span>새로고침</span>
-          </button>
+          </button> : null}
           <div className="map-territory-legend" aria-label="수도 및 거점 아이콘 설명">
             <span><b>👑</b> 수도</span>
             <span><b>⚔️</b> 병영</span>
@@ -282,13 +668,106 @@ export function MapViewer({ compact = false, initialData }: { compact?: boolean;
         </div>
       </div>
 
-      <div className={`admin-map-wrap ${compact ? "compact" : ""}`}>
+      <div
+        className={`admin-map-wrap ${compact ? "compact" : ""}`}
+        onClick={(event) => {
+          if (!simulation) return;
+
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          if (target.closest(".simulation-cell-popover") || target.closest(".admin-territory[data-city-id]")) return;
+          setSimulationPopover(null);
+        }}
+      >
         <svg id="map-viewer" className="map-svg-desktop" viewBox="0 0 1180 720" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 삼국지 지도">
           {renderMapLayers()}
         </svg>
         <svg className="map-svg-mobile" viewBox="190 35 820 610" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 모바일 삼국지 지도">
           {renderMapLayers()}
         </svg>
+
+        {simulation && selectedCastle && simulationPopover ? (
+          <div
+            className="simulation-cell-popover"
+            data-placement={simulationPopover.placement}
+            role="dialog"
+            aria-label={`${selectedCastle.number}번 영지 상태 선택`}
+            style={{ left: `${simulationPopover.left}%`, top: `${simulationPopover.top}%` }}
+          >
+            <div className="simulation-cell-popover-head">
+              <strong>{selectedCastle.number}번 영지</strong>
+              <span>점령 상태와 시설을 설정하세요</span>
+              <button type="button" onClick={() => setSimulationPopover(null)} aria-label="상태 선택 닫기">×</button>
+            </div>
+            <div className="simulation-cell-section-head">
+              <strong>점령 상태</strong>
+            </div>
+            <div className="simulation-cell-options">
+              {(["미점령", ...forceIds] as TerritoryOwnerFull[]).map((owner) => (
+                <button
+                  key={owner}
+                  type="button"
+                  data-owner={forceThemeClass[owner]}
+                  className={selectedCastle.owner === owner ? "current" : ""}
+                  aria-pressed={selectedCastle.owner === owner}
+                  onClick={() => updateSimulatedOwner(selectedCastle.id, owner)}
+                >
+                  {owner}
+                </button>
+              ))}
+            </div>
+            <div className="simulation-cell-section-head facility">
+              <strong>수도</strong>
+              <span>일반 시설과 별도 설정</span>
+            </div>
+            <button
+              type="button"
+              className={`simulation-capital-toggle ${selectedCastle.isCapital ? "current" : ""}`}
+              aria-pressed={selectedCastle.isCapital}
+              disabled={selectedCastle.owner === "미점령"}
+              onClick={() => toggleSimulatedCapital(selectedCastle.id)}
+            >
+              <span aria-hidden="true">👑</span>
+              {selectedCastle.isCapital ? "수도 해제" : "수도로 지정"}
+            </button>
+            <div className="simulation-cell-section-head facility">
+              <strong>일반 시설</strong>
+              <span>
+                {selectedCastle.owner === "미점령" ? "국가 선택 필요" : `${selectedCastle.owner} 장원 `}
+                {selectedCastle.owner !== "미점령" ? <><b>{selectedNationManorCount}</b> / 10</> : null}
+              </span>
+            </div>
+            <div className="simulation-cell-facilities">
+              {territoryFacilityOptions.map((facility) => {
+                const manorLimitReached = facility === "장원"
+                  && selectedCastle.facilityType !== "장원"
+                  && selectedNationManorCount >= 10;
+                const disabled = selectedCastle.owner === "미점령" || manorLimitReached;
+
+                return (
+                  <button
+                    key={facility}
+                    type="button"
+                    data-facility={facility}
+                    className={selectedCastle.facilityType === facility ? "current" : ""}
+                    aria-pressed={selectedCastle.facilityType === facility}
+                    disabled={disabled}
+                    title={manorLimitReached ? "장원은 최대 10개까지 설치할 수 있습니다." : undefined}
+                    onClick={() => updateSimulatedFacility(selectedCastle.id, facility)}
+                  >
+                    <span aria-hidden="true">{simulationFacilityIcons[facility]}</span>
+                    {facility}
+                  </button>
+                );
+              })}
+            </div>
+            {selectedCastle.owner === "미점령" ? (
+              <p className="simulation-cell-facility-hint">시설을 추가하려면 먼저 점령 국가를 선택하세요.</p>
+            ) : selectedNationManorCount >= 10 && selectedCastle.facilityType !== "장원" ? (
+              <p className="simulation-cell-facility-hint limit">{selectedCastle.owner} 장원 10개가 모두 설치되어 있습니다.</p>
+            ) : null}
+          </div>
+        ) : null}
 
         {isLoading ? (
           <div className="map-loading-overlay" aria-live="polite" aria-busy="true">
