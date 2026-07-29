@@ -121,6 +121,30 @@ button, input, select { font: inherit; }
   background: #000000;
 }
 
+aside.site-chrome-bg,
+header.site-chrome-bg {
+  pointer-events: auto;
+}
+
+header.site-chrome-bg > a {
+  min-width: 0;
+  flex: 1 1 0;
+  overflow: hidden;
+}
+
+header.site-chrome-bg > a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+header.site-chrome-bg > button {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 40px;
+  pointer-events: auto;
+}
+
 .site-header-image {
   height: 100%;
   width: auto;
@@ -1819,6 +1843,8 @@ thead .admin-equipment-stat-divider::before {
 
 .home-overview-stage {
   position: relative;
+  width: 100%;
+  max-width: 100%;
 }
 
 .home-streamer-cover {
@@ -1861,12 +1887,14 @@ thead .admin-equipment-stat-divider::before {
 
 .home-overview {
   align-items: stretch;
+  min-width: 0;
 }
 
 .home-overview-map,
 .home-overview .map-viewer-shell.compact {
   height: auto;
   max-height: none;
+  min-width: 0;
   width: 100%;
 }
 
@@ -1907,6 +1935,16 @@ thead .admin-equipment-stat-divider::before {
 }
 
 @media (max-width: 760px) {
+  .home-overview-stage {
+    overflow: hidden;
+    border-radius: 18px;
+  }
+
+  .home-streamer-cover {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .admin-map-topbar {
     align-items: start;
     flex-direction: column;
@@ -1918,7 +1956,7 @@ thead .admin-equipment-stat-divider::before {
   }
 
   .admin-map-wrap.compact {
-    min-height: 420px;
+    min-height: 360px;
   }
 
   .map-svg-desktop {
@@ -1934,6 +1972,12 @@ thead .admin-equipment-stat-divider::before {
     min-height: auto;
     height: auto;
     max-height: none;
+    overflow: hidden;
+  }
+
+  .home-overview .map-viewer-shell.compact .admin-map-wrap.compact {
+    min-height: 300px;
+    aspect-ratio: 1180 / 700;
   }
 
   .home-overview {

@@ -87,7 +87,12 @@ function SidebarContent({
             className={`home-streamer-switch ${streamerModeOn ? "active" : ""}`}
             role="switch"
             aria-checked={streamerModeOn}
-            onClick={onStreamerModeChange}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onStreamerModeChange();
+            }}
           >
             <span className="home-streamer-switch-track" aria-hidden="true">
               <span className="home-streamer-switch-thumb" />
@@ -141,7 +146,7 @@ export function SiteNavbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
-  const [streamerModeOn, setStreamerModeOnState] = useState(getStreamerMode);
+  const [streamerModeOn, setStreamerModeOnState] = useState(true);
 
   useEffect(() => {
     setOpen(false);
@@ -158,7 +163,9 @@ export function SiteNavbar() {
   }, []);
 
   const toggleStreamerMode = () => {
-    setStreamerMode(!getStreamerMode());
+    const nextStreamerMode = !streamerModeOn;
+    setStreamerModeOnState(nextStreamerMode);
+    setStreamerMode(nextStreamerMode);
   };
 
   useEffect(() => {
@@ -190,7 +197,7 @@ export function SiteNavbar() {
 
   return (
     <>
-      <aside className="site-chrome-bg fixed inset-y-0 left-0 z-50 hidden w-64 flex-col md:flex">
+      <aside className="site-chrome-bg fixed inset-y-0 left-0 z-[200] hidden w-64 flex-col md:flex">
         <SidebarContent
           pathname={pathname}
           adminAuthenticated={adminAuthenticated}
@@ -210,8 +217,8 @@ export function SiteNavbar() {
         </form>
       ) : null}
 
-      <header className="site-chrome-bg fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between border-b border-[var(--border)] px-4 md:hidden">
-        <Link href="/" className="flex items-center gap-2.5">
+      <header className="site-chrome-bg fixed inset-x-0 top-0 z-[200] flex h-14 items-center justify-between border-b border-[var(--border)] px-4 md:hidden">
+        <Link href="/" className="flex min-w-0 flex-1 items-center gap-2.5 overflow-hidden">
           <Image src="/assets/gamst-three-kingdoms-banner-source.webp" alt="감컴퍼니 삼국지서버" width={2048} height={749} className="h-9 w-auto object-contain" priority />
           <span className="text-sm font-bold text-[#f4e0bc]">감컴퍼니 삼국지서버</span>
         </Link>
@@ -221,9 +228,9 @@ export function SiteNavbar() {
       </header>
 
       {open && (
-        <div className="fixed inset-0 z-[60] md:hidden">
+        <div className="fixed inset-0 z-[210] md:hidden">
           <button type="button" className="absolute inset-0 bg-black/70" onClick={() => setOpen(false)} aria-label="메뉴 닫기" />
-          <aside className="site-chrome-bg relative flex h-full w-[min(82vw,280px)] flex-col shadow-2xl">
+          <aside className="site-chrome-bg relative z-10 flex h-full w-[min(82vw,280px)] flex-col shadow-2xl">
             <button type="button" onClick={() => setOpen(false)} className="absolute right-2 top-2 z-10 grid h-10 w-10 place-items-center text-[#f0c98b]" aria-label="메뉴 닫기">
               <X size={21} />
             </button>

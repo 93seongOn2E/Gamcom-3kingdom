@@ -21,7 +21,7 @@ function getNationThemeClass(nation: string) {
 export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEntry[]; castleData: CastleDataPayload }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
-  const [isStreamerModeOn, setIsStreamerModeOn] = useState(getStreamerMode);
+  const [isStreamerModeOn, setIsStreamerModeOn] = useState(true);
 
   useEffect(() => {
     const handleStreamerModeChange = (event: Event) => {

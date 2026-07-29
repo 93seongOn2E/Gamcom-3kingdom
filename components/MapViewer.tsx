@@ -286,7 +286,7 @@ export function MapViewer({ compact = false, initialData }: { compact?: boolean;
         <svg id="map-viewer" className="map-svg-desktop" viewBox="0 0 1180 720" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 삼국지 지도">
           {renderMapLayers()}
         </svg>
-        <svg className="map-svg-mobile" viewBox="250 65 700 550" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 모바일 삼국지 지도">
+        <svg className="map-svg-mobile" viewBox="190 35 820 610" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 모바일 삼국지 지도">
           {renderMapLayers()}
         </svg>
 
