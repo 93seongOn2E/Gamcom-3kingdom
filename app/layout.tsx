@@ -5,7 +5,6 @@ import "./globals.css";
 import { RecruitAdminPopup } from "@/components/RecruitAdminPopup";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNavbar } from "@/components/SiteNavbar";
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
   title: "감컴퍼니 삼국지서버",
@@ -45,7 +44,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           </div>
         </div>
       </body>
-      <SpeedInsights />
     </html>
   );
 }
