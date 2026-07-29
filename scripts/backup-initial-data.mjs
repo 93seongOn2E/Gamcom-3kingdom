@@ -69,11 +69,11 @@ const castleColumns = [
   "level",
   "map_x",
   "map_y",
-  "area_scale",
-  "sort_order",
   "created_at",
   "updated_at",
-  "is_use"
+  "is_occupied",
+  "facility_type",
+  "is_capital"
 ];
 
 const chronicleColumns = [
@@ -97,8 +97,8 @@ const members = await sql`
 `;
 
 const castles = await sql`
-  SELECT id, castle_key, name, kingdom, level, map_x::text, map_y::text, area_scale::text, sort_order,
-         created_at::text, updated_at::text, is_use
+  SELECT id, castle_key, name, kingdom, level, map_x::text, map_y::text,
+         created_at::text, updated_at::text, is_occupied, facility_type, is_capital
   FROM public.castle
   ORDER BY id
 `;

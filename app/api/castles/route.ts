@@ -78,7 +78,7 @@ export async function PATCH(request: Request) {
 
     const sql = getSql();
     const beforeRows = await sql`
-      SELECT castle_key, name, level, map_x, map_y, area_scale, kingdom, is_occupied, is_capital, facility_type, updated_at
+      SELECT castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type, updated_at
       FROM public.castle
       WHERE castle_key = ${castleKey}
       LIMIT 1
@@ -100,10 +100,9 @@ export async function PATCH(request: Request) {
 
     if (isCapital) {
       replacedCapitalRows = await sql`
-        SELECT castle_key, name, level, map_x, map_y, area_scale, kingdom, is_occupied, is_capital, facility_type, updated_at
+        SELECT castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type, updated_at
         FROM public.castle
         WHERE kingdom = ${persistedKingdom}
-          AND is_use = true
           AND is_occupied = true
           AND is_capital = true
           AND castle_key <> ${castleKey}
@@ -115,11 +114,10 @@ export async function PATCH(request: Request) {
           SET is_capital = false,
               updated_at = now()
           WHERE kingdom = ${persistedKingdom}
-            AND is_use = true
             AND is_occupied = true
             AND is_capital = true
             AND castle_key <> ${castleKey}
-          RETURNING castle_key, name, level, map_x, map_y, area_scale, kingdom, is_occupied, is_capital, facility_type, updated_at
+          RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type, updated_at
         `,
         sql`
           UPDATE public.castle
@@ -127,7 +125,6 @@ export async function PATCH(request: Request) {
               level = ${level},
               map_x = ${x},
               map_y = ${y},
-              area_scale = 1,
               kingdom = ${persistedKingdom},
               is_occupied = ${isOccupied},
               is_capital = ${isCapital},
@@ -147,7 +144,6 @@ export async function PATCH(request: Request) {
             level = ${level},
             map_x = ${x},
             map_y = ${y},
-            area_scale = 1,
             kingdom = ${persistedKingdom},
             is_occupied = ${isOccupied},
             is_capital = ${isCapital},
@@ -193,7 +189,6 @@ export async function PATCH(request: Request) {
       level: Number(rows[0].level),
       x: Number(rows[0].map_x),
       y: Number(rows[0].map_y),
-      areaScale: 1,
       kingdom: rows[0].is_occupied ? rows[0].kingdom : "미점령",
       isCapital: Boolean(rows[0].is_occupied && rows[0].is_capital),
       facilityType: rows[0].is_occupied ? rows[0].facility_type : "없음"

@@ -14,7 +14,6 @@ export type CastlePayload = {
   facilityType: TerritoryFacility;
   x?: number;
   y?: number;
-  areaScale: number;
 };
 
 export type CastleDataPayload = {
@@ -59,8 +58,8 @@ export async function getCastleData(): Promise<CastleDataPayload> {
   const rows = await sql`
     SELECT castle_key, name, kingdom, level, map_x, map_y, is_occupied, is_capital, facility_type
     FROM public.castle
-    WHERE is_use = TRUE
-    ORDER BY sort_order, id
+    WHERE name ~ '^[0-9]+$'
+    ORDER BY NULLIF(regexp_replace(name, '[^0-9]', '', 'g'), '')::integer NULLS LAST, id
   ` as CastleRow[];
 
   const forces: Record<ForceIdShort, CastlePayload[]> = {
@@ -81,8 +80,7 @@ export async function getCastleData(): Promise<CastleDataPayload> {
       isCapital: row.is_occupied && row.is_capital,
       facilityType: row.is_occupied ? row.facility_type : "없음",
       ...(row.map_x === null ? {} : { x: Number(row.map_x) }),
-      ...(row.map_y === null ? {} : { y: Number(row.map_y) }),
-      areaScale: 1
+      ...(row.map_y === null ? {} : { y: Number(row.map_y) })
     });
   });
 

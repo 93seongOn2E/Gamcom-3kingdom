@@ -23,8 +23,7 @@ $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS castle_one_capital_per_kingdom
   ON public.castle (kingdom)
-  WHERE is_use = true
-    AND is_occupied = true
+  WHERE is_occupied = true
     AND is_capital = true;
 
 COMMIT;
