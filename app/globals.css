@@ -1650,6 +1650,771 @@ header.site-chrome-bg > button {
   }
 }
 
+/* 점령 시뮬게임 */
+.conquest-game {
+  overflow: hidden;
+  border: 1px solid rgba(212, 167, 86, .34);
+  border-radius: 18px;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 8% 0, rgba(212, 167, 86, .12), transparent 30%),
+    linear-gradient(180deg, rgba(24, 20, 15, .98), rgba(10, 10, 10, .98));
+  box-shadow: 0 22px 56px rgba(0, 0, 0, .32);
+}
+
+.conquest-game-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.conquest-game-topbar p {
+  margin: 0 0 4px;
+  color: #d4a756;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .14em;
+}
+
+.conquest-game-topbar h2 {
+  margin: 0;
+  color: #f6e7ca;
+  font-size: 25px;
+  font-weight: 950;
+  letter-spacing: -.04em;
+}
+
+.conquest-game-turn {
+  display: grid;
+  min-width: 92px;
+  gap: 1px;
+  border: 1px solid rgba(212, 167, 86, .34);
+  border-radius: 11px;
+  padding: 8px 13px;
+  background: rgba(212, 167, 86, .08);
+  text-align: center;
+}
+
+.conquest-game-turn-map {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  right: 12px;
+  min-width: 82px;
+  min-height: 50px;
+  padding: 6px 11px;
+  background: rgba(24, 17, 10, .9);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, .3);
+  pointer-events: none;
+}
+
+.conquest-game-funds {
+  min-width: 154px;
+}
+
+.conquest-game-funds strong {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.conquest-game-turn span {
+  color: #a99574;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.conquest-game-turn strong {
+  color: #ffe0a4;
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.conquest-game-scoreboard {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  pointer-events: none;
+}
+
+.conquest-game-score {
+  position: relative;
+  display: grid;
+  width: 88px;
+  min-height: 50px;
+  align-content: center;
+  justify-items: center;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 8px;
+  padding: 5px 7px;
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 5px 12px rgba(0, 0, 0, .28);
+}
+
+.conquest-game-score.wei {
+  background: linear-gradient(145deg, #315e92, #1c3552);
+}
+
+.conquest-game-score.shu {
+  background: linear-gradient(145deg, #34734a, #1d432d);
+}
+
+.conquest-game-score.wu {
+  background: linear-gradient(145deg, #d5a727, #8b5d17);
+  color: #211604;
+}
+
+.conquest-game-score.player {
+  border-color: #ffe8ad;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), 0 0 16px rgba(255, 219, 130, .14);
+}
+
+.conquest-game-score > span {
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.conquest-game-score > strong {
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.conquest-game-score > b {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(14, 10, 4, .76);
+  color: #ffe08a;
+}
+
+.conquest-game-setup {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.1fr) minmax(300px, 1.8fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 17px;
+  border: 1px solid rgba(212, 167, 86, .28);
+  border-radius: 14px;
+  padding: 16px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.conquest-game-setup-copy > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e2b75f;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.conquest-game-setup-copy h3 {
+  margin: 4px 0;
+  color: #f4e5c8;
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.conquest-game-setup-copy p {
+  margin: 0;
+  color: #9f917b;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.conquest-game-nation-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.conquest-game-nation-options button {
+  display: grid;
+  min-height: 62px;
+  align-content: center;
+  gap: 2px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 9px;
+  padding: 8px;
+  color: #e7dbc5;
+  opacity: .68;
+  transition: opacity .15s ease, transform .15s ease, border-color .15s ease;
+}
+
+.conquest-game-nation-options button.wei { background: rgba(47, 120, 216, .2); }
+.conquest-game-nation-options button.shu { background: rgba(34, 164, 87, .18); }
+.conquest-game-nation-options button.wu { background: rgba(212, 160, 23, .18); }
+
+.conquest-game-nation-options button:hover,
+.conquest-game-nation-options button.selected {
+  border-color: rgba(255, 224, 160, .72);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.conquest-game-nation-options span {
+  color: #9e907a;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.conquest-game-nation-options strong {
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.conquest-game-start,
+.conquest-game-finished-actions button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #e8ba5d;
+  border-radius: 9px;
+  padding: 0 17px;
+  background: linear-gradient(180deg, #b77a24, #805018);
+  color: #fff1d3;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .24);
+}
+
+.conquest-game-finished-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.conquest-game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 14px;
+}
+
+.conquest-game-main {
+  min-width: 0;
+}
+
+.conquest-game-actionbar {
+  display: flex;
+  min-height: 74px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(212, 167, 86, .28);
+  border-radius: 11px;
+  padding: 11px 13px;
+  background: rgba(212, 167, 86, .07);
+}
+
+.conquest-game-actionbar > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.conquest-game-actionbar > div:first-child span {
+  color: #d4a756;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.conquest-game-actionbar > div:first-child strong {
+  color: #efe1c7;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.conquest-game-attempt {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.conquest-game-attempt p {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  margin: 0;
+  color: #ad9d83;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.conquest-game-attempt p > b {
+  color: #ffdc91;
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.conquest-game-attempt p > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #ed997c;
+}
+
+.conquest-game-attempt p > span.safe {
+  color: #76dda0;
+}
+
+.conquest-game-attempt button,
+.conquest-game-skip {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #efc269;
+  border-radius: 8px;
+  padding: 0 15px;
+  background: linear-gradient(180deg, #a96924, #714119);
+  color: #fff0cf;
+  font-size: 11px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.conquest-game-map {
+  position: relative;
+  overflow: hidden;
+  min-height: 540px;
+  border: 1px solid rgba(142, 101, 52, .62);
+  background: #d8bd8b;
+  box-shadow: inset 0 0 0 1px rgba(255, 246, 222, .24);
+}
+
+.conquest-game-map > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.conquest-game-map-mobile {
+  display: none !important;
+}
+
+.conquest-game-tile {
+  cursor: default;
+}
+
+.conquest-game-tile.available {
+  cursor: pointer;
+  stroke: #fff1b8;
+  stroke-width: 2.4px;
+  fill-opacity: .92;
+  filter: drop-shadow(0 0 4px rgba(255, 230, 145, .88));
+  animation: conquest-game-target-pulse 1.2s ease-in-out infinite;
+}
+
+.conquest-game-tile.available.selected {
+  stroke: #fff;
+  stroke-width: 3.2px;
+  filter: drop-shadow(0 0 7px #fff1a8);
+}
+
+.conquest-game-target-chance {
+  pointer-events: none;
+  fill: #fff1b8;
+  stroke: rgba(35, 22, 8, .86);
+  stroke-width: 2px;
+  paint-order: stroke fill;
+  text-anchor: middle;
+  font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-size: 9px;
+  font-weight: 950;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .6));
+}
+
+.conquest-game-tile.captured {
+  stroke: #fff7cf;
+  stroke-width: 3.4px;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: conquest-game-capture .75s cubic-bezier(.18, .8, .28, 1) both;
+}
+
+.conquest-game-map-lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(20, 15, 10, .48);
+  color: #fff0cf;
+  font-size: 13px;
+  font-weight: 950;
+  text-shadow: 0 2px 8px #000;
+  backdrop-filter: blur(1px);
+}
+
+.conquest-turn-banner {
+  position: absolute;
+  z-index: 4;
+  top: 18px;
+  left: 50%;
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 226, 160, .72);
+  border-radius: 999px;
+  padding: 0 17px;
+  background: rgba(20, 14, 8, .91);
+  color: #ffe4a8;
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1.4;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .42), 0 0 18px rgba(224, 171, 69, .2);
+  transform: translateX(-50%);
+  animation: conquest-turn-banner-in .28s ease-out both;
+  pointer-events: none;
+}
+
+.conquest-turn-banner[data-tone="success"] {
+  border-color: rgba(117, 226, 156, .76);
+  background: rgba(15, 48, 29, .94);
+  color: #c8f4d5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .42), 0 0 18px rgba(67, 199, 111, .24);
+}
+
+.conquest-turn-banner[data-tone="failure"] {
+  border-color: rgba(255, 126, 99, .9);
+  background: rgba(76, 21, 17, .96);
+  color: #ffd4ca;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .48), 0 0 22px rgba(224, 72, 47, .34);
+  animation: conquest-turn-banner-failure .4s ease-out both;
+}
+
+.conquest-turn-banner[data-tone="war"] {
+  border-color: #ffd36f;
+  background: rgba(73, 46, 11, .96);
+  color: #fff0bc;
+}
+
+.conquest-turn-banner svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: #e6b653;
+  animation: conquest-turn-swords 1s ease-in-out infinite;
+}
+
+.conquest-turn-banner[data-tone="failure"] svg {
+  color: #ff9c85;
+  animation: conquest-turn-failure-icon .5s ease-in-out infinite;
+}
+
+.conquest-game-side {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.conquest-game-rules {
+  border: 1px solid rgba(212, 167, 86, .24);
+  border-radius: 12px;
+  padding: 14px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.conquest-game-rules {
+  border-color: rgba(226, 180, 91, .44);
+  padding: 21px;
+  background:
+    radial-gradient(circle at 0 0, rgba(212, 167, 86, .12), transparent 38%),
+    rgba(255, 255, 255, .045);
+  box-shadow: inset 0 1px 0 rgba(255, 241, 205, .05);
+}
+
+.conquest-game-rules h3 {
+  margin: 0 0 11px;
+  color: #edd6ad;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.conquest-game-rules h3 {
+  margin-bottom: 19px;
+  color: #ffe0a4;
+  font-size: 19px;
+}
+
+.conquest-game-rules ol {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conquest-game-rules li {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 11px;
+}
+
+.conquest-game-rules li b {
+  color: #d9ad58;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.conquest-game-rules li span {
+  color: #d3c3a6;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.72;
+}
+
+.conquest-game-probability {
+  display: grid;
+  gap: 6px;
+  margin-top: 22px;
+  border: 1px solid rgba(212, 167, 86, .3);
+  border-radius: 10px;
+  padding: 15px;
+  background: rgba(0, 0, 0, .2);
+}
+
+.conquest-game-probability h4 {
+  margin: 0 0 5px;
+  color: #f2d49c;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.conquest-game-probability > div {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, .055);
+  color: #d1c0a2;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.conquest-game-probability > div strong {
+  color: #ffe09a;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.conquest-game-probability p {
+  margin: 7px 0 0;
+  color: #d7c7aa;
+  font-size: 11.5px;
+  font-weight: 900;
+  line-height: 1.55;
+}
+
+.conquest-game-probability p b {
+  color: #ffd677;
+}
+
+@keyframes conquest-game-target-pulse {
+  0%, 100% { fill-opacity: .8; }
+  50% { fill-opacity: 1; }
+}
+
+@keyframes conquest-game-capture {
+  0% {
+    opacity: .45;
+    transform: scale(.72);
+    filter: brightness(2.2) drop-shadow(0 0 12px #fff1a8);
+  }
+  58% {
+    opacity: 1;
+    transform: scale(1.14);
+    filter: brightness(1.65) drop-shadow(0 0 9px #ffe074);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 2px rgba(255, 231, 153, .5));
+  }
+}
+
+@keyframes conquest-turn-banner-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes conquest-turn-swords {
+  0%, 100% { transform: rotate(-7deg) scale(.95); }
+  50% { transform: rotate(7deg) scale(1.08); }
+}
+
+@keyframes conquest-turn-banner-failure {
+  0% { opacity: 0; transform: translateX(-50%) scale(.94); }
+  35% { opacity: 1; transform: translateX(calc(-50% - 5px)) scale(1); }
+  58% { transform: translateX(calc(-50% + 4px)) scale(1); }
+  78% { transform: translateX(calc(-50% - 2px)) scale(1); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+@keyframes conquest-turn-failure-icon {
+  0%, 100% { transform: scale(.9); }
+  50% { transform: scale(1.14); }
+}
+
+@media (max-width: 1100px) {
+  .conquest-game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .conquest-game-map {
+    min-height: 0;
+    aspect-ratio: 760 / 520;
+  }
+
+  .conquest-game-map-desktop {
+    display: none !important;
+  }
+
+  .conquest-game-map-mobile {
+    display: block !important;
+  }
+
+  .conquest-game-side {
+    grid-template-columns: 1fr 1fr;
+  }
+
+}
+
+@media (max-width: 760px) {
+  .conquest-game {
+    border-radius: 14px;
+    padding: 13px;
+  }
+
+  .conquest-game-topbar h2 {
+    font-size: 21px;
+  }
+
+  .conquest-game-score {
+    width: 68px;
+    min-height: 43px;
+    padding: 4px;
+  }
+
+  .conquest-game-score > span {
+    font-size: 8px;
+  }
+
+  .conquest-game-score > strong {
+    font-size: 15px;
+  }
+
+  .conquest-game-score > b {
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .conquest-game-setup {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .conquest-game-start,
+  .conquest-game-finished-actions button {
+    width: 100%;
+  }
+
+  .conquest-game-actionbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .conquest-game-attempt {
+    justify-content: space-between;
+  }
+
+  .conquest-game-attempt p {
+    justify-items: start;
+  }
+
+  .conquest-game-attempt button {
+    min-width: 118px;
+  }
+
+  .conquest-game-side {
+    grid-template-columns: 1fr;
+  }
+
+  .conquest-game-map {
+    margin-top: 62px;
+    overflow: visible;
+  }
+
+  .conquest-game-scoreboard {
+    top: -54px;
+    left: 0;
+  }
+
+  .conquest-turn-banner {
+    top: 10px;
+    max-width: calc(100% - 20px);
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .conquest-game-funds {
+    top: -54px;
+    right: 0;
+    min-width: 126px;
+  }
+
+  .conquest-game-funds strong {
+    font-size: 12px;
+  }
+
+}
+
+@media (max-width: 420px) {
+  .conquest-game-topbar {
+    align-items: flex-start;
+  }
+
+  .conquest-game-turn {
+    min-width: 78px;
+  }
+
+  .conquest-game-nation-options {
+    gap: 4px;
+  }
+
+  .conquest-game-nation-options button {
+    min-height: 58px;
+    padding: 5px;
+  }
+}
+
 @keyframes map-territory-neighbor-in {
   from { opacity: 0; }
   to { opacity: .34; }

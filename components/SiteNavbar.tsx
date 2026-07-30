@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, Map, Menu, Monitor, Radio, ScrollText, Swords, Video, X } from "lucide-react";
+import { BookOpen, Gamepad2, Home, Map, Menu, Monitor, Radio, ScrollText, Swords, Video, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getStreamerMode, setStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
 
@@ -23,6 +23,7 @@ type NavItem = NavLinkItem | NavSeparatorItem;
 const baseNavItems: NavLinkItem[] = [
   { href: "/", label: "홈", icon: Home },
   { href: "/simulation", label: "점령 시뮬레이터", icon: Map },
+  { href: "/conquest-game", label: "점령 시뮬게임", icon: Gamepad2 },
   { href: "/about", label: "티저영상", icon: Video },
   { href: "/jobs", label: "직업소개", icon: BookOpen },
   { href: "/broadcast", label: "지통실", icon: Radio },
