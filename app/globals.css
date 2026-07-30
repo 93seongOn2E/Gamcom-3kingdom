@@ -2530,6 +2530,21 @@ thead .admin-equipment-stat-divider::before {
     border-left: 0;
     border-top: 1px solid #c6aa82;
   }
+
+  .map-viewer-shell.simulation .admin-map-wrap.simulation {
+    flex: none;
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 760 / 520;
+  }
+
+  .map-viewer-shell.simulation .admin-map-wrap.simulation .map-svg-desktop {
+    display: none !important;
+  }
+
+  .map-viewer-shell.simulation .admin-map-wrap.simulation .map-svg-mobile {
+    display: block !important;
+  }
 }
 
 @media (max-width: 760px) {
@@ -2555,6 +2570,13 @@ thead .admin-equipment-stat-divider::before {
 
   .admin-map-wrap.compact {
     min-height: 360px;
+  }
+
+  .map-viewer-shell.simulation .admin-map-wrap.simulation {
+    flex: none;
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 760 / 520;
   }
 
   .map-svg-desktop {

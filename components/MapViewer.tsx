@@ -610,7 +610,7 @@ export function MapViewer({
   );
 
   return (
-    <section className={`map-viewer-shell pixel-frame overflow-hidden ${compact ? "compact p-3 md:p-4" : "p-4 md:p-6"}`}>
+    <section className={`map-viewer-shell pixel-frame overflow-hidden ${simulation ? "simulation" : ""} ${compact ? "compact p-3 md:p-4" : "p-4 md:p-6"}`}>
       {simulation ? (
         <div className="simulation-toolbar" aria-label="점령 시뮬레이터 도구">
           <div className="simulation-toolbar-main">
@@ -671,7 +671,7 @@ export function MapViewer({
       </div>
 
       <div
-        className={`admin-map-wrap ${compact ? "compact" : ""}`}
+        className={`admin-map-wrap ${simulation ? "simulation" : ""} ${compact ? "compact" : ""}`}
         onClick={(event) => {
           if (!simulation) return;
 
@@ -684,7 +684,7 @@ export function MapViewer({
         <svg id="map-viewer" className="map-svg-desktop" viewBox="0 0 1180 720" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 삼국지 지도">
           {renderMapLayers()}
         </svg>
-        <svg className="map-svg-mobile" viewBox="190 35 820 610" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 모바일 삼국지 지도">
+        <svg className="map-svg-mobile" viewBox={simulation ? "220 75 760 520" : "190 35 820 610"} preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 모바일 삼국지 지도">
           {renderMapLayers()}
         </svg>
 
