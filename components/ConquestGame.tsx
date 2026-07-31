@@ -26,10 +26,30 @@ const nationStartingTerritory: Record<Nation, number> = {
 };
 const weiOpeningPlansAgainstShu = [
   [7, 6, 13, 19],
-  [7, 14, 20, 19],
-  [7, 14, 20, 28]
+  [7, 14, 20, 19]
 ];
 const wuLowerFlankResponse = [46, 54, 53, 59];
+const wuUpperPressureResponse = [38, 39, 30, 29, 28, 21, 46, 37, 36, 35];
+const buffAdjacentTerritories = getAdjacentNumbers(27);
+const buffApproachRoutes: Partial<Record<Nation, number[][]>> = {
+  촉나라: [
+    [33, 24, 25, 26, 27],
+    [33, 24, 25, 35, 27],
+    [43, 44, 34, 26, 27]
+  ],
+  오나라: [
+    [38, 37, 36, 28, 27],
+    [38, 37, 36, 35, 27],
+    [46, 37, 36, 28, 27],
+    [46, 37, 36, 35, 27],
+    [39, 30, 29, 28, 27]
+  ],
+  위나라: [
+    [7, 14, 20, 28, 27],
+    [13, 19, 26, 27],
+    [15, 29, 28, 27]
+  ]
+};
 const startingFunds = 10_000_000;
 const conquestCost = 500_000;
 const tileSize = 53;
@@ -157,6 +177,10 @@ function getScores(owners: Owners) {
   }, { 위나라: 0, 촉나라: 0, 오나라: 0 });
 }
 
+function getTerritoryCountChanceModifier(owners: Owners, nation: Nation) {
+  return Math.max(0, getScores(owners)[nation] - 9);
+}
+
 function getConquerableTargets(owners: Owners, nation: Nation) {
   const candidates = new Set<number>();
 
@@ -185,8 +209,18 @@ function getInterference(owners: Owners, nation: Nation, target: number) {
 function getConquestChance(owners: Owners, nation: Nation, target: number) {
   const interference = getInterference(owners, nation, target);
   const baseChance = 100 * (0.5 ** interference.count);
-  const buff = owners[27] === nation ? 5 : 0;
-  return Math.min(100, baseChance + buff);
+  const attackerBuff = owners[27] === nation ? 5 : 0;
+  const defenderBuff = interference.nations.some((enemy) => owners[27] === enemy) ? 5 : 0;
+  const attackerTerritoryBuff = getTerritoryCountChanceModifier(owners, nation);
+  const defenderTerritoryBuff = Math.max(
+    0,
+    ...interference.nations.map((enemy) => getTerritoryCountChanceModifier(owners, enemy))
+  );
+
+  return Math.min(
+    100,
+    Math.max(0, baseChance + attackerBuff + attackerTerritoryBuff - defenderBuff - defenderTerritoryBuff)
+  );
 }
 
 function getExpansionScore(owners: Owners, nation: Nation, target: number) {
@@ -224,6 +258,42 @@ function getFutureExpansionScore(
   return immediateScore + bestFollowingScore * 0.72;
 }
 
+function getBuffApproachScore(owners: Owners, nation: Nation, target: number) {
+  if (owners[27] !== "미점령") return 0;
+
+  const routes = buffApproachRoutes[nation] ?? [];
+  if (routes.length === 0) return 0;
+
+  const nextOwners: Owners = { ...owners, [target]: nation };
+
+  return Math.max(
+    0,
+    ...routes.map((route, routeIndex) => {
+      const targetIndex = route.indexOf(target);
+      if (targetIndex < 0) return 0;
+
+      const previousRouteIsSecured = route
+        .slice(0, targetIndex)
+        .every((number) => nextOwners[number] === nation);
+      if (!previousRouteIsSecured) return 0;
+
+      const remainingRoute = route.slice(targetIndex + 1);
+      const blockedByEnemy = remainingRoute.some(
+        (number) => nextOwners[number] !== "미점령" && nextOwners[number] !== nation
+      );
+      if (blockedByEnemy) return 0;
+
+      const nextStep = remainingRoute[0];
+      const nextStepIsOpen = nextStep !== undefined && nextOwners[nextStep] === "미점령";
+      const progressScore = Math.max(0, route.length - targetIndex) * 8;
+      const distanceScore = Math.max(0, 8 - getDistanceToBuff(target)) * 6;
+      const preferredRouteBonus = routeIndex === 0 ? 9 : 0;
+
+      return progressScore + distanceScore + preferredRouteBonus + (nextStepIsOpen ? 7 : 0);
+    })
+  );
+}
+
 function getTrailingGap(owners: Owners, nation: Nation) {
   const scores = getScores(owners);
   return Math.max(...nations.map((candidate) => scores[candidate])) - scores[nation];
@@ -242,6 +312,36 @@ function shouldAttemptBuffTerritory(
   const trailingBonus = Math.min(0.18, getTrailingGap(owners, nation) * 0.04);
   const attemptRate = chance >= 50 ? 0.62 + trailingBonus : 0.28 + trailingBonus;
   return Math.random() < attemptRate;
+}
+
+function selectGuaranteedBuffAdjacentTarget(
+  owners: Owners,
+  nation: Nation,
+  targets: number[]
+) {
+  if (owners[27] !== "미점령") return null;
+
+  const candidates = targets.filter(
+    (target) =>
+      buffAdjacentTerritories.includes(target)
+      && owners[target] === "미점령"
+      && getConquestChance(owners, nation, target) === 100
+  );
+  if (candidates.length === 0) return null;
+
+  return [...candidates].sort((left, right) => {
+    const buffApproachDifference =
+      getBuffApproachScore(owners, nation, right)
+      - getBuffApproachScore(owners, nation, left);
+    if (buffApproachDifference) return buffApproachDifference;
+
+    const futureDifference =
+      getFutureExpansionScore(owners, nation, right, 4)
+      - getFutureExpansionScore(owners, nation, left, 4);
+    if (Math.abs(futureDifference) > 0.001) return futureDifference;
+
+    return getDistanceToBuff(left) - getDistanceToBuff(right) || left - right;
+  })[0];
 }
 
 function selectBreakoutTarget(
@@ -317,6 +417,31 @@ function selectAiTarget(
     return 27;
   }
 
+  const guaranteedBuffAdjacentTarget = selectGuaranteedBuffAdjacentTarget(owners, nation, targets);
+  if (guaranteedBuffAdjacentTarget !== null) {
+    return guaranteedBuffAdjacentTarget;
+  }
+
+  if (
+    preferredOpeningTarget !== undefined
+    && targets.includes(preferredOpeningTarget)
+    && getConquestChance(owners, nation, preferredOpeningTarget) >= 50
+  ) {
+    return preferredOpeningTarget;
+  }
+
+  if (nation === "오나라" && previousFrontTarget !== undefined && [38, 46, 37, 36].includes(previousFrontTarget)) {
+    const committedCentralTarget = [37, 36, 35, 28, 27].find(
+      (target) =>
+        targets.includes(target)
+        && owners[target] === "미점령"
+        && getConquestChance(owners, nation, target) === 100
+    );
+    if (committedCentralTarget !== undefined) {
+      return committedCentralTarget;
+    }
+  }
+
   if (safeTargets.length > 0) {
     const hasReachedBuffFront = getAdjacentNumbers(27).some(
       (number) => owners[number] === nation
@@ -352,6 +477,11 @@ function selectAiTarget(
       : safeCandidates;
 
     return [...strategicCandidates].sort((left, right) => {
+      const buffApproachDifference =
+        getBuffApproachScore(owners, nation, right) -
+        getBuffApproachScore(owners, nation, left);
+      if (buffApproachDifference) return buffApproachDifference;
+
       if (nearbyThreatNation) {
         const pressureDifference =
           getFocusPressureScore(owners, right, pressureNation) -
@@ -411,6 +541,11 @@ function selectAiTarget(
     const leftMatchesOpening = left === preferredOpeningTarget;
     const rightMatchesOpening = right === preferredOpeningTarget;
     if (leftMatchesOpening !== rightMatchesOpening) return rightMatchesOpening ? 1 : -1;
+
+    const buffApproachDifference =
+      getBuffApproachScore(owners, nation, right) -
+      getBuffApproachScore(owners, nation, left);
+    if (buffApproachDifference) return buffApproachDifference;
 
     const pressureDifference =
       getFocusPressureScore(owners, right, pressureNation) -
@@ -572,12 +707,66 @@ function getWuCentralPressureResponse(
   }
 
   const conquerableTargets = getConquerableTargets(owners, "오나라");
-  return wuLowerFlankResponse.find(
+  const centralRaceTargets = [38, 37, 36, 28, 29, 27];
+  const hasCentralRaceOption = centralRaceTargets.some(
     (target) =>
       owners[target] === "미점령"
       && conquerableTargets.includes(target)
       && getConquestChance(owners, "오나라", target) === 100
-  ) ?? null;
+  );
+  if (hasCentralRaceOption) {
+    return null;
+  }
+
+  const committedCentralRoute = [37, 36, 35, 28, 27];
+  const hasStartedCentralRoute =
+    owners[38] === "오나라"
+    || owners[46] === "오나라"
+    || owners[37] === "오나라"
+    || owners[36] === "오나라";
+  if (hasStartedCentralRoute) {
+    const nextCentralTarget = committedCentralRoute.find(
+      (target) =>
+        owners[target] === "미점령"
+        && conquerableTargets.includes(target)
+        && getConquestChance(owners, "오나라", target) === 100
+    );
+    if (nextCentralTarget !== undefined) {
+      return nextCentralTarget;
+    }
+  }
+
+  const responseCandidates = [...wuUpperPressureResponse, ...wuLowerFlankResponse].filter(
+    (target) =>
+      owners[target] === "미점령"
+      && conquerableTargets.includes(target)
+      && getConquestChance(owners, "오나라", target) === 100
+  );
+  if (responseCandidates.length === 0) return null;
+
+  return [...responseCandidates].sort((left, right) => {
+    const buffApproachDifference =
+      getBuffApproachScore(owners, "오나라", right)
+      - getBuffApproachScore(owners, "오나라", left);
+    if (buffApproachDifference) return buffApproachDifference;
+
+    const pressureDifference =
+      getFocusPressureScore(owners, right, "위나라")
+      - getFocusPressureScore(owners, left, "위나라");
+    if (pressureDifference) return pressureDifference;
+
+    const weiDistanceDifference =
+      getDistanceToNation(owners, left, "위나라")
+      - getDistanceToNation(owners, right, "위나라");
+    if (weiDistanceDifference) return weiDistanceDifference;
+
+    const futureDifference =
+      getFutureExpansionScore(owners, "오나라", right, 4)
+      - getFutureExpansionScore(owners, "오나라", left, 4);
+    if (Math.abs(futureDifference) > 0.001) return futureDifference;
+
+    return left - right;
+  })[0];
 }
 
 export function ConquestGame() {
@@ -960,7 +1149,7 @@ export function ConquestGame() {
             <svg className="conquest-game-map-desktop" viewBox="0 0 1180 720" preserveAspectRatio="none" role="img" aria-label="점령 시뮬게임 지도">
               {renderMapLayers()}
             </svg>
-            <svg className="conquest-game-map-mobile" viewBox="220 75 760 520" preserveAspectRatio="none" role="img" aria-label="모바일 점령 시뮬게임 지도">
+            <svg className="conquest-game-map-mobile" viewBox="150 35 900 640" preserveAspectRatio="none" role="img" aria-label="모바일 점령 시뮬게임 지도">
               {renderMapLayers()}
             </svg>
             <div className="conquest-game-scoreboard" aria-label="국가별 점령 수">
@@ -1006,7 +1195,8 @@ export function ConquestGame() {
               <li><b>인접 점령</b><span>내 영지의 상하좌우만 점령할 수 있습니다.</span></li>
               <li><b>점령 비용</b><span>사용자가 점령을 시도할 때마다 🪙 500,000이 차감됩니다.</span></li>
               <li><b>국가 견제</b><span>인접한 적국 1개국마다 확률이 절반이 됩니다. 같은 국가의 여러 타일은 한 번만 계산합니다.</span></li>
-              <li><b>27번 버프</b><span>보유 국가는 점령 성공 확률이 5%p 증가합니다. 예를 들어 50%는 55%가 됩니다.</span></li>
+              <li><b>27번 버프</b><span>보유 국가는 점령 성공 확률이 5%p 증가하며, 견제자로 붙으면 상대 확률을 5%p 낮춥니다.</span></li>
+              <li><b>영토 보정</b><span>10칸부터 보유 수에 따라 10칸 1%p, 11칸 2%p처럼 공격 버프와 견제 디버프가 적용됩니다.</span></li>
               <li><b>게임 종료</b><span>금화가 소진되면 점령 확률이 100%인 미점령 영지만 자동 점령됩니다.</span></li>
             </ol>
             <div className="conquest-game-probability">
@@ -1014,7 +1204,7 @@ export function ConquestGame() {
               <div><span>견제 없음</span><strong>100%</strong></div>
               <div><span>적국 1개국 인접</span><strong>50%</strong></div>
               <div><span>적국 2개국 인접</span><strong>25%</strong></div>
-              <p>⭐ 27번 보유 시 위 확률에 <b>+5%p</b>가 적용됩니다.</p>
+              <p>⭐ 27번과 보유 영토 수에 따라 공격 버프/견제 디버프가 함께 적용됩니다.</p>
             </div>
           </div>
         </aside>

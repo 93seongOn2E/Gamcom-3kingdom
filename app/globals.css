@@ -2040,6 +2040,11 @@ header.site-chrome-bg > button {
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .6));
 }
 
+.conquest-game .map-territory-number,
+.conquest-game .map-territory-special-star {
+  pointer-events: none;
+}
+
 .conquest-game-tile.captured {
   stroke: #fff7cf;
   stroke-width: 3.4px;
@@ -2286,7 +2291,7 @@ header.site-chrome-bg > button {
 
   .conquest-game-map {
     min-height: 0;
-    aspect-ratio: 760 / 520;
+    aspect-ratio: 900 / 640;
   }
 
   .conquest-game-map-desktop {
@@ -2307,6 +2312,7 @@ header.site-chrome-bg > button {
   .conquest-game {
     border-radius: 14px;
     padding: 13px;
+    overflow: hidden;
   }
 
   .conquest-game-topbar h2 {
@@ -2367,7 +2373,9 @@ header.site-chrome-bg > button {
 
   .conquest-game-map {
     margin-top: 62px;
-    overflow: visible;
+    height: min(430px, calc((100vw - 52px) * 0.711));
+    min-height: 0;
+    overflow: hidden;
   }
 
   .conquest-game-scoreboard {
