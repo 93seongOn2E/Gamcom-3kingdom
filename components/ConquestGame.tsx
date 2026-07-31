@@ -1110,41 +1110,6 @@ export function ConquestGame() {
 
       <div className="conquest-game-layout">
         <div className="conquest-game-main">
-          {phase === "playing" ? (
-            <div className="conquest-game-actionbar">
-              <div>
-                <span>{playerNation} · 점령 비용 🪙500,000</span>
-                <strong>
-                  {isResolvingTurn
-                    ? turnBanner || "상대 국가 차례입니다."
-                    : conquerableTargets.length === 0
-                    ? "점령 가능한 영지가 없습니다."
-                    : selectedTarget === null
-                      ? "빛나는 인접 영지를 선택하세요."
-                      : `${selectedTarget}번 영지를 점령하시겠습니까?`}
-                </strong>
-              </div>
-
-              {!isResolvingTurn && selectedTarget !== null && selectedChance !== null && selectedInterference ? (
-                <div className="conquest-game-attempt">
-                  <p>
-                    성공 확률 <b>{selectedChance}%</b>
-                    {selectedInterference.count > 0
-                      ? <span><ShieldAlert size={14} /> 적국 {selectedInterference.count}개국 견제</span>
-                      : <span className="safe">견제 없음</span>}
-                  </p>
-                  <button type="button" onClick={() => finishRound(selectedTarget)}>
-                    <Swords size={16} /> 점령 시도 · 🪙500,000
-                  </button>
-                </div>
-              ) : !isResolvingTurn && conquerableTargets.length === 0 ? (
-                <button type="button" className="conquest-game-skip" onClick={() => finishRound(null)}>
-                  게임 종료
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-
           <div className="conquest-game-map">
             <svg className="conquest-game-map-desktop" viewBox="0 0 1180 720" preserveAspectRatio="none" role="img" aria-label="점령 시뮬게임 지도">
               {renderMapLayers()}
@@ -1172,6 +1137,23 @@ export function ConquestGame() {
               <span>{phase === "finished" ? "금화 소진" : "보유 금화"}</span>
               <strong>🪙 {funds.toLocaleString("ko-KR")}</strong>
             </div>
+            {phase === "playing" && !isResolvingTurn && selectedTarget !== null && selectedChance !== null && selectedInterference ? (
+              <div className="conquest-game-attempt conquest-game-map-attempt">
+                <p>
+                  성공 확률 <b>{selectedChance}%</b>
+                  {selectedInterference.count > 0
+                    ? <span><ShieldAlert size={14} /> 적국 {selectedInterference.count}개국 견제</span>
+                    : <span className="safe">견제 없음</span>}
+                </p>
+                <button type="button" onClick={() => finishRound(selectedTarget)}>
+                  <Swords size={16} /> 점령 시도 · 🪙500,000
+                </button>
+              </div>
+            ) : phase === "playing" && !isResolvingTurn && conquerableTargets.length === 0 ? (
+              <button type="button" className="conquest-game-skip conquest-game-map-attempt" onClick={() => finishRound(null)}>
+                게임 종료
+              </button>
+            ) : null}
             {phase === "setup" ? <div className="conquest-game-map-lock">국가를 선택하고 게임을 시작하세요</div> : null}
             {isResolvingTurn && turnBanner ? (
               <div
