@@ -3,6 +3,7 @@
 import { ExternalLink } from "lucide-react";
 
 const contactUrl = "https://note.sooplive.com/app/index.php?page=write&id_list=lsw5332";
+const reportUrl = "https://www.sooplive.com/station/kimjony/post/203105201";
 
 export function RecruitAdminPopup() {
   const openContactPopup = () => {
@@ -24,7 +25,18 @@ export function RecruitAdminPopup() {
             <strong className="recruit-notice-nation recruit-notice-nation-wu">오나라</strong>
             <span> 장비현황 업데이트를 도와주실 분을 모집합니다.</span>
           </span>
-          <span className="recruit-notice-desc">위나라 · 오나라 내실 현황 제보 부탁드립니다.</span>
+          <span className="recruit-notice-report-group">
+            <span className="recruit-notice-desc">위나라 · 오나라 내실 현황 제보 부탁드립니다.</span>
+            <a
+              href={reportUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="recruit-notice-report-button"
+            >
+              제보하기
+              <ExternalLink size={13} />
+            </a>
+          </span>
         </div>
 
         <div className="recruit-notice-actions">

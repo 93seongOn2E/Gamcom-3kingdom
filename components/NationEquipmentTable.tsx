@@ -1,7 +1,7 @@
 "use client";
 
 import { canEquipHeadArmor } from "@/lib/equipment-config";
-import { crewBadgeClassMap, formatJobDisplayName, getHiddenJobBadge } from "@/lib/factions-config";
+import { crewBadgeClassMap, formatJobDisplayName, getHiddenJobBadge, hiddenJobConfig } from "@/lib/factions-config";
 import { Fragment, useMemo, useState } from "react";
 
 export type EquipmentMemberRow = {
@@ -36,6 +36,24 @@ type SortKey =
   | "stat_intelligence";
 
 type SortDirection = "asc" | "desc";
+
+const jobSortGroups: ReadonlyArray<readonly string[]> = [
+  hiddenJobConfig.군주.jobs,
+  hiddenJobConfig["히든 영객"].jobs,
+  hiddenJobConfig["히든 창수"].jobs,
+  hiddenJobConfig["히든 책사"].jobs,
+  hiddenJobConfig.영객.jobs,
+  hiddenJobConfig.패월.jobs,
+  hiddenJobConfig.창수.jobs,
+  hiddenJobConfig.궁장.jobs,
+  hiddenJobConfig.책사.jobs
+];
+
+function getJobSortRank(job: string | null) {
+  if (!job) return 0;
+  const groupIndex = jobSortGroups.findIndex((jobs) => jobs.includes(job));
+  return groupIndex === -1 ? 0 : jobSortGroups.length - groupIndex;
+}
 
 function formatValue(value: number | null) {
   return value == null ? "-" : value;
@@ -152,6 +170,22 @@ export function NationEquipmentTable({
     return rows
       .map((member, index) => ({ member, index }))
       .sort((left, right) => {
+        if (sortKey === "job") {
+          const rankResult = compareValues(
+            getJobSortRank(left.member.job),
+            getJobSortRank(right.member.job),
+            sortDirection
+          );
+          if (rankResult) return rankResult;
+
+          const jobNameResult = compareValues(
+            formatJobDisplayName(left.member.job),
+            formatJobDisplayName(right.member.job),
+            sortDirection
+          );
+          if (jobNameResult) return jobNameResult;
+        }
+
         const result = compareValues(
           getSortValue(left.member, sortKey),
           getSortValue(right.member, sortKey),
@@ -172,8 +206,23 @@ export function NationEquipmentTable({
     setSortDirection("asc");
   }
 
+  function resetSort() {
+    setSortKey(null);
+    setSortDirection("asc");
+  }
+
   return (
     <div className="equipment-table-scroll overflow-x-auto">
+      <div className="flex items-center justify-end border-b border-[rgba(212,167,86,0.16)] bg-black/20 px-3 py-2">
+        <button
+          type="button"
+          onClick={resetSort}
+          disabled={!sortKey}
+          className="inline-flex min-h-7 items-center justify-center rounded-md border border-[rgba(212,167,86,0.28)] bg-[#d4a756]/10 px-2.5 text-[11px] font-black text-[#e6c98f] transition hover:bg-[#d4a756]/20 disabled:cursor-default disabled:border-white/[0.06] disabled:bg-white/[0.025] disabled:text-[#756a58]"
+        >
+          정렬 초기화
+        </button>
+      </div>
       <table className={`equipment-table border-collapse text-[13px] leading-5 ${showStats ? "min-w-[900px] table-fixed" : "w-full min-w-full table-fixed"}`}>
         {showStats ? (
           <colgroup>
@@ -210,11 +259,14 @@ export function NationEquipmentTable({
               </>
             ) : (
               <>
-                {["크루", "이름", "직업", "말", "무기", "두갑", "흉갑", "각갑"].map((label) => (
-                  <th key={label} className="whitespace-nowrap px-1 py-3 text-center text-[11px] font-extrabold tracking-[0.02em]">
-                    {label}
-                  </th>
-                ))}
+                <SortHeader label="크루" sortKey="crew_name" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
+                <SortHeader label="이름" sortKey="nickname" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
+                <SortHeader label="직업" sortKey="job" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
+                <SortHeader label="말" sortKey="horse" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
+                <SortHeader label="무기" sortKey="weapon" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
+                <SortHeader label="두갑" sortKey="helmet" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
+                <SortHeader label="흉갑" sortKey="armor" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
+                <SortHeader label="각갑" sortKey="shoes" activeKey={sortKey} direction={sortDirection} onSort={handleSort} />
               </>
             )}
           </tr>

@@ -487,7 +487,8 @@ header.site-chrome-bg > button {
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  min-height: 64px;
+  gap: 18px;
   border: 0;
   border-bottom: 1px solid rgba(212, 167, 86, .32);
   border-radius: 0;
@@ -498,7 +499,7 @@ header.site-chrome-bg > button {
     0 12px 34px rgba(0, 0, 0, .52),
     0 0 24px rgba(212, 167, 86, .14),
     inset 0 1px 0 rgba(255, 244, 214, .08);
-  padding: 8px 18px;
+  padding: 13px 22px;
 }
 
 .recruit-notice-copy {
@@ -506,9 +507,9 @@ header.site-chrome-bg > button {
   flex: 1 1 auto;
   min-width: 0;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   color: #f3e7d0;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 900;
 }
 
@@ -517,8 +518,8 @@ header.site-chrome-bg > button {
   border-radius: 999px;
   background: linear-gradient(180deg, #ffe1a0, #c79235);
   color: #130d07;
-  padding: 4px 9px;
-  font-size: 11px;
+  padding: 6px 12px;
+  font-size: 13px;
   font-weight: 950;
   letter-spacing: .04em;
 }
@@ -530,21 +531,50 @@ header.site-chrome-bg > button {
   white-space: nowrap;
 }
 
-.recruit-notice-desc {
+.recruit-notice-report-group {
+  display: inline-flex;
   flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+}
+
+.recruit-notice-desc {
   border-left: 1px solid rgba(212, 167, 86, .3);
-  padding-left: 10px;
+  padding-left: 12px;
   color: #f3cd7a;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   white-space: nowrap;
+}
+
+.recruit-notice-report-button {
+  display: inline-flex;
+  min-height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid rgba(240, 201, 120, .46);
+  border-radius: 999px;
+  background: rgba(212, 167, 86, .14);
+  padding: 0 12px;
+  color: #ffe3a1;
+  font-size: 12px;
+  font-weight: 950;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.recruit-notice-report-button:hover {
+  border-color: rgba(255, 221, 145, .72);
+  background: rgba(212, 167, 86, .26);
+  color: #fff1c8;
 }
 
 .recruit-notice-nation {
   display: inline-block;
   border-radius: 999px;
-  padding: 2px 7px;
-  font-size: 12px;
+  padding: 3px 9px;
+  font-size: 13px;
   font-weight: 950;
   letter-spacing: -.02em;
 }
@@ -572,10 +602,10 @@ header.site-chrome-bg > button {
 
 .recruit-notice-actions .recruit-popup-primary,
 .recruit-notice-actions .recruit-popup-secondary {
-  min-height: 28px;
+  min-height: 36px;
   border-radius: 999px;
-  padding: 0 11px;
-  font-size: 12px;
+  padding: 0 16px;
+  font-size: 13px;
 }
 
 .teaser-modal-layer {
@@ -3501,26 +3531,33 @@ thead .admin-equipment-stat-divider::before {
   }
 
   .recruit-notice-inner {
+    min-height: 0;
     align-items: flex-start;
     border-radius: 0;
     flex-direction: column;
     gap: 8px;
-    padding: 10px 12px;
+    padding: 12px;
   }
 
   .recruit-notice-copy {
     width: 100%;
     align-items: center;
+    flex-wrap: wrap;
     gap: 7px;
     line-height: 1.45;
+    font-size: 13px;
   }
 
   .recruit-notice-title {
     white-space: normal;
   }
 
-  .recruit-notice-desc {
+  .recruit-notice-report-group {
     width: 100%;
+  }
+
+  .recruit-notice-desc {
+    min-width: 0;
     border-left: 0;
     padding-left: 0;
     white-space: normal;
@@ -3533,6 +3570,7 @@ thead .admin-equipment-stat-divider::before {
   .recruit-notice-actions .recruit-popup-primary,
   .recruit-notice-actions .recruit-popup-secondary {
     flex: 1;
+    min-height: 34px;
   }
 
 }
