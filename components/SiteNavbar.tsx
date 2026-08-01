@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Home, Map, Menu, Monitor, Radio, ScrollText, Swords, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getStreamerMode, setStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
 
 type NavLinkItem = {
   href: string;
@@ -41,15 +40,11 @@ const nationEquipmentNavItem: NavLinkItem = { href: "/factions/nation", label: "
 function SidebarContent({
   pathname,
   onNavigate,
-  adminAuthenticated,
-  streamerModeOn,
-  onStreamerModeChange
+  adminAuthenticated
 }: {
   pathname: string;
   onNavigate?: () => void;
   adminAuthenticated: boolean;
-  streamerModeOn: boolean;
-  onStreamerModeChange: () => void;
 }) {
   const isActive = (href: string) => {
     if (href === "/" || href === "/factions") {
@@ -63,12 +58,8 @@ function SidebarContent({
   const navItems: NavItem[] = [
     ...baseNavItems,
     nationEquipmentNavItem,
-    ...(!streamerModeOn
-      ? [
-          { type: "separator" as const, label: "-스트리머클릭주의-" },
-          integratedEquipmentNavItem
-        ]
-      : []),
+    { type: "separator", label: "-스트리머클릭주의-" },
+    integratedEquipmentNavItem,
     adminAuthenticated
       ? { href: "/admin/map", label: "관리자", icon: ScrollText }
       : { href: "/admin/login", label: "관리자", icon: ScrollText }
@@ -88,27 +79,6 @@ function SidebarContent({
       </Link>
 
       <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-5" aria-label="주 메뉴">
-        <div className="home-streamer-control sidebar-streamer-control">
-          <button
-            type="button"
-            className={`home-streamer-switch ${streamerModeOn ? "active" : ""}`}
-            role="switch"
-            aria-checked={streamerModeOn}
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onStreamerModeChange();
-            }}
-          >
-            <span className="home-streamer-switch-track" aria-hidden="true">
-              <span className="home-streamer-switch-thumb" />
-            </span>
-            <strong>{streamerModeOn ? "ON" : "OFF"}</strong>
-          </button>
-          <span className="home-streamer-control-label">스트리머 모드</span>
-        </div>
-
         {navItems.map((item, index) => {
           if (!("href" in item)) {
             return (
@@ -155,27 +125,10 @@ export function SiteNavbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
-  const [streamerModeOn, setStreamerModeOnState] = useState(true);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
-
-  useEffect(() => {
-    const handleStreamerModeChange = (event: Event) => {
-      setStreamerModeOnState((event as CustomEvent<boolean>).detail);
-    };
-
-    setStreamerModeOnState(getStreamerMode());
-    window.addEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
-    return () => window.removeEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
-  }, []);
-
-  const toggleStreamerMode = () => {
-    const nextStreamerMode = !streamerModeOn;
-    setStreamerModeOnState(nextStreamerMode);
-    setStreamerMode(nextStreamerMode);
-  };
 
   useEffect(() => {
     let mounted = true;
@@ -210,8 +163,6 @@ export function SiteNavbar() {
         <SidebarContent
           pathname={pathname}
           adminAuthenticated={adminAuthenticated}
-          streamerModeOn={streamerModeOn}
-          onStreamerModeChange={toggleStreamerMode}
         />
       </aside>
 
@@ -247,8 +198,6 @@ export function SiteNavbar() {
               pathname={pathname}
               onNavigate={() => setOpen(false)}
               adminAuthenticated={adminAuthenticated}
-              streamerModeOn={streamerModeOn}
-              onStreamerModeChange={toggleStreamerMode}
             />
           </aside>
         </div>

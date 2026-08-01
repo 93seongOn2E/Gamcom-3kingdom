@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MapViewer } from "@/components/MapViewer";
 import type { CastleDataPayload } from "@/lib/public-data";
-import { getStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
 
 export type ChronicleEntry = {
   nations: string[];
@@ -21,17 +20,6 @@ function getNationThemeClass(nation: string) {
 export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEntry[]; castleData: CastleDataPayload }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
-  const [isStreamerModeOn, setIsStreamerModeOn] = useState(true);
-
-  useEffect(() => {
-    const handleStreamerModeChange = (event: Event) => {
-      setIsStreamerModeOn((event as CustomEvent<boolean>).detail);
-    };
-
-    setIsStreamerModeOn(getStreamerMode());
-    window.addEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
-    return () => window.removeEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
-  }, []);
 
   useEffect(() => {
     const element = mapRef.current;
@@ -63,7 +51,6 @@ export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEn
       <div className="home-overview-stage">
         <section
           className="home-overview grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.6fr)_340px]"
-          aria-hidden={isStreamerModeOn}
         >
           <div ref={mapRef} className="home-overview-map flex h-full flex-col">
             <MapViewer compact initialData={castleData} />
@@ -97,14 +84,6 @@ export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEn
           </aside>
         </section>
 
-        {isStreamerModeOn ? (
-          <div className="home-streamer-cover" role="status" aria-live="polite">
-            <div className="home-streamer-cover-inner">
-              <span aria-hidden="true">⚔️</span>
-              <strong>스트리머 모드 적용 중입니다.</strong>
-            </div>
-          </div>
-        ) : null}
       </div>
     </div>
   );
