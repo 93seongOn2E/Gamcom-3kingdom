@@ -65,7 +65,7 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
     : undefined;
 
   return (
-    <div className="mx-auto max-w-[92rem] px-3 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
+    <div className="mx-auto max-w-[102rem] px-3 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-black" style={{ color: selectedNationConfig?.color ?? "#f3e7d0" }}>
@@ -122,7 +122,7 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
         </div>
       ) : null}
 
-      <div className={selectedNation ? "mx-auto grid w-full max-w-[920px] gap-6" : "grid gap-6 xl:grid-cols-3"}>
+      <div className={selectedNation ? "mx-auto grid w-full max-w-[920px] gap-6" : "grid gap-4 xl:grid-cols-3"}>
         {visibleNationConfigs.map((nation) => {
           const rows = membersByNation[nation.key] ?? [];
           const emptySlotCount = Math.max(0, nationMemberSlotCount - rows.length);

@@ -83,7 +83,7 @@ const jobGroups: JobGroup[] = [
       {
         name: "적령",
         weaponName: "혈영도",
-        weaponType: "단검",
+        weaponType: "장검",
         icon: "/assets/icons/weapons/hyeolyeong-blade.webp",
         stats: { 공격력: "매우높음", 체력: "매우낮음", 속도: "매우빠름", 쿨타임: "빠름" }
       }
