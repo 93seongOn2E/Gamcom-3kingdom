@@ -63,8 +63,12 @@ function SidebarContent({
   const navItems: NavItem[] = [
     ...baseNavItems,
     nationEquipmentNavItem,
-    { type: "separator", label: "-스트리머클릭주의-" },
-    integratedEquipmentNavItem,
+    ...(!streamerModeOn
+      ? [
+          { type: "separator" as const, label: "-스트리머클릭주의-" },
+          integratedEquipmentNavItem
+        ]
+      : []),
     adminAuthenticated
       ? { href: "/admin/map", label: "관리자", icon: ScrollText }
       : { href: "/admin/login", label: "관리자", icon: ScrollText }
