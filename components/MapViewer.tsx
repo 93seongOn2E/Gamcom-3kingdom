@@ -11,6 +11,7 @@ import {
   type TerritoryFacility,
   type TerritoryOwnerFull
 } from "@/lib/territory-map-config";
+import { getStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
 
 type ForceId = "위나라" | "촉나라" | "오나라";
 type CastleLevel = 1 | 2 | 3;
@@ -306,6 +307,17 @@ export function MapViewer({
   const [isLoading, setIsLoading] = useState(!initialData);
   const [simulationHistory, setSimulationHistory] = useState<CastleData[]>([]);
   const [simulationPopover, setSimulationPopover] = useState<SimulationPopoverPosition | null>(null);
+  const [isStreamerModeOn, setIsStreamerModeOn] = useState(true);
+
+  useEffect(() => {
+    const handleStreamerModeChange = (event: Event) => {
+      setIsStreamerModeOn((event as CustomEvent<boolean>).detail);
+    };
+
+    setIsStreamerModeOn(getStreamerMode());
+    window.addEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
+    return () => window.removeEventListener(STREAMER_MODE_EVENT, handleStreamerModeChange);
+  }, []);
 
   const loadCastles = useCallback(async () => {
     setIsLoading(true);
@@ -518,6 +530,7 @@ export function MapViewer({
     acc[force] = castles.filter((castle) => castle.owner === force).length;
     return acc;
   }, { 위나라: 0, 촉나라: 0, 오나라: 0 });
+  const hideMapFacilities = !simulation && isStreamerModeOn;
 
   const renderMapLayers = () => (
     <>
@@ -540,7 +553,7 @@ export function MapViewer({
 
       <g id="territories" transform={viewerTerritoryTransform}>
         {castles.map((castle) => {
-          const hasFacility = castle.facilityType !== "없음";
+          const hasFacility = !hideMapFacilities && castle.facilityType !== "없음";
           const isSpecial = specialTerritoryNumbers.has(castle.number);
           const isUnclaimedSpecial = isSpecial && castle.owner === "미점령";
           const numberY = hasFacility ? castle.cy - 9 : castle.cy + 6;
@@ -564,7 +577,7 @@ export function MapViewer({
                 x={castle.cx}
                 y={numberY}
               >
-                {castle.isCapital ? <tspan className="map-territory-inline-crown">👑</tspan> : null}
+                {!hideMapFacilities && castle.isCapital ? <tspan className="map-territory-inline-crown">👑</tspan> : null}
                 <tspan>{castle.name}</tspan>
               </text>
               {isSpecial ? (
@@ -651,11 +664,11 @@ export function MapViewer({
             <RefreshCcw size={15} className={isLoading ? "animate-spin" : ""} />
             <span>새로고침</span>
           </button> : null}
-          <div className="map-territory-legend" aria-label="수도 및 거점 아이콘 설명">
-            <span><b>👑</b> 수도</span>
-            <span><b>⚔️</b> 병영</span>
-            <span><b>🛡️</b> 성채</span>
-            <span><b>🏠</b> 장원</span>
+          <div className="map-territory-legend" aria-label={hideMapFacilities ? "지도 아이콘 설명" : "수도 및 거점 아이콘 설명"}>
+            {!hideMapFacilities ? <span><b>👑</b> 수도</span> : null}
+            {!hideMapFacilities ? <span><b>⚔️</b> 병영</span> : null}
+            {!hideMapFacilities ? <span><b>🛡️</b> 성채</span> : null}
+            {!hideMapFacilities ? <span><b>🏠</b> 장원</span> : null}
             <span><b>⭐</b> 버프</span>
           </div>
         </div>
