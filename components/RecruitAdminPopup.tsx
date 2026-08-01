@@ -18,8 +18,13 @@ export function RecruitAdminPopup() {
       <div className="recruit-notice-inner">
         <div className="recruit-notice-copy">
           <span className="recruit-notice-badge">관리자 모집</span>
-          <span className="recruit-notice-title">위나라 · 촉나라 · 오나라 장비현황 업데이트를 도와주실 분을 모집합니다.</span>
-          <span className="recruit-notice-desc">담당 희망 크루를 적어 문의해주세요.</span>
+          <span className="recruit-notice-title">
+            <strong className="recruit-notice-nation recruit-notice-nation-wei">위나라</strong>
+            <span aria-hidden="true"> · </span>
+            <strong className="recruit-notice-nation recruit-notice-nation-wu">오나라</strong>
+            <span> 장비현황 업데이트를 도와주실 분을 모집합니다.</span>
+          </span>
+          <span className="recruit-notice-desc">위나라 · 오나라 내실 현황 제보 부탁드립니다.</span>
         </div>
 
         <div className="recruit-notice-actions">

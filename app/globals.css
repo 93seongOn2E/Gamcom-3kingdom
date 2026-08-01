@@ -503,6 +503,7 @@ header.site-chrome-bg > button {
 
 .recruit-notice-copy {
   display: flex;
+  flex: 1 1 auto;
   min-width: 0;
   align-items: center;
   gap: 10px;
@@ -523,6 +524,7 @@ header.site-chrome-bg > button {
 }
 
 .recruit-notice-title {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -530,9 +532,35 @@ header.site-chrome-bg > button {
 
 .recruit-notice-desc {
   flex: 0 0 auto;
-  color: #bda783;
+  border-left: 1px solid rgba(212, 167, 86, .3);
+  padding-left: 10px;
+  color: #f3cd7a;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.recruit-notice-nation {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: -.02em;
+}
+
+.recruit-notice-nation-wei {
+  border: 1px solid rgba(80, 159, 255, .5);
+  background: rgba(43, 113, 198, .25);
+  color: #a8d1ff;
+  box-shadow: 0 0 14px rgba(55, 132, 230, .2);
+}
+
+.recruit-notice-nation-wu {
+  border: 1px solid rgba(239, 181, 35, .55);
+  background: rgba(184, 128, 0, .25);
+  color: #ffe08a;
+  box-shadow: 0 0 14px rgba(227, 166, 23, .2);
 }
 
 .recruit-notice-actions {
@@ -3481,8 +3509,8 @@ thead .admin-equipment-stat-divider::before {
   }
 
   .recruit-notice-copy {
-    align-items: flex-start;
-    flex-wrap: wrap;
+    width: 100%;
+    align-items: center;
     gap: 7px;
     line-height: 1.45;
   }
@@ -3493,6 +3521,9 @@ thead .admin-equipment-stat-divider::before {
 
   .recruit-notice-desc {
     width: 100%;
+    border-left: 0;
+    padding-left: 0;
+    white-space: normal;
   }
 
   .recruit-notice-actions {
@@ -3503,4 +3534,5 @@ thead .admin-equipment-stat-divider::before {
   .recruit-notice-actions .recruit-popup-secondary {
     flex: 1;
   }
+
 }
