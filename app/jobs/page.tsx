@@ -53,7 +53,7 @@ type SkillVideo = {
 };
 
 type HiddenSkillProfile = {
-  kingdom: "위나라" | "촉나라" | "오나라" | "모험 히든";
+  kingdom: "위나라" | "촉나라" | "오나라" | "모험/API 히든";
   name: string;
   role: string;
   skills: SkillInfo[];
@@ -277,7 +277,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
-    kingdom: "모험 히든",
+    kingdom: "모험/API 히든",
     name: "손책",
     role: "패월",
     skills: [
@@ -285,6 +285,12 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
       { name: "회풍검문", description: "주변의 적을 바람으로 밀쳐낸 뒤, 일렁이는 베인선을 펼쳐 그 위의 적에게 지속 피해를 입힙니다. 이때 잠시 동안 자신이 받는 피해도 감소합니다.", controlEffects: ["넉백"], hasVideo: false },
       { name: "돌섬참", description: "앞으로 돌진하며 넓은 범위의 적을 베어낸 뒤, 베인 적에게 지속 피해를 남깁니다.", hasVideo: false }
     ]
+  },
+  {
+    kingdom: "모험/API 히든",
+    name: "하후연",
+    role: "영객",
+    skills: []
   },
   {
     kingdom: "위나라",
@@ -571,7 +577,7 @@ export default function JobsPage() {
         </div>
 
         <div className="grid gap-4 p-4 md:p-5">
-          {(["위나라", "촉나라", "오나라", "모험 히든"] as const).map((kingdom) => {
+          {(["위나라", "촉나라", "오나라", "모험/API 히든"] as const).map((kingdom) => {
             const profiles = hiddenSkillProfiles
               .filter((profile) => profile.kingdom === kingdom)
               .sort((left, right) => {
@@ -598,19 +604,26 @@ export default function JobsPage() {
                       key={`${profile.kingdom}-${profile.name}`}
                       id={profile.role === "군주" ? undefined : `hidden-${profile.name}`}
                       type="button"
-                      onClick={() => setSelectedHiddenProfile(profile)}
-                      className="group rounded-xl border border-[rgba(212,167,86,0.18)] bg-black/34 p-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:border-[#d4a756]/42 hover:bg-black/44"
+                      disabled={profile.skills.length === 0}
+                      onClick={() => profile.skills.length > 0 && setSelectedHiddenProfile(profile)}
+                      className={`group rounded-xl border border-[rgba(212,167,86,0.18)] bg-black/34 p-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition ${
+                        profile.skills.length > 0 ? "hover:border-[#d4a756]/42 hover:bg-black/44" : "cursor-default opacity-80"
+                      }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="text-lg font-black tracking-[-0.02em] text-[#f3e7d0]">{profile.name}</div>
-                          <div className="mt-1 text-xs font-bold text-[#aa9a82]">전용 스킬 {profile.skills.length}개 · 클릭해서 상세 보기</div>
+                          <div className="mt-1 text-xs font-bold text-[#aa9a82]">
+                            {profile.skills.length > 0 ? `전용 스킬 ${profile.skills.length}개 · 클릭해서 상세 보기` : "스킬 추후 추가 예정"}
+                          </div>
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
                           <span className={`rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${hiddenRoleBadgeClass(profile.role, profile.role === "군주")}`}>
                             {profile.role === "군주" ? "👑" : ""}{profile.role}
                           </span>
-                          <span className="rounded-full bg-[#d4a017]/14 px-2 py-1 text-xs font-black text-[#f0c98b] ring-1 ring-[#d4a756]/24">보기</span>
+                          <span className="rounded-full bg-[#d4a017]/14 px-2 py-1 text-xs font-black text-[#f0c98b] ring-1 ring-[#d4a756]/24">
+                            {profile.skills.length > 0 ? "보기" : "예정"}
+                          </span>
                         </div>
                       </div>
                       <SkillNameChips skills={profile.skills} />

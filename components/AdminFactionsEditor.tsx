@@ -285,7 +285,7 @@ export function AdminFactionsEditor() {
                                 </option>
                               ))}
                             </optgroup>
-                            <optgroup label="모험 히든">
+                            <optgroup label="모험/API 히든">
                               {adventureHiddenJobOptions.map((option) => (
                                 <option key={option} value={option}>
                                   히든 - {option}

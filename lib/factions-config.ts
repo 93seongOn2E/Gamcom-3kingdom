@@ -35,7 +35,7 @@ export const hiddenJobConfig = {
     badgeClass: "bg-[#d4a017]/24 text-[#ffe0a3] ring-[#d4a756]/40"
   },
   "히든 영객": {
-    jobs: ["하후돈", "조자룡", "감녕"],
+    jobs: ["하후돈", "조자룡", "감녕", "하후연"],
     badgeClass: "bg-[#581c87]/42 text-[#f5d0fe] ring-[#d946ef]/34",
     prefix: "✦"
   },
@@ -96,7 +96,7 @@ export const baseJobOptions = [
   { value: "운시", group: "궁장" }
 ] as const;
 
-export const adventureHiddenJobOptions = ["손책"] as const;
+export const adventureHiddenJobOptions = ["손책", "하후연"] as const;
 
 export const hiddenJobOptionsByNation: Record<string, string[]> = {
   위나라: ["하후돈", "장료", "전위", "사마의"],
