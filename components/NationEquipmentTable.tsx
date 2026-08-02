@@ -40,6 +40,7 @@ type SortDirection = "asc" | "desc";
 const jobSortGroups: ReadonlyArray<readonly string[]> = [
   hiddenJobConfig.군주.jobs,
   hiddenJobConfig["히든 영객"].jobs,
+  hiddenJobConfig["히든 패월"].jobs,
   hiddenJobConfig["히든 창수"].jobs,
   hiddenJobConfig["히든 책사"].jobs,
   hiddenJobConfig.영객.jobs,

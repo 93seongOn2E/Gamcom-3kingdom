@@ -1,6 +1,6 @@
 "use client";
 
-import { baseJobOptions, formatJobDisplayName, getHiddenJobBadge, hiddenJobOptionsByNation } from "@/lib/factions-config";
+import { adventureHiddenJobOptions, baseJobOptions, formatJobDisplayName, getHiddenJobBadge, hiddenJobOptionsByNation } from "@/lib/factions-config";
 import { canEquipHeadArmor, horseEnhancementOptions, horseOptions } from "@/lib/equipment-config";
 import { useEffect, useMemo, useState } from "react";
 
@@ -83,6 +83,7 @@ function hasSelectableJob(member: EditableMember) {
 
   return [
     ...baseJobOptions.map((option) => option.value),
+    ...adventureHiddenJobOptions,
     ...(hiddenJobOptionsByNation[member.nation] ?? [])
   ].includes(member.job);
 }
@@ -281,6 +282,13 @@ export function AdminFactionsEditor() {
                               {baseJobOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                   {option.group} - {option.value}
+                                </option>
+                              ))}
+                            </optgroup>
+                            <optgroup label="모험 히든">
+                              {adventureHiddenJobOptions.map((option) => (
+                                <option key={option} value={option}>
+                                  히든 - {option}
                                 </option>
                               ))}
                             </optgroup>
