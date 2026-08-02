@@ -43,6 +43,7 @@ type SkillInfo = {
   name: string;
   description: string;
   controlEffects?: string[];
+  hasVideo?: boolean;
 };
 
 type SkillVideo = {
@@ -52,7 +53,7 @@ type SkillVideo = {
 };
 
 type HiddenSkillProfile = {
-  kingdom: "위나라" | "촉나라" | "오나라";
+  kingdom: "위나라" | "촉나라" | "오나라" | "모험 히든";
   name: string;
   role: string;
   skills: SkillInfo[];
@@ -276,6 +277,16 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
+    kingdom: "모험 히든",
+    name: "손책",
+    role: "패월",
+    skills: [
+      { name: "사연섬", description: "제자리에서 빠르게 네 번 연속으로 베어냅니다.", hasVideo: false },
+      { name: "회풍검문", description: "주변의 적을 바람으로 밀쳐낸 뒤, 일렁이는 베인선을 펼쳐 그 위의 적에게 지속 피해를 입힙니다. 이때 잠시 동안 자신이 받는 피해도 감소합니다.", controlEffects: ["넉백"], hasVideo: false },
+      { name: "돌섬참", description: "앞으로 돌진하며 넓은 범위의 적을 베어낸 뒤, 베인 적에게 지속 피해를 남깁니다.", hasVideo: false }
+    ]
+  },
+  {
     kingdom: "위나라",
     name: "장료",
     role: "창수",
@@ -437,21 +448,35 @@ function getSkillVideoSrc(ownerName: string, skillName: string) {
 function SkillList({ skills, ownerName, onPlaySkill }: { skills: SkillInfo[]; ownerName: string; onPlaySkill: (video: SkillVideo) => void }) {
   return (
     <div className="grid gap-2">
-      {skills.map((skill) => (
-        <button
-          key={skill.name}
-          type="button"
-          onClick={() => onPlaySkill({ ownerName, skillName: skill.name, src: getSkillVideoSrc(ownerName, skill.name) })}
-          className="rounded-lg border border-white/8 bg-black/20 px-3 py-2.5 text-left transition hover:border-[#d4a756]/42 hover:bg-[#d4a017]/8"
-        >
+      {skills.map((skill) => {
+        const content = (
+          <>
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-sm font-black text-[#f3e7d0]">{skill.name}</span>
             <ControlEffectBadges effects={skill.controlEffects} />
-            <span className="ml-auto rounded-full bg-[#d4a017]/14 px-2 py-0.5 text-[10px] font-black text-[#f0c98b] ring-1 ring-[#d4a756]/22">영상</span>
+            {skill.hasVideo === false ? null : (
+              <span className="ml-auto rounded-full bg-[#d4a017]/14 px-2 py-0.5 text-[10px] font-black text-[#f0c98b] ring-1 ring-[#d4a756]/22">영상</span>
+            )}
           </div>
           <p className="mt-1 text-[13px] font-semibold leading-6 text-[#aa9a82]">{skill.description}</p>
-        </button>
-      ))}
+          </>
+        );
+
+        if (skill.hasVideo === false) {
+          return <div key={skill.name} className="rounded-lg border border-white/8 bg-black/20 px-3 py-2.5 text-left">{content}</div>;
+        }
+
+        return (
+          <button
+            key={skill.name}
+            type="button"
+            onClick={() => onPlaySkill({ ownerName, skillName: skill.name, src: getSkillVideoSrc(ownerName, skill.name) })}
+            className="rounded-lg border border-white/8 bg-black/20 px-3 py-2.5 text-left transition hover:border-[#d4a756]/42 hover:bg-[#d4a017]/8"
+          >
+            {content}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -500,7 +525,8 @@ function SkillNameChips({ skills }: { skills: SkillInfo[] }) {
 function kingdomDotClass(kingdom: HiddenSkillProfile["kingdom"]) {
   if (kingdom === "위나라") return "bg-sky-400";
   if (kingdom === "촉나라") return "bg-emerald-400";
-  return "bg-amber-400";
+  if (kingdom === "오나라") return "bg-amber-400";
+  return "bg-fuchsia-400";
 }
 
 function kingdomPanelClass(kingdom: HiddenSkillProfile["kingdom"]) {
@@ -512,7 +538,11 @@ function kingdomPanelClass(kingdom: HiddenSkillProfile["kingdom"]) {
     return "border-emerald-400/24 bg-[radial-gradient(circle_at_top_left,rgba(52,211,153,0.13),transparent_34%),rgba(0,0,0,0.24)]";
   }
 
-  return "border-amber-400/24 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.14),transparent_34%),rgba(0,0,0,0.24)]";
+  if (kingdom === "오나라") {
+    return "border-amber-400/24 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.14),transparent_34%),rgba(0,0,0,0.24)]";
+  }
+
+  return "border-fuchsia-400/24 bg-[radial-gradient(circle_at_top_left,rgba(232,121,249,0.14),transparent_34%),rgba(0,0,0,0.24)]";
 }
 
 export default function JobsPage() {
@@ -541,7 +571,7 @@ export default function JobsPage() {
         </div>
 
         <div className="grid gap-4 p-4 md:p-5">
-          {(["위나라", "촉나라", "오나라"] as const).map((kingdom) => {
+          {(["위나라", "촉나라", "오나라", "모험 히든"] as const).map((kingdom) => {
             const profiles = hiddenSkillProfiles
               .filter((profile) => profile.kingdom === kingdom)
               .sort((left, right) => {
