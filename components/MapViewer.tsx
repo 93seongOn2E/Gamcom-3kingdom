@@ -549,6 +549,7 @@ export function MapViewer({
 
     const selectedTile = getTerritoryTilePosition(selectedCastle.number);
     if (!selectedTile) return [];
+    const hasBarracksRange = simulation && selectedCastle.facilityType === "병영";
 
     return castles.filter((castle) => {
       if (castle.owner !== "미점령") return false;
@@ -556,9 +557,16 @@ export function MapViewer({
       const tile = getTerritoryTilePosition(castle.number);
       if (!tile) return false;
 
-      return Math.abs(tile.row - selectedTile.row) + Math.abs(tile.column - selectedTile.column) === 1;
+      const rowDistance = Math.abs(tile.row - selectedTile.row);
+      const columnDistance = Math.abs(tile.column - selectedTile.column);
+
+      if (hasBarracksRange) {
+        return rowDistance <= 1 && columnDistance <= 1 && rowDistance + columnDistance > 0;
+      }
+
+      return rowDistance + columnDistance === 1;
     });
-  }, [castles, selectedCastle]);
+  }, [castles, selectedCastle, simulation]);
   const summary = forceIds.reduce<Record<ForceId, number>>((acc, force) => {
     acc[force] = castles.filter((castle) => castle.owner === force).length;
     return acc;

@@ -3186,14 +3186,14 @@ thead .admin-equipment-stat-divider::before {
   line-height: 1.75;
 }
 
-.chronicle-inline-force {
-  min-height: 20px;
-  margin: 0 3px;
-  padding: 0 7px;
-  vertical-align: 1px;
-  font-size: 10px;
-  line-height: 20px;
+.chronicle-inline-nation {
+  font-weight: 950;
+  text-shadow: 0 0 8px currentColor;
 }
+
+.chronicle-inline-nation.wei { color: #72b5ff; }
+.chronicle-inline-nation.shu { color: #68dd91; }
+.chronicle-inline-nation.wu { color: #f1c84b; }
 
 .chronicle-list::-webkit-scrollbar {
   width: 10px;

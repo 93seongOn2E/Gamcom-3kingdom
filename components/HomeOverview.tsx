@@ -22,7 +22,7 @@ function renderChronicleContent(content: string) {
     const isNation = part === "위나라" || part === "촉나라" || part === "오나라";
 
     return isNation ? (
-      <span key={`${part}-${index}`} className={`chronicle-force chronicle-inline-force ${getNationThemeClass(part)}`}>
+      <span key={`${part}-${index}`} className={`chronicle-inline-nation ${getNationThemeClass(part)}`}>
         {part}
       </span>
     ) : part;

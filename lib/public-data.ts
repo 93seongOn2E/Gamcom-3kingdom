@@ -101,7 +101,6 @@ export async function getChronicleData(): Promise<ChroniclePayload[]> {
     WHERE is_deleted = FALSE
       AND approval_status = 'approved'
     ORDER BY event_at DESC, id DESC
-    LIMIT 20
   `) as ChronicleRow[];
 
   return rows.map((row) => ({
