@@ -5,13 +5,17 @@ import { writeAdminAuditLog } from "@/lib/admin-audit";
 import { getSql } from "@/lib/db";
 import { getCachedCastleData, getCastleData } from "@/lib/public-data";
 import { territoryFacilityOptions, type TerritoryFacility } from "@/lib/territory-map-config";
+import { parseSeason } from "@/lib/season";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const data = searchParams.get("fresh") === "1"
-      ? await getCastleData()
-      : await getCachedCastleData();
+    const season = parseSeason(searchParams.get("season") ?? undefined);
+    const data = season === 1
+      ? await getCastleData(1)
+      : searchParams.get("fresh") === "1"
+        ? await getCastleData(2)
+        : await getCachedCastleData();
 
     return NextResponse.json(data);
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { ThreeKingdomSeason } from "@/lib/season";
 
 const nationOptions = [
   { key: "위나라", slug: "위", color: "#2f73c8" },
@@ -11,7 +12,7 @@ const nationOptions = [
 
 type NationOption = (typeof nationOptions)[number];
 
-export function NationEquipmentSelector() {
+export function NationEquipmentSelector({ season }: { season: ThreeKingdomSeason }) {
   const router = useRouter();
   const [pendingNation, setPendingNation] = useState<NationOption | null>(null);
 
@@ -19,7 +20,7 @@ export function NationEquipmentSelector() {
     if (!pendingNation) {
       return;
     }
-    router.push(`/factions/${pendingNation.slug}`);
+    router.push(`/factions/${pendingNation.slug}?season=${season}`);
   }
 
   return (

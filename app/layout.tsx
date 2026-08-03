@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import "./globals.css";
 import { RecruitAdminPopup } from "@/components/RecruitAdminPopup";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -35,7 +35,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             </div>
           </div>
 
-          <SiteNavbar />
+          <Suspense fallback={null}>
+            <SiteNavbar />
+          </Suspense>
 
           <RecruitAdminPopup />
           <div className="flex min-h-screen flex-col pt-14 md:pt-6">

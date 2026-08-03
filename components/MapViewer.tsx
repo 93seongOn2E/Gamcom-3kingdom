@@ -12,6 +12,7 @@ import {
   type TerritoryOwnerFull
 } from "@/lib/territory-map-config";
 import { getStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
+import type { ThreeKingdomSeason } from "@/lib/season";
 
 type ForceId = "위나라" | "촉나라" | "오나라";
 type CastleLevel = 1 | 2 | 3;
@@ -305,11 +306,13 @@ function buildMapCastles(data: CastleData): MapCastle[] {
 export function MapViewer({
   compact = false,
   initialData,
-  simulation = false
+  simulation = false,
+  season = 2
 }: {
   compact?: boolean;
   initialData?: RawCastleData;
   simulation?: boolean;
+  season?: ThreeKingdomSeason;
 }) {
   const initialCastleData = useMemo(() => initialData ? normalizeCastleData(initialData) : emptyCastleData, [initialData]);
   const [castleData, setCastleData] = useState<CastleData>(initialCastleData);
@@ -333,7 +336,7 @@ export function MapViewer({
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/castles?fresh=1", { cache: "no-store" });
+      const response = await fetch(`/api/castles?fresh=1&season=${season}`, { cache: "no-store" });
       const data = await response.json() as RawCastleData;
       if (!response.ok) {
         throw new Error("지도 데이터를 불러오지 못했습니다.");
@@ -349,13 +352,21 @@ export function MapViewer({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [season]);
 
   useEffect(() => {
     if (!initialData) {
       void loadCastles();
     }
   }, [initialData, loadCastles]);
+
+  useEffect(() => {
+    if (simulation || !initialData) return;
+
+    setCastleData(initialCastleData);
+    setSelectedCityId("");
+    setSimulationPopover(null);
+  }, [initialCastleData, initialData, season, simulation]);
 
   useEffect(() => {
     if (!simulation) return;

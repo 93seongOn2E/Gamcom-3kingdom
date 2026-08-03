@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { EquipmentNation, FactionsEquipmentPage } from "@/components/FactionsEquipmentPage";
+import { parseSeason } from "@/lib/season";
 
 export const revalidate = 15;
 
@@ -13,8 +14,15 @@ export function generateStaticParams() {
   return Object.keys(nationSlugMap).map((nation) => ({ nation }));
 }
 
-export default async function NationFactionsPage({ params }: { params: Promise<{ nation: string }> }) {
+export default async function NationFactionsPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{ nation: string }>;
+  searchParams: Promise<{ season?: string }>;
+}) {
   const { nation } = await params;
+  const season = parseSeason((await searchParams).season);
   let decodedNation = nation;
 
   try {
@@ -29,5 +37,5 @@ export default async function NationFactionsPage({ params }: { params: Promise<{
     notFound();
   }
 
-  return <FactionsEquipmentPage selectedNation={selectedNation} />;
+  return <FactionsEquipmentPage selectedNation={selectedNation} season={season} />;
 }

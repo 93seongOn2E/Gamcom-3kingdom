@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { getSql } from "@/lib/db";
 import type { TerritoryFacility, TerritoryOwnerShort } from "@/lib/territory-map-config";
+import type { ThreeKingdomSeason } from "@/lib/season";
 
 export type ForceIdShort = "위" | "촉" | "오";
 export type ForceIdFull = "위나라" | "촉나라" | "오나라";
@@ -55,14 +56,15 @@ function getOriginForce(castleKey: string): ForceIdShort | null {
   return null;
 }
 
-export async function getCastleData(): Promise<CastleDataPayload> {
+export async function getCastleData(season: ThreeKingdomSeason = 2): Promise<CastleDataPayload> {
   const sql = getSql();
-  const rows = await sql`
+  const tableName = season === 1 ? "castle_season1" : "castle";
+  const rows = await sql.query(`
     SELECT castle_key, name, kingdom, level, map_x, map_y, is_occupied, is_capital, is_cheonrimun, facility_type
-    FROM public.castle
+    FROM public.${tableName}
     WHERE name ~ '^[0-9]+$'
     ORDER BY NULLIF(regexp_replace(name, '[^0-9]', '', 'g'), '')::integer NULLS LAST, id
-  ` as CastleRow[];
+  `) as CastleRow[];
 
   const forces: Record<ForceIdShort, CastlePayload[]> = {
     위: [],
@@ -90,14 +92,15 @@ export async function getCastleData(): Promise<CastleDataPayload> {
   return { forces };
 }
 
-export async function getChronicleData(): Promise<ChroniclePayload[]> {
+export async function getChronicleData(season: ThreeKingdomSeason = 2): Promise<ChroniclePayload[]> {
   const sql = getSql();
+  const tableName = season === 1 ? "chronicle_season1" : "chronicle";
   const rows = await sql.query(`
     SELECT
       nation,
       content,
       to_char(event_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI') AS event_at
-    FROM public.chronicle
+    FROM public.${tableName}
     WHERE is_deleted = FALSE
       AND approval_status = 'approved'
     ORDER BY event_at DESC, id DESC
@@ -111,15 +114,35 @@ export async function getChronicleData(): Promise<ChroniclePayload[]> {
 }
 
 export const getCachedCastleData = unstable_cache(
-  getCastleData,
-  ["public-castle-data"],
+  () => getCastleData(2),
+  ["public-castle-data-season-2"],
   { revalidate: 15, tags: ["public-castles"] }
 );
 
+export const getCachedSeasonOneCastleData = unstable_cache(
+  () => getCastleData(1),
+  ["public-castle-data-season-1"],
+  { revalidate: 3600, tags: ["public-castles-season-1"] }
+);
+
 export const getCachedChronicleData = unstable_cache(
-  getChronicleData,
-  ["public-chronicle-data"],
+  () => getChronicleData(2),
+  ["public-chronicle-data-season-2"],
   { revalidate: 15, tags: ["public-chronicle"] }
 );
+
+export const getCachedSeasonOneChronicleData = unstable_cache(
+  () => getChronicleData(1),
+  ["public-chronicle-data-season-1"],
+  { revalidate: 3600, tags: ["public-chronicle-season-1"] }
+);
+
+export function getCachedCastleDataForSeason(season: ThreeKingdomSeason) {
+  return season === 1 ? getCachedSeasonOneCastleData() : getCachedCastleData();
+}
+
+export function getCachedChronicleDataForSeason(season: ThreeKingdomSeason) {
+  return season === 1 ? getCachedSeasonOneChronicleData() : getCachedChronicleData();
+}
 
 export { emptyForces };

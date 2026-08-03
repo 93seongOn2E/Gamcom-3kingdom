@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MapViewer } from "@/components/MapViewer";
 import type { CastleDataPayload } from "@/lib/public-data";
+import type { ThreeKingdomSeason } from "@/lib/season";
 
 export type ChronicleEntry = {
   nations: string[];
@@ -29,7 +30,15 @@ function renderChronicleContent(content: string) {
   });
 }
 
-export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEntry[]; castleData: CastleDataPayload }) {
+export function HomeOverview({
+  chronicle,
+  castleData,
+  season
+}: {
+  chronicle: ChronicleEntry[];
+  castleData: CastleDataPayload;
+  season: ThreeKingdomSeason;
+}) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
 
@@ -65,7 +74,7 @@ export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEn
           className="home-overview grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.6fr)_340px]"
         >
           <div ref={mapRef} className="home-overview-map flex h-full flex-col">
-            <MapViewer compact initialData={castleData} />
+            <MapViewer compact initialData={castleData} season={season} />
           </div>
 
           <aside className="pixel-frame chronicle-panel p-5 md:p-6" style={mapHeight ? { height: `${mapHeight}px` } : undefined}>

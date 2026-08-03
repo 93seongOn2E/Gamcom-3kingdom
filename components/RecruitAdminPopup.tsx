@@ -15,7 +15,14 @@ export function RecruitAdminPopup() {
   };
 
   return (
-    <div className="recruit-notice-bar" role="region" aria-label="관리자 모집 공지">
+    <div className="recruit-notice-bar" role="region" aria-label="시즌 1 우승 및 관리자 모집 공지">
+      <div className="season-one-champion-notice">
+        <span aria-hidden="true">🏆</span>
+        <strong>삼국지서버 시즌 1</strong>
+        <span className="season-one-champion-nation">오나라</span>
+        <span className="season-one-champion-names">지권 · 홍사자 · 황원태</span>
+        <b>삼국통일을 축하합니다!</b>
+      </div>
       <div className="recruit-notice-inner">
         <div className="recruit-notice-copy">
           <span className="recruit-notice-badge">관리자 모집</span>
@@ -36,6 +43,7 @@ export function RecruitAdminPopup() {
               제보하기
               <ExternalLink size={13} />
             </a>
+            <small className="recruit-notice-aside">하... ㅈ댔네...</small>
           </span>
         </div>
 

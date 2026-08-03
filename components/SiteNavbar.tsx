@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { BookOpen, Home, Map, Menu, Monitor, Radio, ScrollText, Swords, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getStreamerMode, setStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
+import { SeasonTabs } from "@/components/SeasonTabs";
+import { parseSeason, type ThreeKingdomSeason } from "@/lib/season";
 
 type NavLinkItem = {
   href: string;
@@ -42,12 +44,14 @@ function SidebarContent({
   pathname,
   onNavigate,
   adminAuthenticated,
+  activeSeason,
   streamerModeOn,
   onStreamerModeChange
 }: {
   pathname: string;
   onNavigate?: () => void;
   adminAuthenticated: boolean;
+  activeSeason: ThreeKingdomSeason;
   streamerModeOn: boolean;
   onStreamerModeChange: () => void;
 }) {
@@ -76,7 +80,7 @@ function SidebarContent({
 
   return (
     <>
-      <Link href="/" onClick={onNavigate} className="block px-5 py-5">
+      <Link href={`/?season=${activeSeason}`} onClick={onNavigate} className="block px-5 py-5">
         <Image
           src="/assets/gamst-company-logo-aside.png"
           alt="감컴퍼니 Gamst Company"
@@ -109,6 +113,12 @@ function SidebarContent({
           <span className="home-streamer-control-label">스트리머 모드</span>
         </div>
 
+        <SeasonTabs
+          activeSeason={activeSeason}
+          pathname={pathname === "/" || pathname.startsWith("/factions") ? pathname : "/"}
+          compact
+        />
+
         {navItems.map((item, index) => {
           if (!("href" in item)) {
             return (
@@ -123,11 +133,14 @@ function SidebarContent({
           const Icon = item.icon;
           const active = isActive(item.href);
           const isAdmin = item.href.startsWith("/admin");
+          const href = !item.external && (item.href === "/" || item.href.startsWith("/factions"))
+            ? `${item.href}?season=${activeSeason}`
+            : item.href;
 
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={href}
               target={item.external ? "_blank" : undefined}
               rel={item.external ? "noopener noreferrer" : undefined}
               onClick={onNavigate}
@@ -153,6 +166,8 @@ function SidebarContent({
 
 export function SiteNavbar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeSeason = parseSeason(searchParams.get("season") ?? undefined);
   const [open, setOpen] = useState(false);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [streamerModeOn, setStreamerModeOnState] = useState(true);
@@ -210,6 +225,7 @@ export function SiteNavbar() {
         <SidebarContent
           pathname={pathname}
           adminAuthenticated={adminAuthenticated}
+          activeSeason={activeSeason}
           streamerModeOn={streamerModeOn}
           onStreamerModeChange={toggleStreamerMode}
         />
@@ -227,7 +243,7 @@ export function SiteNavbar() {
       ) : null}
 
       <header className="site-chrome-bg fixed inset-x-0 top-0 z-[200] flex h-14 items-center justify-between border-b border-[var(--border)] px-4 md:hidden">
-        <Link href="/" className="flex min-w-0 flex-1 items-center gap-2.5 overflow-hidden">
+        <Link href={`/?season=${activeSeason}`} className="flex min-w-0 flex-1 items-center gap-2.5 overflow-hidden">
           <Image src="/assets/gamst-three-kingdoms-banner-source.webp" alt="감컴퍼니 삼국지서버" width={2048} height={749} className="h-9 w-auto object-contain" priority />
           <span className="text-sm font-bold text-[#f4e0bc]">감컴퍼니 삼국지서버</span>
         </Link>
@@ -247,6 +263,7 @@ export function SiteNavbar() {
               pathname={pathname}
               onNavigate={() => setOpen(false)}
               adminAuthenticated={adminAuthenticated}
+              activeSeason={activeSeason}
               streamerModeOn={streamerModeOn}
               onStreamerModeChange={toggleStreamerMode}
             />

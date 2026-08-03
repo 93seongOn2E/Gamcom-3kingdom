@@ -2,6 +2,7 @@ import { getSql } from "@/lib/db";
 import { hiddenJobConfig, hiddenJobNames, nationConfigs } from "@/lib/factions-config";
 import { NationEquipmentTable, type EquipmentMemberRow } from "@/components/NationEquipmentTable";
 import Link from "next/link";
+import type { ThreeKingdomSeason } from "@/lib/season";
 
 const nationMemberSlotCount = 30;
 export type EquipmentNation = (typeof nationConfigs)[number]["key"];
@@ -17,13 +18,20 @@ function formatEquipmentAverage(value: number | null) {
   return value == null ? "-" : value.toFixed(1);
 }
 
-export async function FactionsEquipmentPage({ selectedNation }: { selectedNation?: EquipmentNation }) {
+export async function FactionsEquipmentPage({
+  selectedNation,
+  season = 2
+}: {
+  selectedNation?: EquipmentNation;
+  season?: ThreeKingdomSeason;
+}) {
   const sql = getSql();
+  const tableName = season === 1 ? "member_season1" : "member";
   const hiddenJobSqlList = hiddenJobNames.map((job) => `'${job.replaceAll("'", "''")}'`).join(", ");
   const members = await sql.query(`
     SELECT nation, crew_name, nickname, job, horse, horse_level, weapon, helmet, armor, shoes,
            stat_strength, stat_agility, stat_vitality, stat_intelligence
-    FROM public.member
+    FROM public.${tableName}
     ${selectedNation ? "WHERE nation = $1" : ""}
     ORDER BY
       CASE nation
@@ -170,7 +178,7 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
       {selectedNation ? (
         <div className="mx-auto mb-5 flex w-full max-w-[920px] justify-start">
           <Link
-            href="/factions/nation"
+            href={`/factions/nation?season=${season}`}
             className="inline-flex items-center gap-1.5 rounded-lg border border-[#f0c978] bg-[#d4a756] px-4 py-2.5 text-sm font-black text-[#181108] shadow-[0_4px_16px_rgba(212,167,86,0.22)] transition hover:bg-[#edc56f] hover:shadow-[0_5px_20px_rgba(212,167,86,0.32)]"
           >
             <span aria-hidden="true">←</span>

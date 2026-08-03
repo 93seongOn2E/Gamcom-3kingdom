@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { BookOpen, Monitor, Radio } from "lucide-react";
 import { HomeOverview } from "@/components/HomeOverview";
-import { getCachedCastleData, getCachedChronicleData } from "@/lib/public-data";
+import { getCachedCastleDataForSeason, getCachedChronicleDataForSeason } from "@/lib/public-data";
+import { parseSeason } from "@/lib/season";
 
 
 const baseCards = [
@@ -9,10 +10,11 @@ const baseCards = [
   { href: "/broadcast", title: "지통실", desc: "방송, 공지, 전달 정보를 시각적으로 관리합니다.", icon: Radio }
 ];
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ season?: string }> }) {
+  const season = parseSeason((await searchParams).season);
   const [chronicle, castleData] = await Promise.all([
-    getCachedChronicleData(),
-    getCachedCastleData()
+    getCachedChronicleDataForSeason(season),
+    getCachedCastleDataForSeason(season)
   ]);
 
   const cards = [
@@ -22,7 +24,7 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <HomeOverview chronicle={chronicle} castleData={castleData} />
+      <HomeOverview chronicle={chronicle} castleData={castleData} season={season} />
 
       <section className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => {
