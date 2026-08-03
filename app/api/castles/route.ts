@@ -41,6 +41,7 @@ export async function PATCH(request: Request) {
       kingdom?: unknown;
       facilityType?: unknown;
       isCapital?: unknown;
+      isCheonrimun?: unknown;
     };
 
     const castleKey = typeof body.castleKey === "string" ? body.castleKey : "";
@@ -51,6 +52,7 @@ export async function PATCH(request: Request) {
     const kingdom = body.kingdom;
     const requestedFacility = typeof body.facilityType === "string" ? body.facilityType : "없음";
     const requestedIsCapital = body.isCapital === true;
+    const requestedIsCheonrimun = body.isCheonrimun === true;
 
     if (!/^(위|촉|오)-\d{3}$/.test(castleKey)) {
       return NextResponse.json({ message: "올바르지 않은 성 ID입니다." }, { status: 400 });
@@ -78,7 +80,7 @@ export async function PATCH(request: Request) {
 
     const sql = getSql();
     const beforeRows = await sql`
-      SELECT castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type, updated_at
+      SELECT castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, is_cheonrimun, facility_type, updated_at
       FROM public.castle
       WHERE castle_key = ${castleKey}
       LIMIT 1
@@ -94,13 +96,14 @@ export async function PATCH(request: Request) {
     const persistedKingdom = isOccupied ? kingdom : before.kingdom;
     const facilityType = (isOccupied ? requestedFacility : "없음") as TerritoryFacility;
     const isCapital = isOccupied && requestedIsCapital;
+    const isCheonrimun = isOccupied && requestedIsCheonrimun;
     let replacedCapitalRows: Record<string, unknown>[] = [];
     let replacedCapitalAfterRows: Record<string, unknown>[] = [];
     let rows: Record<string, unknown>[];
 
     if (isCapital) {
       replacedCapitalRows = await sql`
-        SELECT castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type, updated_at
+        SELECT castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, is_cheonrimun, facility_type, updated_at
         FROM public.castle
         WHERE kingdom = ${persistedKingdom}
           AND is_occupied = true
@@ -117,7 +120,7 @@ export async function PATCH(request: Request) {
             AND is_occupied = true
             AND is_capital = true
             AND castle_key <> ${castleKey}
-          RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type, updated_at
+          RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, is_cheonrimun, facility_type, updated_at
         `,
         sql`
           UPDATE public.castle
@@ -128,10 +131,11 @@ export async function PATCH(request: Request) {
               kingdom = ${persistedKingdom},
               is_occupied = ${isOccupied},
               is_capital = ${isCapital},
+              is_cheonrimun = ${isCheonrimun},
               facility_type = ${facilityType},
               updated_at = now()
           WHERE castle_key = ${castleKey}
-          RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type
+          RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, is_cheonrimun, facility_type
         `
       ]);
 
@@ -147,10 +151,11 @@ export async function PATCH(request: Request) {
             kingdom = ${persistedKingdom},
             is_occupied = ${isOccupied},
             is_capital = ${isCapital},
+            is_cheonrimun = ${isCheonrimun},
             facility_type = ${facilityType},
             updated_at = now()
         WHERE castle_key = ${castleKey}
-        RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, facility_type
+        RETURNING castle_key, name, level, map_x, map_y, kingdom, is_occupied, is_capital, is_cheonrimun, facility_type
       ` as Record<string, unknown>[];
     }
 
@@ -191,6 +196,7 @@ export async function PATCH(request: Request) {
       y: Number(rows[0].map_y),
       kingdom: rows[0].is_occupied ? rows[0].kingdom : "미점령",
       isCapital: Boolean(rows[0].is_occupied && rows[0].is_capital),
+      isCheonrimun: Boolean(rows[0].is_occupied && rows[0].is_cheonrimun),
       facilityType: rows[0].is_occupied ? rows[0].facility_type : "없음"
     });
   } catch (error) {

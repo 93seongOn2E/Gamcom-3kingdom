@@ -21,6 +21,7 @@ type CastleSource = {
   level: CastleLevel;
   owner: string;
   isCapital?: boolean;
+  isCheonrimun?: boolean;
   facilityType?: string;
   x?: number;
   y?: number;
@@ -38,6 +39,7 @@ type MapCastle = {
   origin: ForceId;
   owner: TerritoryOwnerShort;
   isCapital: boolean;
+  isCheonrimun: boolean;
   facilityType: TerritoryFacility;
   cx: number;
   cy: number;
@@ -102,6 +104,7 @@ function buildMapCastles(data: CastleData): MapCastle[] {
         origin,
         owner: normalizeOwner(source.owner),
         isCapital: normalizeOwner(source.owner) === "미점령" ? false : Boolean(source.isCapital),
+        isCheonrimun: normalizeOwner(source.owner) === "미점령" ? false : Boolean(source.isCheonrimun),
         facilityType: normalizeOwner(source.owner) === "미점령" ? "없음" : normalizeFacility(source.facilityType),
         cx: Number.isFinite(source.x) ? (source.x as number) : fallback.cx,
         cy: Number.isFinite(source.y) ? (source.y as number) : fallback.cy
@@ -122,6 +125,7 @@ export function AdminMapEditor() {
   const [selectedCityId, setSelectedCityId] = useState("");
   const [selectedOwner, setSelectedOwner] = useState<TerritoryOwnerShort>("미점령");
   const [selectedIsCapital, setSelectedIsCapital] = useState(false);
+  const [selectedIsCheonrimun, setSelectedIsCheonrimun] = useState(false);
   const [selectedFacility, setSelectedFacility] = useState<TerritoryFacility>("없음");
 
   useEffect(() => {
@@ -151,6 +155,7 @@ export function AdminMapEditor() {
       setSelectedCityId(selectedCastle.id);
       setSelectedOwner(selectedCastle.owner);
       setSelectedIsCapital(selectedCastle.isCapital);
+      setSelectedIsCheonrimun(selectedCastle.isCheonrimun);
       setSelectedFacility(selectedCastle.facilityType);
     }
   }, [selectedCastle]);
@@ -175,6 +180,7 @@ export function AdminMapEditor() {
           y: Math.round(selectedCastle.cy),
           kingdom: selectedOwner,
           isCapital: selectedOwner === "미점령" ? false : selectedIsCapital,
+          isCheonrimun: selectedOwner === "미점령" ? false : selectedIsCheonrimun,
           facilityType: selectedOwner === "미점령" ? "없음" : selectedFacility
         })
       });
@@ -183,12 +189,14 @@ export function AdminMapEditor() {
         message?: string;
         kingdom?: TerritoryOwnerShort;
         isCapital?: boolean;
+        isCheonrimun?: boolean;
         facilityType?: TerritoryFacility;
       };
       if (!response.ok) throw new Error(result.message || "점령 상태 저장에 실패했습니다.");
 
       const savedOwner = result.kingdom ?? selectedOwner;
       const savedIsCapital = result.isCapital ?? (savedOwner === "미점령" ? false : selectedIsCapital);
+      const savedIsCheonrimun = result.isCheonrimun ?? (savedOwner === "미점령" ? false : selectedIsCheonrimun);
       const savedFacility = result.facilityType ?? (savedOwner === "미점령" ? "없음" : selectedFacility);
 
       setCastleData((current) => {
@@ -201,6 +209,7 @@ export function AdminMapEditor() {
                 ...castle,
                 owner: savedOwner,
                 isCapital: savedIsCapital,
+                isCheonrimun: savedIsCheonrimun,
                 facilityType: savedFacility
               };
             }
@@ -262,9 +271,10 @@ export function AdminMapEditor() {
             <g id="territories">
               {castles.map((castle) => {
                 const hasFacility = castle.facilityType !== "없음";
+                const hasDetails = hasFacility || castle.isCheonrimun;
                 const isSpecial = specialTerritoryNumbers.has(castle.number);
                 const isUnclaimedSpecial = isSpecial && castle.owner === "미점령";
-                const numberY = hasFacility ? castle.cy - 8 : castle.cy + 6;
+                const numberY = hasDetails ? castle.cy - 8 : castle.cy + 6;
 
                 return (
                   <g key={castle.id}>
@@ -280,7 +290,7 @@ export function AdminMapEditor() {
                       onClick={() => setSelectedCityId(castle.id)}
                     />
                     <text
-                      className={`map-territory-number ${hasFacility ? "has-facility" : ""} ${isUnclaimedSpecial ? "is-special-unclaimed" : ""}`}
+                      className={`map-territory-number ${hasDetails ? "has-facility" : ""} ${isUnclaimedSpecial ? "is-special-unclaimed" : ""}`}
                       x={castle.cx}
                       y={numberY}
                     >
@@ -293,10 +303,19 @@ export function AdminMapEditor() {
                     {hasFacility ? (
                       <text
                         className="map-territory-facility-icon"
-                        x={castle.cx}
+                        x={castle.cx + (castle.isCheonrimun ? -8 : 0)}
                         y={castle.cy + 14}
                       >
                         {territoryFacilityIcons[castle.facilityType]}
+                      </text>
+                    ) : null}
+                    {castle.isCheonrimun ? (
+                      <text
+                        className="map-territory-facility-icon"
+                        x={castle.cx + (hasFacility ? 8 : 0)}
+                        y={castle.cy + 14}
+                      >
+                        🟣
                       </text>
                     ) : null}
                   </g>
@@ -337,6 +356,7 @@ export function AdminMapEditor() {
                   setSelectedOwner(owner);
                   if (owner === "미점령") {
                     setSelectedIsCapital(false);
+                    setSelectedIsCheonrimun(false);
                     setSelectedFacility("없음");
                   }
                 }}
@@ -378,6 +398,21 @@ export function AdminMapEditor() {
           </select>
           <small>병영·성채·장원 중 하나만 건설할 수 있습니다.</small>
         </label>
+
+        <div className="admin-field">
+          <span>천리문 설정</span>
+          <label className="admin-capital-checkbox-row">
+            <input
+              className="admin-capital-checkbox"
+              type="checkbox"
+              checked={selectedIsCheonrimun}
+              onChange={(event) => setSelectedIsCheonrimun(event.target.checked)}
+              disabled={!selectedCastle || selectedOwner === "미점령"}
+            />
+            <span>🟣 천리문 설치</span>
+          </label>
+          <small>천리문은 수도 및 거점과 별도로 설정됩니다.</small>
+        </div>
 
         <button className="admin-capture" type="button" onClick={applySelectedCastle} disabled={!selectedCastle}>
           적용

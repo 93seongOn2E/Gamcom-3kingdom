@@ -11,6 +11,7 @@ export type CastlePayload = {
   level: 1 | 2 | 3;
   owner: TerritoryOwnerShort;
   isCapital: boolean;
+  isCheonrimun: boolean;
   facilityType: TerritoryFacility;
   x?: number;
   y?: number;
@@ -35,6 +36,7 @@ type CastleRow = {
   map_y: string | null;
   is_occupied: boolean;
   is_capital: boolean;
+  is_cheonrimun: boolean;
   facility_type: TerritoryFacility;
 };
 
@@ -56,7 +58,7 @@ function getOriginForce(castleKey: string): ForceIdShort | null {
 export async function getCastleData(): Promise<CastleDataPayload> {
   const sql = getSql();
   const rows = await sql`
-    SELECT castle_key, name, kingdom, level, map_x, map_y, is_occupied, is_capital, facility_type
+    SELECT castle_key, name, kingdom, level, map_x, map_y, is_occupied, is_capital, is_cheonrimun, facility_type
     FROM public.castle
     WHERE name ~ '^[0-9]+$'
     ORDER BY NULLIF(regexp_replace(name, '[^0-9]', '', 'g'), '')::integer NULLS LAST, id
@@ -78,6 +80,7 @@ export async function getCastleData(): Promise<CastleDataPayload> {
       level: row.level as 1 | 2 | 3,
       owner: row.is_occupied ? row.kingdom : "미점령",
       isCapital: row.is_occupied && row.is_capital,
+      isCheonrimun: row.is_occupied && row.is_cheonrimun,
       facilityType: row.is_occupied ? row.facility_type : "없음",
       ...(row.map_x === null ? {} : { x: Number(row.map_x) }),
       ...(row.map_y === null ? {} : { y: Number(row.map_y) })

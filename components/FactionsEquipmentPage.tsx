@@ -6,6 +6,17 @@ import Link from "next/link";
 const nationMemberSlotCount = 30;
 export type EquipmentNation = (typeof nationConfigs)[number]["key"];
 
+function getEquipmentAverage(values: Array<number | null>) {
+  const enteredValues = values.filter((value): value is number => value != null);
+  if (enteredValues.length === 0) return null;
+
+  return enteredValues.reduce((sum, value) => sum + value, 0) / enteredValues.length;
+}
+
+function formatEquipmentAverage(value: number | null) {
+  return value == null ? "-" : value.toFixed(1);
+}
+
 export async function FactionsEquipmentPage({ selectedNation }: { selectedNation?: EquipmentNation }) {
   const sql = getSql();
   const hiddenJobSqlList = hiddenJobNames.map((job) => `'${job.replaceAll("'", "''")}'`).join(", ");
@@ -63,6 +74,15 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
   const selectedNationConfig = selectedNation
     ? nationConfigs.find((nation) => nation.key === selectedNation)
     : undefined;
+  const nationAverages = visibleNationConfigs.map((nation) => {
+    const nationMembers = membersByNation[nation.key] ?? [];
+    return {
+      ...nation,
+      weapon: getEquipmentAverage(nationMembers.map((member) => member.weapon)),
+      armor: getEquipmentAverage(nationMembers.map((member) => member.armor)),
+      shoes: getEquipmentAverage(nationMembers.map((member) => member.shoes))
+    };
+  });
 
   return (
     <div className="mx-auto max-w-[102rem] px-3 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
@@ -112,6 +132,40 @@ export async function FactionsEquipmentPage({ selectedNation }: { selectedNation
           </div>
         </div>
       </div>
+
+      <section className={`pixel-frame mb-5 p-4 md:p-5 ${selectedNation ? "mx-auto w-full max-w-[920px]" : "w-full"}`} aria-labelledby="nation-equipment-average-title">
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 id="nation-equipment-average-title" className="text-lg font-black text-[#f3e7d0]">나라별 장비 평균</h2>
+            <p className="mt-1 text-[12px] font-semibold text-[#8f8068]">무기·흉갑·각갑 기준 · 미입력 제외 · 0강 포함</p>
+          </div>
+        </div>
+
+        <div className={`grid gap-2.5 ${selectedNation ? "grid-cols-1" : "sm:grid-cols-3"}`}>
+          {nationAverages.map((nation) => (
+              <article key={nation.key} className="rounded-xl border border-[rgba(212,167,86,0.16)] bg-black/25 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]">
+                <div className="mb-2.5 flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: nation.color }} />
+                  <span className="text-sm font-black" style={{ color: nation.color }}>
+                    {nation.short}나라
+                  </span>
+                </div>
+                <dl className="grid grid-cols-3 gap-1.5 text-center">
+                  {([
+                    ["무기", nation.weapon],
+                    ["흉갑", nation.armor],
+                    ["각갑", nation.shoes]
+                  ] as const).map(([label, value]) => (
+                    <div key={label} className="rounded-lg border border-white/[0.055] bg-black/25 px-1 py-2">
+                      <dt className="text-[10px] font-bold text-[#8f8068]">{label}</dt>
+                      <dd className="mt-0.5 text-sm font-black tabular-nums text-[#ffe4ac]">{formatEquipmentAverage(value)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </article>
+          ))}
+        </div>
+      </section>
 
       {selectedNation ? (
         <div className="mx-auto mb-5 flex w-full max-w-[920px] justify-start">

@@ -22,6 +22,7 @@ type CastleSource = {
   level: CastleLevel;
   owner: string;
   isCapital?: boolean;
+  isCheonrimun?: boolean;
   facilityType?: string;
   x?: number;
   y?: number;
@@ -41,6 +42,7 @@ type MapCastle = {
   number: number;
   owner: TerritoryOwnerFull;
   isCapital: boolean;
+  isCheonrimun: boolean;
   facilityType: TerritoryFacility;
   cx: number;
   cy: number;
@@ -128,7 +130,8 @@ function serializeSimulationOwners(data: CastleData, baseline: CastleData) {
         [
           simulationOwnerCodes[normalizeOwner(castle.owner)],
           castle.isCapital ? "1" : "0",
-          simulationFacilityCodes[normalizeFacility(castle.facilityType)]
+          simulationFacilityCodes[normalizeFacility(castle.facilityType)],
+          castle.isCheonrimun ? "1" : "0"
         ].join(":")
       ])
   );
@@ -139,7 +142,8 @@ function serializeSimulationOwners(data: CastleData, baseline: CastleData) {
       const state = [
         simulationOwnerCodes[normalizeOwner(castle.owner)],
         castle.isCapital ? "1" : "0",
-        simulationFacilityCodes[normalizeFacility(castle.facilityType)]
+        simulationFacilityCodes[normalizeFacility(castle.facilityType)],
+        castle.isCheonrimun ? "1" : "0"
       ].join(":");
       return state !== baselineState.get(castle.name);
     })
@@ -147,7 +151,8 @@ function serializeSimulationOwners(data: CastleData, baseline: CastleData) {
       castle.name,
       simulationOwnerCodes[normalizeOwner(castle.owner)],
       castle.isCapital ? "1" : "0",
-      simulationFacilityCodes[normalizeFacility(castle.facilityType)]
+      simulationFacilityCodes[normalizeFacility(castle.facilityType)],
+      castle.isCheonrimun ? "1" : "0"
     ].join(":"))
     .join(",");
 }
@@ -158,7 +163,7 @@ function applySimulationOwners(data: CastleData, serialized: string) {
       .split(",")
       .map((entry) => entry.split(":"))
       .filter((entry) => entry.length >= 2 && Boolean(simulationCodeOwners[entry[1]]))
-      .map(([number, ownerCode, capitalOrLegacyCode, facilityCode]) => {
+      .map(([number, ownerCode, capitalOrLegacyCode, facilityCode, cheonrimunCode]) => {
         const isNewFormat = capitalOrLegacyCode === "0" || capitalOrLegacyCode === "1";
         const legacyFacility = simulationCodeFacilities[capitalOrLegacyCode];
 
@@ -167,7 +172,8 @@ function applySimulationOwners(data: CastleData, serialized: string) {
           {
             owner: simulationCodeOwners[ownerCode],
             isCapital: isNewFormat ? capitalOrLegacyCode === "1" : capitalOrLegacyCode === "c",
-            facility: isNewFormat ? simulationCodeFacilities[facilityCode] : legacyFacility
+            facility: isNewFormat ? simulationCodeFacilities[facilityCode] : legacyFacility,
+            isCheonrimun: isNewFormat && cheonrimunCode !== undefined ? cheonrimunCode === "1" : undefined
           }
         ];
       })
@@ -184,11 +190,13 @@ function applySimulationOwners(data: CastleData, serialized: string) {
           const keepsExistingDetails = state.owner === normalizeOwner(castle.owner);
           const isCapital = state.isCapital ?? (keepsExistingDetails ? Boolean(castle.isCapital) : false);
           const facility = state.facility ?? (keepsExistingDetails ? normalizeFacility(castle.facilityType) : "없음");
+          const isCheonrimun = state.isCheonrimun ?? (keepsExistingDetails ? Boolean(castle.isCheonrimun) : false);
 
           return {
             ...castle,
             owner: state.owner,
             isCapital: state.owner !== "미점령" && isCapital,
+            isCheonrimun: state.owner !== "미점령" && isCheonrimun,
             facilityType: state.owner === "미점령" ? "없음" : facility
           };
         })
@@ -248,6 +256,7 @@ function normalizeCastleSources(castles: CastleSource[] | undefined): CastleSour
     ...castle,
     owner: normalizeOwner(castle.owner),
     isCapital: Boolean(castle.isCapital),
+    isCheonrimun: Boolean(castle.isCheonrimun),
     facilityType: normalizeFacility(castle.facilityType),
     x: Number.isFinite(castle.x) ? castle.x : undefined,
     y: Number.isFinite(castle.y) ? castle.y : undefined
@@ -283,6 +292,7 @@ function buildMapCastles(data: CastleData): MapCastle[] {
         number,
         owner: normalizeOwner(source.owner),
         isCapital: normalizeOwner(source.owner) === "미점령" ? false : Boolean(source.isCapital),
+        isCheonrimun: normalizeOwner(source.owner) === "미점령" ? false : Boolean(source.isCheonrimun),
         facilityType: normalizeOwner(source.owner) === "미점령" ? "없음" : normalizeFacility(source.facilityType),
         cx: Number.isFinite(source.x) ? (source.x as number) : fallback.cx,
         cy: Number.isFinite(source.y) ? (source.y as number) : fallback.cy
@@ -370,6 +380,7 @@ export function MapViewer({
                 ...castle,
                 owner,
                 isCapital: owner === normalizeOwner(castle.owner) ? castle.isCapital : false,
+                isCheonrimun: owner === normalizeOwner(castle.owner) ? castle.isCheonrimun : false,
                 facilityType: owner === normalizeOwner(castle.owner) ? castle.facilityType : "없음"
               }
             : castle)
@@ -409,6 +420,28 @@ export function MapViewer({
 
             return castle;
           })
+        ])
+      ) as CastleData["forces"]
+    };
+
+    setSimulationHistory((history) => [...history.slice(-29), castleData]);
+    setCastleData(next);
+    persistSimulation(next, initialCastleData);
+  }, [castleData, initialCastleData]);
+
+  const toggleSimulatedCheonrimun = useCallback((castleId: string) => {
+    const selectedSource = forceIds
+      .flatMap((force) => castleData.forces[force])
+      .find((castle) => castle.castleKey === castleId);
+    if (!selectedSource || normalizeOwner(selectedSource.owner) === "미점령") return;
+
+    const next: CastleData = {
+      forces: Object.fromEntries(
+        forceIds.map((force) => [
+          force,
+          castleData.forces[force].map((castle) => castle.castleKey === castleId
+            ? { ...castle, isCheonrimun: !castle.isCheonrimun }
+            : castle)
         ])
       ) as CastleData["forces"]
     };
@@ -554,9 +587,11 @@ export function MapViewer({
       <g id="territories" transform={viewerTerritoryTransform}>
         {castles.map((castle) => {
           const hasFacility = !hideMapFacilities && castle.facilityType !== "없음";
+          const hasCheonrimun = !hideMapFacilities && castle.isCheonrimun;
+          const hasDetails = hasFacility || hasCheonrimun;
           const isSpecial = specialTerritoryNumbers.has(castle.number);
           const isUnclaimedSpecial = isSpecial && castle.owner === "미점령";
-          const numberY = hasFacility ? castle.cy - 9 : castle.cy + 6;
+          const numberY = hasDetails ? castle.cy - 9 : castle.cy + 6;
           const facilityY = castle.cy + 14;
 
           return (
@@ -573,7 +608,7 @@ export function MapViewer({
                 onClick={(event) => handleTerritoryClick(event, castle.id)}
               />
               <text
-                className={`map-territory-number ${hasFacility ? "has-facility" : ""} ${isUnclaimedSpecial ? "is-special-unclaimed" : ""}`}
+                className={`map-territory-number ${hasDetails ? "has-facility" : ""} ${isUnclaimedSpecial ? "is-special-unclaimed" : ""}`}
                 x={castle.cx}
                 y={numberY}
               >
@@ -586,8 +621,16 @@ export function MapViewer({
               {hasFacility ? (
                 <g className="map-territory-detail" data-facility={castle.facilityType}>
                   <title>{castle.facilityType}</title>
-                  <text className="map-territory-facility-icon" x={castle.cx} y={facilityY}>
+                  <text className="map-territory-facility-icon" x={castle.cx + (hasCheonrimun ? -8 : 0)} y={facilityY}>
                     {territoryFacilityIcons[castle.facilityType]}
+                  </text>
+                </g>
+              ) : null}
+              {hasCheonrimun ? (
+                <g className="map-territory-detail" data-facility="천리문">
+                  <title>천리문</title>
+                  <text className="map-territory-facility-icon" x={castle.cx + (hasFacility ? 8 : 0)} y={facilityY}>
+                    🟣
                   </text>
                 </g>
               ) : null}
@@ -664,11 +707,12 @@ export function MapViewer({
             <RefreshCcw size={15} className={isLoading ? "animate-spin" : ""} />
             <span>새로고침</span>
           </button> : null}
-          <div className="map-territory-legend" aria-label={hideMapFacilities ? "지도 아이콘 설명" : "수도 및 거점 아이콘 설명"}>
+          <div className="map-territory-legend" aria-label={hideMapFacilities ? "지도 아이콘 설명" : "수도, 거점 및 천리문 아이콘 설명"}>
             {!hideMapFacilities ? <span><b>👑</b> 수도</span> : null}
             {!hideMapFacilities ? <span><b>⚔️</b> 병영</span> : null}
             {!hideMapFacilities ? <span><b>🛡️</b> 성채</span> : null}
             {!hideMapFacilities ? <span><b>🏠</b> 장원</span> : null}
+            {!hideMapFacilities ? <span><b>🟣</b> 천리문</span> : null}
             <span><b>⭐</b> 버프</span>
           </div>
         </div>
@@ -781,6 +825,20 @@ export function MapViewer({
             ) : selectedNationManorCount >= 10 && selectedCastle.facilityType !== "장원" ? (
               <p className="simulation-cell-facility-hint limit">{selectedCastle.owner} 장원 10개가 모두 설치되어 있습니다.</p>
             ) : null}
+            <div className="simulation-cell-section-head facility">
+              <strong>천리문</strong>
+              <span>수도 및 일반 시설과 별도 설정</span>
+            </div>
+            <button
+              type="button"
+              className={`simulation-capital-toggle ${selectedCastle.isCheonrimun ? "current" : ""}`}
+              aria-pressed={selectedCastle.isCheonrimun}
+              disabled={selectedCastle.owner === "미점령"}
+              onClick={() => toggleSimulatedCheonrimun(selectedCastle.id)}
+            >
+              <span aria-hidden="true">🟣</span>
+              {selectedCastle.isCheonrimun ? "천리문 해제" : "천리문 설치"}
+            </button>
             <button
               type="button"
               className="simulation-cell-close-button"

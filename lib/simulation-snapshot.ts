@@ -23,6 +23,7 @@ const snapshotCastles = territoryTiles.map((tile): CastlePayload => {
     level: 3,
     owner,
     isCapital: isOccupied,
+    isCheonrimun: false,
     facilityType: isOccupied ? "장원" : "없음"
   };
 });

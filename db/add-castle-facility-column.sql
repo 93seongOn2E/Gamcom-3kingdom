@@ -6,6 +6,9 @@ ALTER TABLE public.castle
 ALTER TABLE public.castle
   ADD COLUMN IF NOT EXISTS is_capital boolean NOT NULL DEFAULT false;
 
+ALTER TABLE public.castle
+  ADD COLUMN IF NOT EXISTS is_cheonrimun boolean NOT NULL DEFAULT false;
+
 DO $$
 BEGIN
   IF NOT EXISTS (
