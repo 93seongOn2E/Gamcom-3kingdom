@@ -296,7 +296,11 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     kingdom: "모험/API 히든",
     name: "손상향",
     role: "영객",
-    skills: []
+    skills: [
+      { name: "월아비무", description: "정면으로 초승달 형태의 검기를 다섯 갈래로 발사하고, 바라보는 방향의 적을 함께 베어냅니다.", hasVideo: false },
+      { name: "비류난격", description: "정면으로 깊게 돌진해 피해를 입힌 뒤, 지나온 경로에 비수가 내리꽂히며 적을 한 번 더 베어냅니다.", hasVideo: false },
+      { name: "만천검무", description: "사방으로 검을 흩뿌려 적에게 피해를 입힌 뒤, 흩어진 검이 멀리서 회전한 뒤 되돌아와 적을 다시 베어냅니다.", hasVideo: false }
+    ]
   },
   {
     kingdom: "위나라",
