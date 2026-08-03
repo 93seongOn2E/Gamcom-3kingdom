@@ -17,6 +17,18 @@ function getNationThemeClass(nation: string) {
   return "neutral";
 }
 
+function renderChronicleContent(content: string) {
+  return content.split(/(위나라|촉나라|오나라)/g).map((part, index) => {
+    const isNation = part === "위나라" || part === "촉나라" || part === "오나라";
+
+    return isNation ? (
+      <span key={`${part}-${index}`} className={`chronicle-force chronicle-inline-force ${getNationThemeClass(part)}`}>
+        {part}
+      </span>
+    ) : part;
+  });
+}
+
 export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEntry[]; castleData: CastleDataPayload }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
@@ -77,7 +89,7 @@ export function HomeOverview({ chronicle, castleData }: { chronicle: ChronicleEn
                     ))}
                   </div>
 
-                  <p className="chronicle-content">{entry.content}</p>
+                  <p className="chronicle-content">{renderChronicleContent(entry.content)}</p>
                 </article>
               ))}
             </div>

@@ -3186,6 +3186,15 @@ thead .admin-equipment-stat-divider::before {
   line-height: 1.75;
 }
 
+.chronicle-inline-force {
+  min-height: 20px;
+  margin: 0 3px;
+  padding: 0 7px;
+  vertical-align: 1px;
+  font-size: 10px;
+  line-height: 20px;
+}
+
 .chronicle-list::-webkit-scrollbar {
   width: 10px;
 }

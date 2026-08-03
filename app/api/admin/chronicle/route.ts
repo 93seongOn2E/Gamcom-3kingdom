@@ -83,8 +83,8 @@ export async function GET(request: Request) {
           WHEN 'approved' THEN 2
           ELSE 3
         END,
-        event_at ASC,
-        id ASC
+        event_at DESC,
+        id DESC
     `)) as ChronicleRow[];
 
     return NextResponse.json({ entries });

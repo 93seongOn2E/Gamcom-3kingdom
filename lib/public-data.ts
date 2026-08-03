@@ -100,7 +100,7 @@ export async function getChronicleData(): Promise<ChroniclePayload[]> {
     FROM public.chronicle
     WHERE is_deleted = FALSE
       AND approval_status = 'approved'
-    ORDER BY event_at ASC, id ASC
+    ORDER BY event_at DESC, id DESC
     LIMIT 20
   `) as ChronicleRow[];
 

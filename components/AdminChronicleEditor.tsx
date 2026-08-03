@@ -94,7 +94,7 @@ function buildDateString(form: ChronicleForm) {
   return `${fixedCreateYear}-${fixedCreateMonth}-${padDatePart(form.eventAt.getDate())} ${padDatePart(form.eventAt.getHours())}:${padDatePart(form.eventAt.getMinutes())}`;
 }
 
-function sortEntriesAscending(entries: ChronicleRow[]) {
+function sortEntriesDescending(entries: ChronicleRow[]) {
   const statusOrder: Record<ChronicleRow["approval_status"], number> = {
     pending: 1,
     approved: 2,
@@ -105,9 +105,9 @@ function sortEntriesAscending(entries: ChronicleRow[]) {
     const statusDiff = statusOrder[left.approval_status] - statusOrder[right.approval_status];
     if (statusDiff !== 0) return statusDiff;
 
-    const timeDiff = new Date(left.event_at).getTime() - new Date(right.event_at).getTime();
+    const timeDiff = new Date(right.event_at).getTime() - new Date(left.event_at).getTime();
     if (timeDiff !== 0) return timeDiff;
-    return left.id - right.id;
+    return right.id - left.id;
   });
 }
 
@@ -269,7 +269,7 @@ export function AdminChronicleEditor({ role }: { role: "master" | "manager" | "s
       }
 
       const entry = data.entry as ChronicleRow;
-      setEntries((current) => sortEntriesAscending([...current, entry]));
+      setEntries((current) => sortEntriesDescending([...current, entry]));
       setEditForms((current) => ({
         ...current,
         [entry.id]: toChronicleForm(entry)
@@ -307,7 +307,7 @@ export function AdminChronicleEditor({ role }: { role: "master" | "manager" | "s
       }
 
       const entry = data.entry as ChronicleRow;
-      setEntries((current) => sortEntriesAscending(current.map((item) => (item.id === id ? entry : item))));
+      setEntries((current) => sortEntriesDescending(current.map((item) => (item.id === id ? entry : item))));
       setEditForms((current) => ({
         ...current,
         [id]: toChronicleForm(entry)
@@ -364,7 +364,7 @@ export function AdminChronicleEditor({ role }: { role: "master" | "manager" | "s
       }
 
       const entry = data.entry as ChronicleRow;
-      setEntries((current) => sortEntriesAscending(current.map((item) => (item.id === id ? entry : item))));
+      setEntries((current) => sortEntriesDescending(current.map((item) => (item.id === id ? entry : item))));
       setEditForms((current) => ({
         ...current,
         [id]: toChronicleForm(entry)
