@@ -1,7 +1,7 @@
 "use client";
 
 import { adventureHiddenJobOptions, baseJobOptions, formatJobDisplayName, getHiddenJobBadge, hiddenJobOptionsByNation } from "@/lib/factions-config";
-import { canEquipHeadArmor, horseEnhancementOptions, horseOptions } from "@/lib/equipment-config";
+import { canEquipHeadArmor, getHorseEnhancementMax, getHorseEnhancementOptions, horseOptions } from "@/lib/equipment-config";
 import { useEffect, useMemo, useState } from "react";
 
 type MemberRow = {
@@ -314,6 +314,9 @@ export function AdminFactionsEditor() {
                             const horse = event.target.value;
                             updateField(member.id, "horseInput", horse);
                             if (!horse) updateField(member.id, "horseLevelInput", "0");
+                            else if (Number(member.horseLevelInput) > getHorseEnhancementMax(horse)) {
+                              updateField(member.id, "horseLevelInput", String(getHorseEnhancementMax(horse)));
+                            }
                           }}
                           className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/60 px-0.5 text-[10px] font-bold text-[#f3e7d0] outline-none"
                         >
@@ -333,7 +336,7 @@ export function AdminFactionsEditor() {
                           disabled={!member.horseInput}
                           className="h-8 w-full min-w-0 rounded-md border border-[var(--border)] bg-black/60 px-0 text-center text-[10px] font-bold text-[#f3e7d0] outline-none disabled:cursor-not-allowed disabled:opacity-45"
                         >
-                          {horseEnhancementOptions.map((level) => (
+                          {getHorseEnhancementOptions(member.horseInput).map((level) => (
                             <option key={level} value={level}>{level}</option>
                           ))}
                         </select>

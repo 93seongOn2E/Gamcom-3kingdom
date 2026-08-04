@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getSql } from "@/lib/db";
 import { getAdminSessionFromRequest } from "@/lib/admin-request";
 import { writeAdminAuditLog } from "@/lib/admin-audit";
-import { canEquipHeadArmor, horseOptions } from "@/lib/equipment-config";
+import { canEquipHeadArmor, getHorseEnhancementMax, horseOptions } from "@/lib/equipment-config";
 import { hiddenJobNames } from "@/lib/factions-config";
 
 export const dynamic = "force-dynamic";
@@ -121,8 +121,9 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ message: "말 종류를 목록에서 선택해주세요." }, { status: 400 });
     }
 
-    if (!Number.isInteger(horseLevel) || horseLevel < 0 || horseLevel > 5) {
-      return NextResponse.json({ message: "말 강화는 0부터 5까지만 선택할 수 있습니다." }, { status: 400 });
+    const horseEnhancementMax = getHorseEnhancementMax(horse);
+    if (!Number.isInteger(horseLevel) || horseLevel < 0 || horseLevel > horseEnhancementMax) {
+      return NextResponse.json({ message: `${horse || "말"} 강화는 0부터 ${horseEnhancementMax}까지만 선택할 수 있습니다.` }, { status: 400 });
     }
 
     for (const value of [weapon, helmet, armor, shoes]) {
