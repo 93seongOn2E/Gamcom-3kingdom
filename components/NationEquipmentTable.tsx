@@ -71,9 +71,17 @@ function formatHorseName(horse: string | null, horseLevel = 0) {
 }
 
 function getHorseBadgeClass(horse: string | null) {
-  return horse?.trim() === "적토마"
-    ? "bg-[#b4312b] text-white ring-[#ff7a70]/45 shadow-[0_0_14px_rgba(180,49,43,0.24)]"
-    : "bg-white/[0.05] text-[#dbc292] ring-white/[0.10]";
+  const horseName = horse?.trim();
+
+  if (horseName === "적토마") {
+    return "bg-[#b4312b] text-white ring-[#ff7a70]/45 shadow-[0_0_14px_rgba(180,49,43,0.24)]";
+  }
+
+  if (horseName === "현풍마") {
+    return "bg-black text-white ring-white/30 shadow-[0_0_14px_rgba(255,255,255,0.08)]";
+  }
+
+  return "bg-white/[0.05] text-[#dbc292] ring-white/[0.10]";
 }
 
 function EquipmentValue({ value }: { value: number | string }) {
