@@ -278,7 +278,7 @@ export function AdminFactionsEditor() {
                             {!hasSelectableJob(member) && member.job ? (
                               <option value={member.job}>현재값 - {member.job}</option>
                             ) : null}
-                            <optgroup label="일반 무기">
+                            <optgroup label="일반 직업군">
                               {baseJobOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                   {option.group} - {option.value}

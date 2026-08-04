@@ -134,7 +134,7 @@ export const getCachedChronicleData = unstable_cache(
 export const getCachedSeasonOneChronicleData = unstable_cache(
   () => getChronicleData(1),
   ["public-chronicle-data-season-1"],
-  { revalidate: 3600, tags: ["public-chronicle-season-1"] }
+  { revalidate: 15, tags: ["public-chronicle-season-1"] }
 );
 
 export function getCachedCastleDataForSeason(season: ThreeKingdomSeason) {

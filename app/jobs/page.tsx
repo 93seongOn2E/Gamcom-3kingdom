@@ -570,7 +570,7 @@ export default function JobsPage() {
       <section className="pixel-frame overflow-hidden p-6 md:p-8">
         <h1 className="text-3xl font-black tracking-[-0.02em] text-[#f3e7d0]">직업소개</h1>
         <p className="mt-3 max-w-5xl text-sm font-semibold leading-7 text-[#aa9a82]">
-          삼국지 RPG 직업별 무기와 운영진이 공개한 능력치 지표를 한눈에 확인할 수 있습니다. 무기 이미지는 AI로 제작된 참고 이미지입니다.
+          삼국지 RPG의 일반 직업군과 히든 직업, 직업별 스킬을 한눈에 확인할 수 있습니다.
         </p>
       </section>
 
@@ -727,33 +727,6 @@ export default function JobsPage() {
               </div>
 
               {group.id === "job-paewol" ? <div id="job-paewol-changsu" className="-mt-[18px] scroll-mt-35" /> : null}
-
-              <div className="grid gap-4 p-4 md:grid-cols-2 md:p-5">
-                {group.variants.map((job) => (
-                  <article key={job.name} className="grid gap-4 rounded-xl border border-[rgba(212,167,86,0.18)] bg-black/26 p-4 md:grid-cols-[minmax(180px,220px)_minmax(0,1fr)]">
-                    <div className="flex h-full items-stretch">
-                      <div className="relative min-h-[220px] w-full overflow-hidden rounded-xl border border-[rgba(212,167,86,0.28)] bg-black shadow-[0_18px_36px_rgba(0,0,0,0.35)] sm:min-h-[260px] md:min-h-full">
-                        <Image src={job.icon} alt={`${job.weaponName} 아이콘`} fill sizes="(min-width: 768px) 220px, 100vw" className="object-cover" />
-                      </div>
-                    </div>
-
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-xl font-black text-[#f3e7d0]">{job.name}</h3>
-                        <span className="rounded-full bg-[#d4a017]/14 px-2.5 py-1 text-[12px] font-black text-[#f0c98b] ring-1 ring-[#d4a756]/28">
-                          {job.weaponName} · {job.weaponType}
-                        </span>
-                      </div>
-
-                      <div className="mt-4 grid gap-3">
-                        {Object.entries(job.stats).map(([label, value]) => (
-                          <StatMeter key={label} label={label as keyof JobVariant["stats"]} value={value} />
-                        ))}
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
 
               <div className="border-t border-[rgba(212,167,86,0.16)] p-4 md:p-5">
                 <div className="mb-3 flex items-center gap-2">

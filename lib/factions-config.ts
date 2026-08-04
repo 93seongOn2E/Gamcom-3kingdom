@@ -84,17 +84,30 @@ export const hiddenJobNames = [
 ];
 
 export const baseJobOptions = [
-  { value: "야운", group: "영객" },
-  { value: "적령", group: "영객" },
-  { value: "노월", group: "패월" },
-  { value: "천강", group: "패월" },
-  { value: "창화", group: "창수" },
-  { value: "룡격", group: "창수" },
-  { value: "운책", group: "책사" },
-  { value: "지명", group: "책사" },
-  { value: "백현", group: "궁장" },
-  { value: "운시", group: "궁장" }
+  { value: "영객", group: "영객" },
+  { value: "패월", group: "패월" },
+  { value: "창수", group: "창수" },
+  { value: "책사", group: "책사" },
+  { value: "궁장", group: "궁장" }
 ] as const;
+
+const baseJobGroupByName: Record<string, string> = {
+  영객: "영객",
+  야운: "영객",
+  적령: "영객",
+  패월: "패월",
+  노월: "패월",
+  천강: "패월",
+  창수: "창수",
+  창화: "창수",
+  룡격: "창수",
+  책사: "책사",
+  운책: "책사",
+  지명: "책사",
+  궁장: "궁장",
+  백현: "궁장",
+  운시: "궁장"
+};
 
 export const adventureHiddenJobOptions = ["손책", "하후연", "손상향"] as const;
 
@@ -109,8 +122,7 @@ export function formatJobDisplayName(job: string | null) {
     return "-";
   }
 
-  const baseJob = baseJobOptions.find((option) => option.value === job);
-  return baseJob ? `${baseJob.group}-${job}` : job;
+  return baseJobGroupByName[job] ?? job;
 }
 
 export function getHiddenJobBadge(job: string | null) {
