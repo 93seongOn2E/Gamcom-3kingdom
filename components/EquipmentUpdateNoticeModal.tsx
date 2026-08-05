@@ -39,7 +39,7 @@ export function EquipmentUpdateNoticeModal() {
 
         <div className="equipment-update-modal-copy">
           <p>
-            위나라 오나라 내실 업데이트 해달라는 쪽지만 오는데<br />
+            위나라 오나라 내실 업데이트 부탁한다는 쪽지만 오는데<br />
             제보를 해주셔야 빠른 반영이 가능 합니다.
           </p>
           <p>
