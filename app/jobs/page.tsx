@@ -303,6 +303,12 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
+    kingdom: "모험/API 히든",
+    name: "마등",
+    role: "창수",
+    skills: []
+  },
+  {
     kingdom: "위나라",
     name: "장료",
     role: "창수",

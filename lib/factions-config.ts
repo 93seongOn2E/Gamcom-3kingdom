@@ -45,7 +45,7 @@ export const hiddenJobConfig = {
     prefix: "✦"
   },
   "히든 창수": {
-    jobs: ["장료", "전위", "관우", "장비", "여몽", "태사자"],
+    jobs: ["장료", "전위", "관우", "장비", "여몽", "태사자", "마등"],
     badgeClass: "bg-[#1e3a2f]/44 text-[#d9f99d] ring-[#84cc16]/32",
     prefix: "✦"
   },
@@ -109,7 +109,7 @@ const baseJobGroupByName: Record<string, string> = {
   운시: "궁장"
 };
 
-export const adventureHiddenJobOptions = ["손책", "하후연", "손상향"] as const;
+export const adventureHiddenJobOptions = ["손책", "하후연", "손상향", "마등"] as const;
 
 export const hiddenJobOptionsByNation: Record<string, string[]> = {
   위나라: ["하후돈", "장료", "전위", "사마의"],
