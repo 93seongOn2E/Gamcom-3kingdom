@@ -2,15 +2,14 @@ export const horseOptions = ["담운마", "금표마", "백룡마", "현풍마",
 
 export type HorseName = (typeof horseOptions)[number];
 
-export const horseEnhancementOptions = [0, 1, 2, 3, 4, 5] as const;
-export const hyeonpungHorseEnhancementOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
+export const horseEnhancementOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
 
 export function getHorseEnhancementOptions(horse: string | null | undefined): readonly number[] {
-  return horse === "현풍마" ? hyeonpungHorseEnhancementOptions : horseEnhancementOptions;
+  return horse ? horseEnhancementOptions : [0];
 }
 
 export function getHorseEnhancementMax(horse: string | null | undefined) {
-  return horse === "현풍마" ? 15 : 5;
+  return horse ? 15 : 0;
 }
 
 export const headArmorJobs = ["유비", "조조", "손권"] as const;
