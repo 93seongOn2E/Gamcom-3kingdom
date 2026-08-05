@@ -760,7 +760,7 @@ export function MapViewer({
         <svg id="map-viewer" className="map-svg-desktop" viewBox="0 0 1180 720" preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 삼국지 지도">
           {renderMapLayers()}
         </svg>
-        <svg className="map-svg-mobile" viewBox={simulation ? "220 75 760 520" : "190 35 820 610"} preserveAspectRatio="none" role="img" aria-label="60개 지역으로 구성된 모바일 삼국지 지도">
+        <svg className="map-svg-mobile" viewBox={simulation ? "220 75 760 520" : "0 0 1180 720"} preserveAspectRatio="xMidYMid meet" role="img" aria-label="60개 지역으로 구성된 모바일 삼국지 지도">
           {renderMapLayers()}
         </svg>
 

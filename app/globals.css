@@ -4041,8 +4041,8 @@ thead .admin-equipment-stat-divider::before {
   }
 
   .home-overview .map-viewer-shell.compact .admin-map-wrap.compact {
-    min-height: 300px;
-    aspect-ratio: 1180 / 700;
+    min-height: 0;
+    aspect-ratio: 1180 / 720;
   }
 
   .home-overview {
