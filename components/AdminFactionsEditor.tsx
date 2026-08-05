@@ -240,7 +240,153 @@ export function AdminFactionsEditor() {
             <h2 className={`text-lg font-black ${nationTitleClassMap[group.nation] ?? "text-[#f3e7d0]"}`}>{group.nation}</h2>
           </div>
 
-          <div className="overflow-hidden">
+          <div className="admin-factions-mobile-list">
+            {group.members.map((member) => {
+              const selectedBadge = getHiddenJobBadge(member.job);
+
+              return (
+                <article key={`${member.id}-mobile`} className="admin-factions-mobile-card">
+                  <div className="admin-factions-mobile-head">
+                    <h3>{member.nickname}</h3>
+                    {member.job ? (
+                      <span className={`inline-flex max-w-full justify-center truncate rounded-full px-2 py-1 text-[11px] font-extrabold ring-1 ${selectedBadge ? selectedBadge.className : "bg-white/5 text-[#dbc292] ring-white/10"}`}>
+                        {selectedBadge?.label === "군주" ? "👑" : selectedBadge?.prefix ? <span className="mr-1 text-white">{selectedBadge.prefix}</span> : null}{formatJobDisplayName(member.job)}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <label className="admin-factions-mobile-field">
+                    <span>직업</span>
+                    <select
+                      value={member.job ?? ""}
+                      onChange={(event) => updateField(member.id, "job", event.target.value)}
+                    >
+                      <option value="">미선택</option>
+                      {!hasSelectableJob(member) && member.job ? (
+                        <option value={member.job}>현재값 - {member.job}</option>
+                      ) : null}
+                      <optgroup label="일반 직업군">
+                        {baseJobOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.group} - {option.value}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="모험/API 히든">
+                        {adventureHiddenJobOptions.map((option) => (
+                          <option key={option} value={option}>
+                            히든 - {option}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label={`${member.nation} 히든`}>
+                        {(hiddenJobOptionsByNation[member.nation] ?? []).map((option) => (
+                          <option key={option} value={option}>
+                            히든 - {option}
+                          </option>
+                        ))}
+                      </optgroup>
+                    </select>
+                  </label>
+
+                  <div className="admin-factions-mobile-two">
+                    <label className="admin-factions-mobile-field">
+                      <span>말</span>
+                      <select
+                        value={member.horseInput}
+                        onChange={(event) => {
+                          const horse = event.target.value;
+                          updateField(member.id, "horseInput", horse);
+                          if (!horse) updateField(member.id, "horseLevelInput", "0");
+                          else if (Number(member.horseLevelInput) > getHorseEnhancementMax(horse)) {
+                            updateField(member.id, "horseLevelInput", String(getHorseEnhancementMax(horse)));
+                          }
+                        }}
+                      >
+                        <option value="">없음</option>
+                        {member.horseInput && !horseOptions.includes(member.horseInput as (typeof horseOptions)[number]) ? (
+                          <option value={member.horseInput}>현재값 - {member.horseInput}</option>
+                        ) : null}
+                        {horseOptions.map((horse) => (
+                          <option key={horse} value={horse}>{horse}</option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="admin-factions-mobile-field">
+                      <span>말 강화</span>
+                      <select
+                        value={member.horseLevelInput}
+                        onChange={(event) => updateField(member.id, "horseLevelInput", event.target.value)}
+                        disabled={!member.horseInput}
+                      >
+                        {getHorseEnhancementOptions(member.horseInput).map((level) => (
+                          <option key={level} value={level}>{level}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="admin-factions-mobile-group">
+                    <span>장비</span>
+                    <div className="admin-factions-mobile-grid">
+                      {([
+                        ["무기", "weaponInput"],
+                        ["두갑", "helmetInput"],
+                        ["흉갑", "armorInput"],
+                        ["각갑", "shoesInput"]
+                      ] as const).map(([label, field]) => (
+                        <label key={field}>
+                          <span>{label}</span>
+                          {field === "helmetInput" && !canEquipHeadArmor(member.job) ? (
+                            <div className="admin-factions-mobile-disabled">-</div>
+                          ) : (
+                            <input
+                              value={member[field]}
+                              onChange={(event) => updateField(member.id, field, event.target.value)}
+                              inputMode="numeric"
+                            />
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="admin-factions-mobile-group">
+                    <span>스탯</span>
+                    <div className="admin-factions-mobile-grid">
+                      {([
+                        ["무력", "statStrengthInput"],
+                        ["기민", "statAgilityInput"],
+                        ["기력", "statVitalityInput"],
+                        ["지모", "statIntelligenceInput"]
+                      ] as const).map(([label, field]) => (
+                        <label key={field}>
+                          <span>{label}</span>
+                          <input
+                            value={member[field]}
+                            onChange={(event) => updateField(member.id, field, event.target.value)}
+                            inputMode="numeric"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => saveMember(member)}
+                    disabled={savingId === member.id}
+                    className={`${nationSaveButtonClassMap[group.nation] ?? "admin-btn-save"} admin-factions-mobile-save rounded-lg`}
+                  >
+                    {savingId === member.id ? "저장 중..." : `${member.nickname} 저장`}
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="admin-factions-table-wrap overflow-hidden">
             <table className="w-full table-fixed border-collapse text-[11px] leading-4">
               <thead>
                 <tr className="bg-white/[0.03] text-[#dbc292]">

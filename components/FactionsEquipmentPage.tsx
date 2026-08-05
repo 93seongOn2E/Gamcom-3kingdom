@@ -1,5 +1,6 @@
 import { getSql } from "@/lib/db";
 import { hiddenJobConfig, hiddenJobNames, nationConfigs } from "@/lib/factions-config";
+import { EquipmentUpdateNoticeModal } from "@/components/EquipmentUpdateNoticeModal";
 import { NationEquipmentTable, type EquipmentMemberRow } from "@/components/NationEquipmentTable";
 import Link from "next/link";
 import type { ThreeKingdomSeason } from "@/lib/season";
@@ -94,6 +95,8 @@ export async function FactionsEquipmentPage({
 
   return (
     <div className="mx-auto max-w-[102rem] px-3 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
+      {!selectedNation ? <EquipmentUpdateNoticeModal /> : null}
+
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-black" style={{ color: selectedNationConfig?.color ?? "#f3e7d0" }}>

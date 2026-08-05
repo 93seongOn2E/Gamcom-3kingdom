@@ -162,6 +162,77 @@ function SortHeader({
   );
 }
 
+function MobileEquipmentCard({ member, index, showStats }: { member: EquipmentMemberRow; index: number; showStats: boolean }) {
+  const crewBadgeClass = crewBadgeClassMap[member.crew_name] ?? "bg-white/10 text-[#f3e7d0] ring-white/10";
+  const hiddenJob = getHiddenJobBadge(member.job);
+  const stripeClass = index % 2 === 0 ? "bg-black/18" : "bg-[rgba(212,167,86,0.08)]";
+  const equipmentItems = [
+    ["무기", formatValue(member.weapon)],
+    ["두갑", formatHeadArmor(member.job, member.helmet)],
+    ["흉갑", formatValue(member.armor)],
+    ["각갑", formatValue(member.shoes)]
+  ] as const;
+  const statItems = [
+    ["무력", member.stat_strength],
+    ["기민", member.stat_agility],
+    ["기력", member.stat_vitality],
+    ["지모", member.stat_intelligence]
+  ] as const;
+
+  return (
+    <article className={`equipment-mobile-card ${stripeClass}`}>
+      <div className="equipment-mobile-card-head">
+        <div className="min-w-0">
+          <div className="equipment-mobile-badges">
+            <span className={`inline-flex items-center rounded-full px-2 py-1 text-[10px] font-extrabold tracking-[-0.02em] ring-1 ${crewBadgeClass}`}>
+              {member.crew_name}
+            </span>
+            {hiddenJob ? (
+              <span className={`inline-flex items-center rounded-full px-2 py-1 text-[11px] font-extrabold ring-1 ${hiddenJob.className}`}>
+                {hiddenJob.label === "군주" ? "👑" : hiddenJob.prefix ? <span className="mr-1 text-white">{hiddenJob.prefix}</span> : null}{formatJobDisplayName(member.job)}
+              </span>
+            ) : (
+              <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 text-[11px] font-extrabold text-[#dbc292]">
+                {formatJobDisplayName(member.job)}
+              </span>
+            )}
+          </div>
+          <h3>{member.nickname}</h3>
+        </div>
+        <span className={`equipment-mobile-horse ${getHorseBadgeClass(member.horse)}`}>
+          {formatHorseName(member.horse, member.horse_level)}
+        </span>
+      </div>
+
+      <dl className="equipment-mobile-values">
+        {equipmentItems.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd><EquipmentValue value={value} /></dd>
+          </div>
+        ))}
+      </dl>
+
+      {showStats ? (
+        <dl className="equipment-mobile-values equipment-mobile-stats">
+          {statItems.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd><EquipmentValue value={value} /></dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <div className="equipment-mobile-stat-line">
+          {statItems.map(([label, value]) => (
+            <span key={label}>{label} <b>{value}</b></span>
+          ))}
+        </div>
+      )}
+    </article>
+  );
+}
+
 export function NationEquipmentTable({
   rows,
   emptySlotCount,
@@ -231,6 +302,16 @@ export function NationEquipmentTable({
         >
           정렬 초기화
         </button>
+      </div>
+      <div className="equipment-mobile-list">
+        {sortedRows.map((member, index) => (
+          <MobileEquipmentCard key={`${member.nation}-${member.nickname}-mobile`} member={member} index={index} showStats={showStats} />
+        ))}
+        {emptySlotCount > 0 ? (
+          <div className="equipment-mobile-empty">
+            미입력 슬롯 {emptySlotCount}명
+          </div>
+        ) : null}
       </div>
       <table className={`equipment-table border-collapse text-[13px] leading-5 ${showStats ? "min-w-[900px] table-fixed" : "w-full min-w-full table-fixed"}`}>
         {showStats ? (

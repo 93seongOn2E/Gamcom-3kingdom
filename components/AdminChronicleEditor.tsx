@@ -46,6 +46,10 @@ const approvalStatusClassMap: Record<ChronicleRow["approval_status"], string> = 
   rejected: "bg-[#b43d2f]/24 text-[#ffe0dd] ring-[#b43d2f]/44"
 };
 
+function formatDisplayDate(value: string) {
+  return value.replace("T", " ").slice(0, 16);
+}
+
 const fixedCreateYear = "2026";
 const fixedCreateMonth = "08";
 const minChronicleDate = new Date(2026, 7, 1, 0, 0, 0);
@@ -463,7 +467,116 @@ export function AdminChronicleEditor({ role }: { role: "master" | "manager" | "s
         {loading ? (
           <div className="p-5 text-sm text-[#dbc292]">연대기 정보를 불러오는 중입니다...</div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          <div className="admin-chronicle-mobile-list">
+            {entries.map((entry) => {
+              const form = editForms[entry.id];
+              const selectableNations = nationOptions.filter((nation) => !form?.nations.includes(nation));
+
+              return (
+                <article key={`${entry.id}-mobile`} className="admin-chronicle-mobile-card">
+                  <div className="admin-chronicle-mobile-card-head">
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ring-1 ${approvalStatusClassMap[entry.approval_status]}`}>
+                      {approvalStatusLabelMap[entry.approval_status]}
+                    </span>
+                    <span>{entry.author_name}</span>
+                  </div>
+
+                  <label className="grid gap-2">
+                    <span>발생일</span>
+                    {form ? <DateSelectGroup form={form} onChange={(value) => updateEditDate(entry.id, value)} /> : null}
+                  </label>
+
+                  <label className="grid gap-2">
+                    <span>국가</span>
+                    <select
+                      value=""
+                      onChange={(event) => {
+                        addNationToEdit(entry.id, event.target.value);
+                        event.target.value = "";
+                      }}
+                      className="h-11 w-full rounded-lg border border-[var(--border)] bg-black/40 px-3 text-[#f3e7d0] outline-none"
+                    >
+                      <option value="">{selectableNations.length ? "국가 선택" : "모든 국가 선택됨"}</option>
+                      {selectableNations.map((nation) => (
+                        <option key={nation} value={nation}>
+                          {nation}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex flex-wrap gap-2">
+                      {form?.nations.map((nation) => (
+                        <button
+                          key={nation}
+                          type="button"
+                          onClick={() => removeNationFromEdit(entry.id, nation)}
+                          className={`rounded-full px-3 py-1 text-xs font-bold ${nationBadgeClassMap[nation] ?? "bg-white/10 text-white"}`}
+                        >
+                          {nation}
+                        </button>
+                      ))}
+                    </div>
+                  </label>
+
+                  <label className="grid gap-2">
+                    <span>내용</span>
+                    <textarea
+                      value={form?.content ?? ""}
+                      onChange={(event) => updateEditContent(entry.id, event.target.value)}
+                      rows={3}
+                      className="min-h-24 w-full resize-y rounded-lg border border-[var(--border)] bg-black/40 px-3 py-2 text-[#f3e7d0] outline-none"
+                    />
+                  </label>
+
+                  <div className="admin-chronicle-mobile-meta">
+                    <span>작성일 {formatDisplayDate(entry.created_at)}</span>
+                    {role === "master" ? null : <span>{entry.reviewed_by_name ? `${entry.reviewed_by_name} 검수` : "대기 중"}</span>}
+                  </div>
+
+                  <div className="admin-chronicle-mobile-actions">
+                    {role === "master" ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => reviewEntry(entry.id, "approve")}
+                          disabled={editingId === entry.id || entry.approval_status === "approved"}
+                          className="admin-btn-save rounded-lg text-sm"
+                        >
+                          승인
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => reviewEntry(entry.id, "reject")}
+                          disabled={editingId === entry.id || entry.approval_status === "rejected"}
+                          className="admin-btn-delete rounded-lg text-sm"
+                        >
+                          반려
+                        </button>
+                      </>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => updateEntry(entry.id)}
+                      disabled={editingId === entry.id}
+                      className="admin-btn-edit rounded-lg text-sm"
+                    >
+                      수정
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteEntry(entry.id)}
+                      disabled={editingId === entry.id || (role !== "master" && entry.approval_status === "approved")}
+                      className="admin-btn-delete rounded-lg text-sm"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="admin-chronicle-table-wrap overflow-x-auto">
             <table className="min-w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-white/[0.03] text-left text-[#dbc292]">
@@ -586,6 +699,7 @@ export function AdminChronicleEditor({ role }: { role: "master" | "manager" | "s
               </tbody>
             </table>
           </div>
+          </>
         )}
       </section>
     </div>
