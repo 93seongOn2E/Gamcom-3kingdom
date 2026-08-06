@@ -3519,6 +3519,7 @@ thead .admin-equipment-stat-divider::before {
   color: #f5e7c7;
   font-size: 14px;
   line-height: 1.75;
+  white-space: pre-line;
 }
 
 .chronicle-inline-nation {
@@ -3529,6 +3530,14 @@ thead .admin-equipment-stat-divider::before {
 .chronicle-inline-nation.wei { color: #72b5ff; }
 .chronicle-inline-nation.shu { color: #68dd91; }
 .chronicle-inline-nation.wu { color: #f1c84b; }
+
+.chronicle-inline-result {
+  font-weight: 950;
+  text-shadow: 0 0 8px currentColor;
+}
+
+.chronicle-inline-result.success { color: #c4a7ff; }
+.chronicle-inline-result.failure { color: #ff6b6b; }
 
 .chronicle-list::-webkit-scrollbar {
   width: 10px;

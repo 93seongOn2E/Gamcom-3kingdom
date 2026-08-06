@@ -61,14 +61,30 @@ function getNationThemeClass(nation: string) {
 }
 
 function renderChronicleContent(content: string) {
-  return content.split(/(위나라|촉나라|오나라)/g).map((part, index) => {
+  return content.split(/(\r?\n|위나라|촉나라|오나라|성공|실패)/g).map((part, index) => {
+    if (part === "\n" || part === "\r\n") {
+      return <br key={`line-break-${index}`} />;
+    }
+
     const isNation = part === "위나라" || part === "촉나라" || part === "오나라";
 
-    return isNation ? (
-      <span key={`${part}-${index}`} className={`chronicle-inline-nation ${getNationThemeClass(part)}`}>
-        {part}
-      </span>
-    ) : part;
+    if (isNation) {
+      return (
+        <span key={`${part}-${index}`} className={`chronicle-inline-nation ${getNationThemeClass(part)}`}>
+          {part}
+        </span>
+      );
+    }
+
+    if (part === "성공" || part === "실패") {
+      return (
+        <span key={`${part}-${index}`} className={`chronicle-inline-result ${part === "성공" ? "success" : "failure"}`}>
+          {part}
+        </span>
+      );
+    }
+
+    return part;
   });
 }
 
@@ -76,8 +92,8 @@ const siegeRules = [
   {
     title: "신규 점령 영토의 보호",
     items: [
-      "점령한 영토의 거점은 장원으로 건설되며 24시간의 보호시간을 갖습니다.",
-      "24시간의 보호시간 동안은 거점 형태를 변경할 수 없고, 성문과 수호석이 보호됩니다."
+      "점령한 영토의 거점은 장원으로 건설되며 2시간의 보호시간을 갖습니다.",
+      "2시간의 보호시간 동안은 거점 형태를 변경할 수 없고, 성문과 수호석이 보호됩니다."
     ]
   },
   {
