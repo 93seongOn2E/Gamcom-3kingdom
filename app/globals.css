@@ -3724,7 +3724,7 @@ thead .admin-equipment-stat-divider::before {
 }
 
 .siege-rules-panel {
-  margin-top: 22px;
+  margin-bottom: 22px;
   padding: 22px;
 }
 
@@ -3734,7 +3734,19 @@ thead .admin-equipment-stat-divider::before {
   margin-bottom: 18px;
 }
 
-.siege-rules-head span {
+.siege-rules-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.siege-rules-title-row > div {
+  display: grid;
+  gap: 7px;
+}
+
+.siege-rules-badge {
   width: fit-content;
   border: 1px solid rgba(212, 167, 86, .28);
   border-radius: 999px;
@@ -3761,6 +3773,107 @@ thead .admin-equipment-stat-divider::before {
   font-weight: 750;
   line-height: 1.7;
   word-break: keep-all;
+}
+
+.siege-rules-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 86px;
+  min-height: 40px;
+  border: 1px solid rgba(212, 167, 86, .38);
+  border-radius: 9px;
+  background: rgba(212, 167, 86, .09);
+  padding: 8px 13px;
+  color: #f0cf8d;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, color .18s ease;
+}
+
+.siege-rules-toggle:hover {
+  border-color: rgba(240, 201, 120, .68);
+  background: rgba(212, 167, 86, .16);
+  color: #ffe4ac;
+}
+
+.siege-rules-toggle:focus-visible {
+  outline: 2px solid #f0c978;
+  outline-offset: 3px;
+}
+
+.siege-rules-toggle svg {
+  flex: 0 0 auto;
+  transition: transform .18s ease;
+}
+
+.siege-rules-toggle svg.open {
+  transform: rotate(180deg);
+}
+
+.siege-rules-content {
+  display: grid;
+  gap: 14px;
+}
+
+.war-schedule-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(212, 167, 86, .24);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, .28);
+}
+
+.war-schedule-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  color: #d8c6a0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.war-schedule-table th,
+.war-schedule-table td {
+  border-right: 1px solid rgba(212, 167, 86, .14);
+  border-bottom: 1px solid rgba(212, 167, 86, .14);
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: middle;
+  word-break: keep-all;
+}
+
+.war-schedule-table tr > :last-child {
+  border-right: 0;
+}
+
+.war-schedule-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.war-schedule-table thead th {
+  background: rgba(212, 167, 86, .13);
+  color: #f7dda7;
+  font-weight: 950;
+}
+
+.war-schedule-table tbody th {
+  width: 140px;
+  color: #ffe4ac;
+  font-weight: 900;
+}
+
+.war-schedule-table tbody td:nth-child(2) {
+  width: 280px;
+  color: #ead5ae;
+}
+
+.war-schedule-table strong {
+  color: #f0c978;
+  font-weight: 950;
 }
 
 .siege-rules-list {
@@ -4167,8 +4280,16 @@ thead .admin-equipment-stat-divider::before {
   }
 
   .siege-rules-panel {
-    margin-top: 18px;
+    margin-bottom: 18px;
     padding: 16px;
+  }
+
+  .siege-rules-title-row {
+    align-items: flex-start;
+  }
+
+  .siege-rules-toggle {
+    min-width: 76px;
   }
 
   .siege-rule-card {

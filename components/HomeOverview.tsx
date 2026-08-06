@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { MapViewer } from "@/components/MapViewer";
 import type { CastleDataPayload } from "@/lib/public-data";
 import type { ThreeKingdomSeason } from "@/lib/season";
@@ -10,6 +11,42 @@ export type ChronicleEntry = {
   date: string;
   content: string;
 };
+
+const warSchedule = [
+  {
+    type: "평화 기간",
+    period: "8월 7일 19시 59분까지",
+    scope: (
+      <>
+        평화 기간에는 주인이 없는 <strong>영토 구매</strong>만 가능합니다.
+      </>
+    )
+  },
+  {
+    type: "1차 전쟁 기간",
+    period: "8월 7일 20시 ~ 8월 8일 02시 (6시간)",
+    scope: (
+      <>
+        전쟁 기간에는 주인이 없는 영토를 50만에 <strong>구매</strong>하거나, 타국의 영토를 뺏을 수 있습니다.
+      </>
+    )
+  },
+  {
+    type: "2차 전쟁 기간",
+    period: "8월 8일 20시 ~ 8월 9일 08시 (12시간)",
+    scope: "1차 전쟁 기간 규칙과 동일"
+  },
+  {
+    type: "3차 전쟁 기간",
+    period: "8월 9일 20시 ~ 8월 10일 20시 (24시간)",
+    scope: "1차 전쟁 기간 규칙과 동일"
+  },
+  {
+    type: "서버 종료",
+    period: "8월 10일 21시",
+    scope: "-"
+  }
+];
 
 function getNationThemeClass(nation: string) {
   if (nation === "위나라") return "wei";
@@ -77,6 +114,7 @@ export function HomeOverview({
 }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
+  const [areSiegeRulesOpen, setAreSiegeRulesOpen] = useState(false);
 
   useEffect(() => {
     const element = mapRef.current;
@@ -106,6 +144,74 @@ export function HomeOverview({
   return (
     <div className="home-overview-container">
       <div className="home-overview-stage">
+        <section className="pixel-frame siege-rules-panel" aria-labelledby="siege-rules-title">
+          <div className="siege-rules-head">
+            <div className="siege-rules-title-row">
+              <div>
+                <span className="siege-rules-badge">공성전 규칙</span>
+                <h2 id="siege-rules-title">영토 점령 및 공성 규칙 안내</h2>
+              </div>
+              <button
+                type="button"
+                className="siege-rules-toggle"
+                aria-expanded={areSiegeRulesOpen}
+                aria-controls="siege-rules-content"
+                onClick={() => setAreSiegeRulesOpen((isOpen) => !isOpen)}
+              >
+                {areSiegeRulesOpen ? "접기" : "펼치기"}
+                <ChevronDown
+                  aria-hidden="true"
+                  className={areSiegeRulesOpen ? "open" : ""}
+                  size={17}
+                  strokeWidth={2.5}
+                />
+              </button>
+            </div>
+            <p>평화 및 전쟁 기간별로 가능한 영토 활동을 확인해 주세요.</p>
+          </div>
+
+          {areSiegeRulesOpen && (
+            <div id="siege-rules-content" className="siege-rules-content">
+              <div className="war-schedule-wrap">
+                <table className="war-schedule-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">구분</th>
+                      <th scope="col">기간</th>
+                      <th scope="col">가능 범위</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {warSchedule.map((schedule) => (
+                      <tr key={schedule.type}>
+                        <th scope="row">{schedule.type}</th>
+                        <td>{schedule.period}</td>
+                        <td>{schedule.scope}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="siege-rules-list">
+                {siegeRules.map((rule, index) => (
+                  <article key={rule.title} className="siege-rule-card">
+                    <div className="siege-rule-number">{index + 1}</div>
+                    <div>
+                      <h3>{rule.title}</h3>
+                      <ul>
+                        {rule.items.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
         <section
           className="home-overview grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.6fr)_340px]"
         >
@@ -139,30 +245,6 @@ export function HomeOverview({
               ))}
             </div>
           </aside>
-        </section>
-
-        <section className="pixel-frame siege-rules-panel" aria-labelledby="siege-rules-title">
-          <div className="siege-rules-head">
-            <span>공성전 규칙</span>
-            <h2 id="siege-rules-title">영토 점령 및 공성 규칙 안내</h2>
-            <p>전쟁 기간은 8월 7일 00시부터 시작되며 다음과 같은 규칙으로 진행됩니다.</p>
-          </div>
-
-          <div className="siege-rules-list">
-            {siegeRules.map((rule, index) => (
-              <article key={rule.title} className="siege-rule-card">
-                <div className="siege-rule-number">{index + 1}</div>
-                <div>
-                  <h3>{rule.title}</h3>
-                  <ul>
-                    {rule.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
-            ))}
-          </div>
         </section>
       </div>
     </div>
