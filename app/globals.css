@@ -3723,6 +3723,113 @@ thead .admin-equipment-stat-divider::before {
   min-height: 0;
 }
 
+.siege-rules-panel {
+  margin-top: 22px;
+  padding: 22px;
+}
+
+.siege-rules-head {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.siege-rules-head span {
+  width: fit-content;
+  border: 1px solid rgba(212, 167, 86, .28);
+  border-radius: 999px;
+  background: rgba(212, 167, 86, .1);
+  padding: 5px 10px;
+  color: #f0c978;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.siege-rules-head h2 {
+  margin: 0;
+  color: #f3e7d0;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 950;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.siege-rules-head p {
+  margin: 0;
+  color: #cdb487;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+.siege-rules-list {
+  display: grid;
+  gap: 8px;
+}
+
+.siege-rule-card {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 12px;
+  border: 1px solid rgba(212, 167, 86, .16);
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, rgba(212, 167, 86, .085), transparent 34%),
+    rgba(0, 0, 0, .24);
+  padding: 12px 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 244, 214, .045);
+}
+
+.siege-rule-number {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe1a0, #c79235);
+  color: #120d08;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.siege-rule-card h3 {
+  margin: 2px 0 6px;
+  color: #ffe4ac;
+  font-size: 15px;
+  font-weight: 950;
+  line-height: 1.35;
+}
+
+.siege-rule-card ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.siege-rule-card li {
+  position: relative;
+  padding-left: 12px;
+  color: #d8c6a0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.siege-rule-card li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .72em;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #d4a756;
+}
+
 @media (max-width: 1100px) {
   .admin-map-shell {
     grid-template-columns: 1fr;
@@ -4058,6 +4165,18 @@ thead .admin-equipment-stat-divider::before {
   .home-overview .chronicle-panel .chronicle-list {
     min-height: 0;
   }
+
+  .siege-rules-panel {
+    margin-top: 18px;
+    padding: 16px;
+  }
+
+  .siege-rule-card {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 10px;
+    padding: 13px;
+  }
+
 
   .multiview-floating-panel {
     left: 12px;

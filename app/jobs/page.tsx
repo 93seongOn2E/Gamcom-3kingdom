@@ -290,7 +290,11 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     kingdom: "모험/API 히든",
     name: "하후연",
     role: "영객",
-    skills: []
+    skills: [
+      { name: "연화신무", description: "제자리에서 장검을 휘둘러 주변 일대의 적을 밀쳐내며 한 번에 베어내고, 잠시 이동 속도가 빨라집니다.", controlEffects: ["넉백"], hasVideo: false },
+      { name: "비연교차", description: "조준한 적에게 도약해 주변 일대를 모조리 베어낸 뒤, 뒤로 빠져 거리를 벌립니다.", hasVideo: false },
+      { name: "천화난무", description: "네 개의 잔영이 부채꼴로 퍼져 중앙을 향해 검기를 날린 뒤, 일제히 돌진해 중앙에서 교차하며 베어냅니다.", hasVideo: false }
+    ]
   },
   {
     kingdom: "모험/API 히든",
@@ -306,7 +310,11 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     kingdom: "모험/API 히든",
     name: "마등",
     role: "창수",
-    skills: []
+    skills: [
+      { name: "돌파창무", description: "정면으로 대시하며 창을 깊게 내지른 뒤, 잠시 뒤 반원을 그리며 크게 베어냅니다.", hasVideo: false },
+      { name: "천강창우", description: "하늘에서 여러 자루의 창이 빠르게 쏟아져 내리며 여러 차례 적을 꿰뚫고, 마지막에 거대한 창 하나가 크게 내려꽂혀 강타합니다.", hasVideo: false },
+      { name: "서량철기", description: "뒤로 한 걸음 도약한 뒤, 거대한 기마 부대의 형상과 함께 정면을 휩쓸며 돌진해 적을 강타합니다.", hasVideo: false }
+    ]
   },
   {
     kingdom: "위나라",
