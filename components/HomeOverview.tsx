@@ -15,7 +15,7 @@ export type ChronicleEntry = {
 const warSchedule = [
   {
     type: "평화 기간",
-    period: "8월 7일 19시 59분까지",
+    period: "8월 6일 21시 59분까지",
     scope: (
       <>
         평화 기간에는 주인이 없는 <strong>영토 구매</strong>만 가능합니다.
@@ -24,7 +24,7 @@ const warSchedule = [
   },
   {
     type: "1차 전쟁 기간",
-    period: "8월 7일 20시 ~ 8월 8일 02시 (6시간)",
+    period: "8월 6일 22시 ~ 8월 7일 02시 (4시간)",
     scope: (
       <>
         전쟁 기간에는 주인이 없는 영토를 50만에 <strong>구매</strong>하거나, 타국의 영토를 뺏을 수 있습니다.
@@ -33,11 +33,16 @@ const warSchedule = [
   },
   {
     type: "2차 전쟁 기간",
-    period: "8월 8일 20시 ~ 8월 9일 08시 (12시간)",
+    period: "8월 7일 22시 ~ 8월 8일 04시 (6시간)",
     scope: "1차 전쟁 기간 규칙과 동일"
   },
   {
     type: "3차 전쟁 기간",
+    period: "8월 8일 16시 ~ 8월 9일 04시 (12시간)",
+    scope: "1차 전쟁 기간 규칙과 동일"
+  },
+  {
+    type: "4차 전쟁 기간",
     period: "8월 9일 20시 ~ 8월 10일 20시 (24시간)",
     scope: "1차 전쟁 기간 규칙과 동일"
   },
