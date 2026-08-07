@@ -12,6 +12,53 @@ export type ChronicleEntry = {
   content: string;
 };
 
+const warChronicleDays = [
+  {
+    id: "day-1",
+    title: "1일차",
+    period: "8월 6일 22:00 ~ 8월 7일 02:00",
+    start: "2026-08-06 22:00",
+    end: "2026-08-07 02:00"
+  },
+  {
+    id: "day-2",
+    title: "2일차",
+    period: "8월 7일 22:00 ~ 8월 8일 04:00",
+    start: "2026-08-07 22:00",
+    end: "2026-08-08 04:00"
+  },
+  {
+    id: "day-3",
+    title: "3일차",
+    period: "8월 8일 16:00 ~ 8월 9일 04:00",
+    start: "2026-08-08 16:00",
+    end: "2026-08-09 04:00"
+  },
+  {
+    id: "day-4",
+    title: "4일차",
+    period: "8월 9일 20:00 ~ 8월 10일 20:00",
+    start: "2026-08-09 20:00",
+    end: "2026-08-10 20:00"
+  }
+] as const;
+
+function getWarChronicleDay(date: string) {
+  return warChronicleDays.find((day) => date >= day.start && date <= day.end);
+}
+
+function isWarChronicleEntry(entry: ChronicleEntry) {
+  if (!getWarChronicleDay(entry.date)) {
+    return false;
+  }
+
+  const hasTerritoryNumber = /\d+(?:\s*,\s*\d+)*번\s*성/.test(entry.content);
+  const hasWarAction = /(공격|반격|함락|재점령|재탈환|점령|방어)/.test(entry.content);
+  const isWarDaySummary = /전쟁\s*기간.*종료/.test(entry.content);
+
+  return (hasTerritoryNumber && hasWarAction) || isWarDaySummary;
+}
+
 const warSchedule = [
   {
     type: "평화 기간",
@@ -88,6 +135,27 @@ function renderChronicleContent(content: string) {
   });
 }
 
+function ChronicleRecord({ entry, itemKey, compact = false }: { entry: ChronicleEntry; itemKey: string; compact?: boolean }) {
+  return (
+    <article className={compact ? "chronicle-war-entry" : "chronicle-item"}>
+      <time className="chronicle-date">{entry.date}</time>
+
+      <div className="chronicle-meta">
+        {entry.nations.map((nation, index) => (
+          <span
+            key={`${itemKey}-${nation}-${index}`}
+            className={`chronicle-force ${getNationThemeClass(nation)}`}
+          >
+            {nation}
+          </span>
+        ))}
+      </div>
+
+      <p className="chronicle-content">{renderChronicleContent(entry.content)}</p>
+    </article>
+  );
+}
+
 const siegeRules = [
   {
     title: "신규 점령 영토의 보호",
@@ -136,6 +204,33 @@ export function HomeOverview({
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [mapHeight, setMapHeight] = useState<number | null>(null);
   const [areSiegeRulesOpen, setAreSiegeRulesOpen] = useState(false);
+  const [openWarDays, setOpenWarDays] = useState<Set<string>>(() => new Set());
+
+  const chronicleDisplayItems = [
+    ...chronicle
+      .map((entry, index) => ({ type: "entry" as const, entry, index, sortDate: entry.date }))
+      .filter(({ entry }) => !isWarChronicleEntry(entry)),
+    ...warChronicleDays.flatMap((day) => {
+      const entries = chronicle.filter(
+        (entry) => isWarChronicleEntry(entry) && getWarChronicleDay(entry.date)?.id === day.id
+      );
+      return entries.length > 0
+        ? [{ type: "war-day" as const, day, entries, sortDate: entries[0].date }]
+        : [];
+    })
+  ].sort((left, right) => right.sortDate.localeCompare(left.sortDate));
+
+  const toggleWarDay = (dayId: string) => {
+    setOpenWarDays((current) => {
+      const next = new Set(current);
+      if (next.has(dayId)) {
+        next.delete(dayId);
+      } else {
+        next.add(dayId);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     const element = mapRef.current;
@@ -246,24 +341,54 @@ export function HomeOverview({
             </div>
 
             <div className="chronicle-list">
-              {chronicle.map((entry, index) => (
-                <article key={`${entry.date}-${entry.content}-${index}`} className="chronicle-item">
-                  <time className="chronicle-date">{entry.date}</time>
+              {chronicleDisplayItems.map((item) => {
+                if (item.type === "entry") {
+                  return (
+                    <ChronicleRecord
+                      key={`${item.entry.date}-${item.entry.content}-${item.index}`}
+                      entry={item.entry}
+                      itemKey={`${item.entry.date}-${item.index}`}
+                    />
+                  );
+                }
 
-                  <div className="chronicle-meta">
-                    {entry.nations.map((nation) => (
-                      <span
-                        key={`${entry.date}-${nation}-${index}`}
-                        className={`chronicle-force ${getNationThemeClass(nation)}`}
-                      >
-                        {nation}
+                const isOpen = openWarDays.has(item.day.id);
+                const contentId = `chronicle-${item.day.id}-content`;
+
+                return (
+                  <article key={item.day.id} className="chronicle-war-group">
+                    <button
+                      type="button"
+                      className="chronicle-war-toggle"
+                      aria-expanded={isOpen}
+                      aria-controls={contentId}
+                      onClick={() => toggleWarDay(item.day.id)}
+                    >
+                      <span className="chronicle-war-heading">
+                        <strong>{item.day.title} 전쟁 기록</strong>
+                        <span>{item.day.period}</span>
                       </span>
-                    ))}
-                  </div>
+                      <span className="chronicle-war-toggle-meta">
+                        {item.entries.length}건
+                        <ChevronDown aria-hidden="true" className={isOpen ? "open" : ""} size={17} strokeWidth={2.5} />
+                      </span>
+                    </button>
 
-                  <p className="chronicle-content">{renderChronicleContent(entry.content)}</p>
-                </article>
-              ))}
+                    {isOpen ? (
+                      <div id={contentId} className="chronicle-war-entries">
+                        {item.entries.map((entry, index) => (
+                          <ChronicleRecord
+                            key={`${item.day.id}-${entry.date}-${entry.content}-${index}`}
+                            entry={entry}
+                            itemKey={`${item.day.id}-${entry.date}-${index}`}
+                            compact
+                          />
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })}
             </div>
           </aside>
         </section>

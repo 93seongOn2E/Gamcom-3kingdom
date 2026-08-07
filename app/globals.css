@@ -3483,6 +3483,109 @@ thead .admin-equipment-stat-divider::before {
   box-shadow: 0 0 0 4px rgba(200, 154, 93, .12);
 }
 
+.chronicle-war-group {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding-left: 14px;
+}
+
+.chronicle-war-group::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 13px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid #d4a756;
+  border-radius: 999px;
+  background: #17120b;
+  box-shadow: 0 0 0 4px rgba(212, 167, 86, .12);
+}
+
+.chronicle-war-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(212, 167, 86, .28);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(212, 167, 86, .12), rgba(212, 167, 86, .04));
+  padding: 10px 11px;
+  color: #f5e7c7;
+  text-align: left;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+.chronicle-war-toggle:hover {
+  border-color: rgba(228, 191, 136, .56);
+  background: linear-gradient(180deg, rgba(212, 167, 86, .18), rgba(212, 167, 86, .07));
+}
+
+.chronicle-war-heading {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.chronicle-war-heading strong {
+  color: #f3e7d0;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.chronicle-war-heading > span {
+  color: #a9916c;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.chronicle-war-toggle-meta {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  color: #dbc292;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.chronicle-war-toggle-meta svg {
+  transition: transform .18s ease;
+}
+
+.chronicle-war-toggle-meta svg.open {
+  transform: rotate(180deg);
+}
+
+.chronicle-war-entries {
+  display: grid;
+  gap: 13px;
+  margin-left: 5px;
+  border-left: 1px solid rgba(212, 167, 86, .24);
+  padding: 3px 0 3px 14px;
+}
+
+.chronicle-war-entry {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+
+.chronicle-war-entry::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #9f7848;
+  box-shadow: 0 0 0 3px rgba(159, 120, 72, .12);
+}
+
 .chronicle-meta {
   display: flex;
   flex-wrap: wrap;
