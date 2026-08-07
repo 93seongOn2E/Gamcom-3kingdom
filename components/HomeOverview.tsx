@@ -47,6 +47,10 @@ function getWarChronicleDay(date: string) {
   return warChronicleDays.find((day) => date >= day.start && date <= day.end);
 }
 
+function isWarDaySummary(entry: ChronicleEntry) {
+  return Boolean(getWarChronicleDay(entry.date)) && /전쟁\s*기간.*종료/.test(entry.content);
+}
+
 function isWarChronicleEntry(entry: ChronicleEntry) {
   if (!getWarChronicleDay(entry.date)) {
     return false;
@@ -54,9 +58,8 @@ function isWarChronicleEntry(entry: ChronicleEntry) {
 
   const hasTerritoryNumber = /\d+(?:\s*,\s*\d+)*번\s*성/.test(entry.content);
   const hasWarAction = /(공격|반격|함락|재점령|재탈환|점령|방어)/.test(entry.content);
-  const isWarDaySummary = /전쟁\s*기간.*종료/.test(entry.content);
 
-  return (hasTerritoryNumber && hasWarAction) || isWarDaySummary;
+  return hasTerritoryNumber && hasWarAction;
 }
 
 const warSchedule = [
@@ -135,9 +138,19 @@ function renderChronicleContent(content: string) {
   });
 }
 
-function ChronicleRecord({ entry, itemKey, compact = false }: { entry: ChronicleEntry; itemKey: string; compact?: boolean }) {
+function ChronicleRecord({
+  entry,
+  itemKey,
+  compact = false,
+  summary = false
+}: {
+  entry: ChronicleEntry;
+  itemKey: string;
+  compact?: boolean;
+  summary?: boolean;
+}) {
   return (
-    <article className={compact ? "chronicle-war-entry" : "chronicle-item"}>
+    <article className={summary ? "chronicle-war-summary" : compact ? "chronicle-war-entry" : "chronicle-item"}>
       <time className="chronicle-date">{entry.date}</time>
 
       <div className="chronicle-meta">
@@ -209,13 +222,17 @@ export function HomeOverview({
   const chronicleDisplayItems = [
     ...chronicle
       .map((entry, index) => ({ type: "entry" as const, entry, index, sortDate: entry.date }))
-      .filter(({ entry }) => !isWarChronicleEntry(entry)),
+      .filter(({ entry }) => !isWarChronicleEntry(entry) && !isWarDaySummary(entry)),
     ...warChronicleDays.flatMap((day) => {
       const entries = chronicle.filter(
         (entry) => isWarChronicleEntry(entry) && getWarChronicleDay(entry.date)?.id === day.id
       );
-      return entries.length > 0
-        ? [{ type: "war-day" as const, day, entries, sortDate: entries[0].date }]
+      const summaries = chronicle.filter(
+        (entry) => isWarDaySummary(entry) && getWarChronicleDay(entry.date)?.id === day.id
+      );
+      const dayRecords = chronicle.filter((entry) => getWarChronicleDay(entry.date)?.id === day.id);
+      return entries.length > 0 || summaries.length > 0
+        ? [{ type: "war-day" as const, day, entries, summaries, sortDate: dayRecords[0].date }]
         : [];
     })
   ].sort((left, right) => right.sortDate.localeCompare(left.sortDate));
@@ -357,24 +374,35 @@ export function HomeOverview({
 
                 return (
                   <article key={item.day.id} className="chronicle-war-group">
-                    <button
-                      type="button"
-                      className="chronicle-war-toggle"
-                      aria-expanded={isOpen}
-                      aria-controls={contentId}
-                      onClick={() => toggleWarDay(item.day.id)}
-                    >
-                      <span className="chronicle-war-heading">
-                        <strong>{item.day.title} 전쟁 기록</strong>
-                        <span>{item.day.period}</span>
-                      </span>
-                      <span className="chronicle-war-toggle-meta">
-                        {item.entries.length}건
-                        <ChevronDown aria-hidden="true" className={isOpen ? "open" : ""} size={17} strokeWidth={2.5} />
-                      </span>
-                    </button>
+                    {item.summaries.map((entry, index) => (
+                      <ChronicleRecord
+                        key={`${item.day.id}-summary-${entry.date}-${index}`}
+                        entry={entry}
+                        itemKey={`${item.day.id}-summary-${entry.date}-${index}`}
+                        summary
+                      />
+                    ))}
 
-                    {isOpen ? (
+                    {item.entries.length > 0 ? (
+                      <button
+                        type="button"
+                        className="chronicle-war-toggle"
+                        aria-expanded={isOpen}
+                        aria-controls={contentId}
+                        onClick={() => toggleWarDay(item.day.id)}
+                      >
+                        <span className="chronicle-war-heading">
+                          <strong>{item.day.title} 전쟁 기록</strong>
+                          <span>{item.day.period}</span>
+                        </span>
+                        <span className="chronicle-war-toggle-meta">
+                          {item.entries.length}건
+                          <ChevronDown aria-hidden="true" className={isOpen ? "open" : ""} size={17} strokeWidth={2.5} />
+                        </span>
+                      </button>
+                    ) : null}
+
+                    {isOpen && item.entries.length > 0 ? (
                       <div id={contentId} className="chronicle-war-entries">
                         {item.entries.map((entry, index) => (
                           <ChronicleRecord

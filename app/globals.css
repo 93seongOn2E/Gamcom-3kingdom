@@ -3503,6 +3503,15 @@ thead .admin-equipment-stat-divider::before {
   box-shadow: 0 0 0 4px rgba(212, 167, 86, .12);
 }
 
+.chronicle-war-summary {
+  display: grid;
+  gap: 7px;
+  border: 1px solid rgba(212, 167, 86, .3);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(212, 167, 86, .1), rgba(212, 167, 86, .035));
+  padding: 11px;
+}
+
 .chronicle-war-toggle {
   display: flex;
   width: 100%;
