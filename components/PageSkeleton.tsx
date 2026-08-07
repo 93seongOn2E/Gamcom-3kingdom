@@ -13,7 +13,7 @@ function SkeletonCard({ className = "" }: { className?: string }) {
 export function PageSkeleton({ variant = "cards" }: PageSkeletonProps) {
   if (variant === "home") {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <div className="mx-auto max-w-7xl px-4 pb-10 pt-2 md:pt-0">
         <section className="home-overview grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.6fr)_340px]">
           <div className="pixel-frame p-4 md:p-6">
             <div className="mb-4 flex items-center justify-between">

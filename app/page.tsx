@@ -23,7 +23,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
+    <div className="mx-auto max-w-7xl px-4 pb-10 pt-2 md:pt-0">
       <HomeOverview chronicle={chronicle} castleData={castleData} season={season} />
 
       <section className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
