@@ -40,7 +40,7 @@ export const hiddenJobConfig = {
     prefix: "✦"
   },
   "히든 패월": {
-    jobs: ["손책"],
+    jobs: ["손책", "허저"],
     badgeClass: "bg-[#172554]/52 text-[#dbeafe] ring-[#60a5fa]/36",
     prefix: "✦"
   },
@@ -109,7 +109,7 @@ const baseJobGroupByName: Record<string, string> = {
   운시: "궁장"
 };
 
-export const adventureHiddenJobOptions = ["손책", "하후연", "손상향", "마등"] as const;
+export const adventureHiddenJobOptions = ["손책", "하후연", "손상향", "마등", "허저"] as const;
 
 export const hiddenJobOptionsByNation: Record<string, string[]> = {
   위나라: ["하후돈", "장료", "전위", "사마의"],
