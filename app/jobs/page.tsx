@@ -742,6 +742,42 @@ export default function JobsPage() {
 
               {group.id === "job-paewol" ? <div id="job-paewol-changsu" className="-mt-[18px] scroll-mt-35" /> : null}
 
+              <div className="grid gap-4 p-4 md:grid-cols-2 md:p-5">
+                {group.variants.map((variant) => (
+                  <article key={variant.name} className="overflow-hidden rounded-xl border border-[rgba(212,167,86,0.18)] bg-black/22 shadow-[inset_0_1px_0_rgba(255,244,214,0.05)]">
+                    <div className="grid gap-4 p-3 sm:grid-cols-[minmax(150px,0.9fr)_minmax(0,1.1fr)]">
+                      <div className="relative aspect-square overflow-hidden rounded-lg border border-[rgba(212,167,86,0.16)] bg-black/36">
+                        <Image
+                          src={variant.icon}
+                          alt={`${variant.weaponName} 무기 이미지`}
+                          fill
+                          sizes="(max-width: 768px) 90vw, 260px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="grid content-between gap-4 py-1">
+                        <div>
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <span className={`rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${hiddenRoleBadgeClass(group.title)}`}>
+                              {variant.name}
+                            </span>
+                            <span className="rounded-full bg-white/[0.055] px-2.5 py-1 text-[12px] font-black text-[#dbc292] ring-1 ring-white/10">
+                              {variant.weaponType}
+                            </span>
+                          </div>
+                          <h3 className="text-xl font-black text-[#f3e7d0]">{variant.weaponName}</h3>
+                        </div>
+                        <div className="grid gap-3">
+                          {(Object.entries(variant.stats) as [keyof JobVariant["stats"], StatLabel][]).map(([label, value]) => (
+                            <StatMeter key={label} label={label} value={value} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
               <div className="border-t border-[rgba(212,167,86,0.16)] p-4 md:p-5">
                 <div className="mb-3 flex items-center gap-2">
                   <span className={`rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${hiddenRoleBadgeClass(group.title)}`}>
