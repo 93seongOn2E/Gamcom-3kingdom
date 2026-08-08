@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Crown, Sparkles } from "lucide-react";
 import { MapViewer } from "@/components/MapViewer";
 import type { CastleDataPayload } from "@/lib/public-data";
 import type { ThreeKingdomSeason } from "@/lib/season";
@@ -150,8 +150,11 @@ function ChronicleRecord({
   compact?: boolean;
   summary?: boolean;
 }) {
+  const isUnification = /삼국통일/.test(entry.content);
+  const recordClassName = summary ? "chronicle-war-summary" : compact ? "chronicle-war-entry" : "chronicle-item";
+
   return (
-    <article className={summary ? "chronicle-war-summary" : compact ? "chronicle-war-entry" : "chronicle-item"}>
+    <article className={`${recordClassName}${isUnification ? " chronicle-unification" : ""}`}>
       <time className="chronicle-date">{entry.date}</time>
 
       <div className="chronicle-meta">
@@ -164,6 +167,15 @@ function ChronicleRecord({
           </span>
         ))}
       </div>
+
+      {isUnification ? (
+        <div className="chronicle-unification-banner" aria-label="삼국통일 달성">
+          <Sparkles aria-hidden="true" size={15} />
+          <Crown aria-hidden="true" size={21} strokeWidth={2.4} />
+          <strong>천하통일 대업 달성</strong>
+          <Sparkles aria-hidden="true" size={15} />
+        </div>
+      ) : null}
 
       <p className="chronicle-content">{renderChronicleContent(entry.content)}</p>
     </article>
