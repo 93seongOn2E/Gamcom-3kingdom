@@ -1,10 +1,12 @@
 import { BroadcastDirectory, type MemberBroadcastRow } from "@/components/BroadcastDirectory";
 import { getSoopLiveSnapshot } from "@/lib/soop-live-cache";
+import { parseSeason } from "@/lib/season";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function BroadcastPage() {
+export default async function BroadcastPage({ searchParams }: { searchParams: Promise<{ season?: string }> }) {
+  const season = parseSeason((await searchParams).season);
   const snapshot = await getSoopLiveSnapshot();
   const members = snapshot.members
     .map((member) => ({
@@ -30,7 +32,7 @@ export default async function BroadcastPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
-      <BroadcastDirectory initialMembers={members} />
+      <BroadcastDirectory initialMembers={members} season={season} />
     </div>
   );
 }

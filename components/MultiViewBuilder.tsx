@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, MonitorPlay, Search, X } from "lucide-react";
 import { crewBadgeClassMap, nationConfigs } from "@/lib/factions-config";
 import { BroadcastRefreshButton } from "@/components/BroadcastRefreshButton";
+import { getNationDisplayName } from "@/lib/nation-display";
+import type { ThreeKingdomSeason } from "@/lib/season";
 
 export type MultiViewMemberRow = {
   id: string;
@@ -38,7 +40,7 @@ function buildMultiViewUrl(soopIds: string[]) {
   return `https://mul.live/${soopIds.map((soopId) => encodeURIComponent(soopId)).join("/")}`;
 }
 
-export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiViewMemberRow[] }) {
+export function MultiViewBuilder({ initialMembers, season }: { initialMembers: MultiViewMemberRow[]; season: ThreeKingdomSeason }) {
   const [selectedNation, setSelectedNation] = useState("");
   const [selectedCrew, setSelectedCrew] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -140,7 +142,7 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
                     : "bg-white/5 text-[#cdbb98] ring-white/10 hover:bg-white/10"
                 }`}
               >
-                {nation}
+                {getNationDisplayName(nation, season)}
               </button>
             ))}
           </div>
@@ -260,7 +262,7 @@ export function MultiViewBuilder({ initialMembers }: { initialMembers: MultiView
 
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${nationBadgeClass}`}>
-                      {member.nation}
+                      {getNationDisplayName(member.nation, season)}
                     </span>
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${crewBadgeClass}`}>
                       {member.crew_name}

@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { MapViewer } from "@/components/MapViewer";
 import type { CastleDataPayload } from "@/lib/public-data";
 import type { ThreeKingdomSeason } from "@/lib/season";
+import { getNationDisplayName, getSeasonNationText } from "@/lib/nation-display";
 
 export type ChronicleEntry = {
   nations: string[];
@@ -106,17 +107,17 @@ const warSchedule = [
 function getNationThemeClass(nation: string) {
   if (nation === "위나라") return "wei";
   if (nation === "촉나라") return "shu";
-  if (nation === "오나라") return "wu";
+  if (nation === "오나라" || nation === "꿈나라") return "wu";
   return "neutral";
 }
 
 function renderChronicleContent(content: string) {
-  return content.split(/(\r?\n|위나라|촉나라|오나라|성공|실패)/g).map((part, index) => {
+  return content.split(/(\r?\n|위나라|촉나라|오나라|꿈나라|성공|실패)/g).map((part, index) => {
     if (part === "\n" || part === "\r\n") {
       return <br key={`line-break-${index}`} />;
     }
 
-    const isNation = part === "위나라" || part === "촉나라" || part === "오나라";
+    const isNation = part === "위나라" || part === "촉나라" || part === "오나라" || part === "꿈나라";
 
     if (isNation) {
       return (
@@ -218,19 +219,24 @@ export function HomeOverview({
   const [mapHeight, setMapHeight] = useState<number | null>(null);
   const [areSiegeRulesOpen, setAreSiegeRulesOpen] = useState(false);
   const [openWarDays, setOpenWarDays] = useState<Set<string>>(() => new Set());
+  const displayedChronicle = chronicle.map((entry) => ({
+    ...entry,
+    nations: entry.nations.map((nation) => getNationDisplayName(nation, season)),
+    content: getSeasonNationText(entry.content, season)
+  }));
 
   const chronicleDisplayItems = [
-    ...chronicle
+    ...displayedChronicle
       .map((entry, index) => ({ type: "entry" as const, entry, index, sortDate: entry.date }))
       .filter(({ entry }) => !isWarChronicleEntry(entry) && !isWarDaySummary(entry)),
     ...warChronicleDays.flatMap((day) => {
-      const entries = chronicle.filter(
+      const entries = displayedChronicle.filter(
         (entry) => isWarChronicleEntry(entry) && getWarChronicleDay(entry.date)?.id === day.id
       );
-      const summaries = chronicle.filter(
+      const summaries = displayedChronicle.filter(
         (entry) => isWarDaySummary(entry) && getWarChronicleDay(entry.date)?.id === day.id
       );
-      const dayRecords = chronicle.filter((entry) => getWarChronicleDay(entry.date)?.id === day.id);
+      const dayRecords = displayedChronicle.filter((entry) => getWarChronicleDay(entry.date)?.id === day.id);
       return entries.length > 0 || summaries.length > 0
         ? [{ type: "war-day" as const, day, entries, summaries, sortDate: dayRecords[0].date }]
         : [];

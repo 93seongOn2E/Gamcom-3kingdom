@@ -7,6 +7,7 @@ import {
   specialTerritoryNumbers,
   territoryTiles
 } from "@/lib/territory-map-config";
+import { getNationDisplayName } from "@/lib/nation-display";
 
 type Nation = "위나라" | "촉나라" | "오나라";
 type Owner = Nation | "미점령";
@@ -596,8 +597,8 @@ function selectAiPressureTarget(
 
 function formatInterferenceNations(interferingNations: Nation[]) {
   if (interferingNations.length === 0) return "";
-  if (interferingNations.length === 1) return interferingNations[0];
-  return `${interferingNations.slice(0, -1).join(", ")}와 ${interferingNations.at(-1)}`;
+  if (interferingNations.length === 1) return getNationDisplayName(interferingNations[0]);
+  return `${interferingNations.slice(0, -1).map((nation) => getNationDisplayName(nation)).join(", ")}와 ${getNationDisplayName(interferingNations.at(-1) ?? "")}`;
 }
 
 function attemptConquest(owners: Owners, nation: Nation, target: number) {
@@ -611,8 +612,8 @@ function attemptConquest(owners: Owners, nation: Nation, target: number) {
     success,
     chance,
     text: success
-      ? `${nation}가 ${target}번 영지를 점령했습니다.`
-      : `인접한 ${formatInterferenceNations(interference.nations)}의 방해로 ${nation}가 ${target}번 영지 점령에 실패했습니다.`
+      ? `${getNationDisplayName(nation)}가 ${target}번 영지를 점령했습니다.`
+      : `인접한 ${formatInterferenceNations(interference.nations)}의 방해로 ${getNationDisplayName(nation)}가 ${target}번 영지 점령에 실패했습니다.`
   };
 }
 
@@ -854,17 +855,17 @@ export function ConquestGame() {
     setFunds(nextFunds);
 
     if (playerTarget !== null) {
-      setTurnBanner(`${playerNation} 점령 시도`);
+      setTurnBanner(`${getNationDisplayName(playerNation)} 점령 시도`);
       setTurnBannerTone("neutral");
       const result = attemptConquest(nextOwners, playerNation, playerTarget);
       nextOwners = result.owners;
       setOwners(nextOwners);
       setRecentCapture(result.success ? playerTarget : null);
-      setTurnBanner(result.success ? `${playerNation} · ${playerTarget}번 점령 성공` : result.text);
+      setTurnBanner(result.success ? `${getNationDisplayName(playerNation)} · ${playerTarget}번 점령 성공` : result.text);
       setTurnBannerTone(result.success ? "success" : "failure");
       playerActionDelay = result.success ? 750 : 1250;
     } else {
-      setTurnBanner(`${playerNation} 게임 종료`);
+      setTurnBanner(`${getNationDisplayName(playerNation)} 게임 종료`);
       setTurnBannerTone("neutral");
       setRecentCapture(null);
     }
@@ -922,13 +923,13 @@ export function ConquestGame() {
         ?? (shouldAttemptPressureTarget ? pressureTarget : neutralTarget);
 
       if (target === null) {
-        setTurnBanner(`${nation} AI · 행동 불가`);
+        setTurnBanner(`${getNationDisplayName(nation)} AI · 행동 불가`);
         setTurnBannerTone("neutral");
         await wait(550);
         continue;
       }
 
-      setTurnBanner(`${nation} AI · ${target}번 점령 시도`);
+      setTurnBanner(`${getNationDisplayName(nation)} AI · ${target}번 점령 시도`);
       setTurnBannerTone("neutral");
       const result = attemptConquest(nextOwners, nation, target);
       nextOwners = result.owners;
@@ -942,7 +943,7 @@ export function ConquestGame() {
       }
       setTurnBanner(
         result.success
-          ? `${nation} AI · ${target}번 점령 성공`
+          ? `${getNationDisplayName(nation)} AI · ${target}번 점령 성공`
           : result.text
       );
       setTurnBannerTone(result.success ? "success" : "failure");
@@ -1091,7 +1092,7 @@ export function ConquestGame() {
                 onClick={() => setPlayerNation(nation)}
               >
                 <span>{nationStartingTerritory[nation]}번에서 시작</span>
-                <strong>{nation}</strong>
+                <strong>{getNationDisplayName(nation)}</strong>
               </button>
             ))}
           </div>
@@ -1123,7 +1124,7 @@ export function ConquestGame() {
                   key={nation}
                   className={`conquest-game-score ${nationTheme[nation]} ${playerNation === nation && phase !== "setup" ? "player" : ""}`}
                 >
-                  <span>{nation}{playerNation === nation && phase !== "setup" ? " · 나" : ""}</span>
+                  <span>{getNationDisplayName(nation)}{playerNation === nation && phase !== "setup" ? " · 나" : ""}</span>
                   <strong>{scores[nation]}</strong>
                   {owners[27] === nation ? (
                     <b title="27번 영지 버프 적용 중" aria-label="27번 영지 버프 적용 중">

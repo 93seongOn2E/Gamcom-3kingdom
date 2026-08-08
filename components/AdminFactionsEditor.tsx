@@ -3,6 +3,7 @@
 import { adventureHiddenJobOptions, baseJobOptions, formatJobDisplayName, getHiddenJobBadge, hiddenJobOptionsByNation } from "@/lib/factions-config";
 import { canEquipHeadArmor, getHorseEnhancementMax, getHorseEnhancementOptions, horseOptions } from "@/lib/equipment-config";
 import { useEffect, useMemo, useState } from "react";
+import { getNationDisplayName } from "@/lib/nation-display";
 
 type MemberRow = {
   id: number;
@@ -227,7 +228,7 @@ export function AdminFactionsEditor() {
                 color: active ? nationColorMap[nation] : "#9f9078"
               }}
             >
-              <span>{nation}</span>
+              <span>{getNationDisplayName(nation)}</span>
               <span className="rounded-full bg-black/30 px-2 py-0.5 text-[11px]">{memberCount}</span>
             </button>
           );
@@ -237,7 +238,7 @@ export function AdminFactionsEditor() {
       {groupedMembers.filter((group) => group.nation === activeNation).map((group) => (
         <section key={group.nation} className="pixel-frame min-w-0 overflow-hidden">
           <div className="border-b border-[var(--border)] px-4 py-3">
-            <h2 className={`text-lg font-black ${nationTitleClassMap[group.nation] ?? "text-[#f3e7d0]"}`}>{group.nation}</h2>
+            <h2 className={`text-lg font-black ${nationTitleClassMap[group.nation] ?? "text-[#f3e7d0]"}`}>{getNationDisplayName(group.nation)}</h2>
           </div>
 
           <div className="admin-factions-mobile-list">
@@ -279,7 +280,7 @@ export function AdminFactionsEditor() {
                           </option>
                         ))}
                       </optgroup>
-                      <optgroup label={`${member.nation} 히든`}>
+                      <optgroup label={`${getNationDisplayName(member.nation)} 히든`}>
                         {(hiddenJobOptionsByNation[member.nation] ?? []).map((option) => (
                           <option key={option} value={option}>
                             히든 - {option}
@@ -438,7 +439,7 @@ export function AdminFactionsEditor() {
                                 </option>
                               ))}
                             </optgroup>
-                            <optgroup label={`${member.nation} 히든`}>
+                            <optgroup label={`${getNationDisplayName(member.nation)} 히든`}>
                               {(hiddenJobOptionsByNation[member.nation] ?? []).map((option) => (
                                 <option key={option} value={option}>
                                   히든 - {option}

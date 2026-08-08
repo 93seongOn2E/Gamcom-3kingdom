@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { crewBadgeClassMap, getHiddenJobBadge, nationConfigs } from "@/lib/factions-config";
 import { BroadcastRefreshButton } from "@/components/BroadcastRefreshButton";
+import { getNationDisplayName } from "@/lib/nation-display";
+import type { ThreeKingdomSeason } from "@/lib/season";
 
 export type MemberBroadcastRow = {
   id: string;
@@ -51,7 +53,7 @@ function getThumbnailUrl(member: MemberBroadcastRow) {
   return "/assets/soop-offline-placeholder.svg";
 }
 
-export function BroadcastDirectory({ initialMembers }: { initialMembers: MemberBroadcastRow[] }) {
+export function BroadcastDirectory({ initialMembers, season }: { initialMembers: MemberBroadcastRow[]; season: ThreeKingdomSeason }) {
   const [selectedNation, setSelectedNation] = useState("");
   const [selectedCrew, setSelectedCrew] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -113,7 +115,7 @@ export function BroadcastDirectory({ initialMembers }: { initialMembers: MemberB
                     : "bg-white/5 text-[#cdbb98] ring-white/10 hover:bg-white/10"
                 }`}
               >
-                {nation}
+                {getNationDisplayName(nation, season)}
               </button>
             ))}
           </div>
@@ -238,7 +240,7 @@ export function BroadcastDirectory({ initialMembers }: { initialMembers: MemberB
 
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${nationBadgeClass}`}>
-                      {member.nation}
+                      {getNationDisplayName(member.nation, season)}
                     </span>
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${crewBadgeClass}`}>
                       {member.crew_name}

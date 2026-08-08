@@ -13,6 +13,7 @@ import {
 } from "@/lib/territory-map-config";
 import { getStreamerMode, STREAMER_MODE_EVENT } from "@/lib/streamer-mode";
 import type { ThreeKingdomSeason } from "@/lib/season";
+import { getNationDisplayName } from "@/lib/nation-display";
 
 type ForceId = "위나라" | "촉나라" | "오나라";
 type CastleLevel = 1 | 2 | 3;
@@ -739,7 +740,7 @@ export function MapViewer({
         <div className="admin-top-summary" aria-label="세력별 보유 지역 수">
           {forceIds.map((force) => (
             <div key={force} className={`admin-top-summary-card ${forceThemeClass[force]}`}>
-              <span>{forceLabels[force]}</span>
+              <span>{getNationDisplayName(forceLabels[force], season)}</span>
               <b>{summary[force]}</b>
             </div>
           ))}
@@ -790,7 +791,7 @@ export function MapViewer({
                   aria-pressed={selectedCastle.owner === owner}
                   onClick={() => updateSimulatedOwner(selectedCastle.id, owner)}
                 >
-                  {owner}
+                  {getNationDisplayName(owner, season)}
                 </button>
               ))}
             </div>
@@ -811,7 +812,7 @@ export function MapViewer({
             <div className="simulation-cell-section-head facility">
               <strong>일반 시설</strong>
               <span>
-                {selectedCastle.owner === "미점령" ? "국가 선택 필요" : `${selectedCastle.owner} 장원 `}
+                {selectedCastle.owner === "미점령" ? "국가 선택 필요" : `${getNationDisplayName(selectedCastle.owner, season)} 장원 `}
                 {selectedCastle.owner !== "미점령" ? <><b>{selectedNationManorCount}</b> / 10</> : null}
               </span>
             </div>
@@ -842,7 +843,7 @@ export function MapViewer({
             {selectedCastle.owner === "미점령" ? (
               <p className="simulation-cell-facility-hint">시설을 추가하려면 먼저 점령 국가를 선택하세요.</p>
             ) : selectedNationManorCount >= 10 && selectedCastle.facilityType !== "장원" ? (
-              <p className="simulation-cell-facility-hint limit">{selectedCastle.owner} 장원 10개가 모두 설치되어 있습니다.</p>
+              <p className="simulation-cell-facility-hint limit">{getNationDisplayName(selectedCastle.owner, season)} 장원 10개가 모두 설치되어 있습니다.</p>
             ) : null}
             <div className="simulation-cell-section-head facility">
               <strong>천리문</strong>

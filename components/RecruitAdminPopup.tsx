@@ -29,11 +29,11 @@ export function RecruitAdminPopup() {
           <span className="recruit-notice-title">
             <strong className="recruit-notice-nation recruit-notice-nation-wei">위나라</strong>
             <span aria-hidden="true"> · </span>
-            <strong className="recruit-notice-nation recruit-notice-nation-wu">오나라</strong>
+            <strong className="recruit-notice-nation recruit-notice-nation-wu">꿈나라</strong>
             <span> 장비현황 업데이트를 도와주실 분을 모집합니다.</span>
           </span>
           <span className="recruit-notice-report-group">
-            <span className="recruit-notice-desc">위나라 · 오나라 내실 현황 제보 부탁드립니다.</span>
+            <span className="recruit-notice-desc">위나라 · 꿈나라 내실 현황 제보 부탁드립니다.</span>
             <a
               href={reportUrl}
               target="_blank"

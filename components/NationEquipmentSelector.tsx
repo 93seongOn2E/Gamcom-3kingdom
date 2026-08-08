@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ThreeKingdomSeason } from "@/lib/season";
+import { getNationDisplayName } from "@/lib/nation-display";
 
 const nationOptions = [
   { key: "위나라", slug: "위", color: "#2f73c8" },
@@ -39,7 +40,7 @@ export function NationEquipmentSelector({ season }: { season: ThreeKingdomSeason
               className="rounded-lg border px-4 py-4 text-base font-black text-white transition duration-150 hover:-translate-y-0.5 hover:brightness-110"
               style={{ borderColor: nation.color, backgroundColor: nation.color }}
             >
-              {nation.key}
+              {getNationDisplayName(nation.key, season)}
             </button>
           ))}
         </div>
@@ -61,7 +62,7 @@ export function NationEquipmentSelector({ season }: { season: ThreeKingdomSeason
             <div className="border-b border-[var(--border)] px-6 py-5 text-center">
               <div className="mx-auto mb-3 h-2 w-16" style={{ backgroundColor: pendingNation.color }} />
               <h3 id="nation-confirm-title" className="text-xl font-black text-[#f3e7d0]">
-                {pendingNation.key} 내실현황
+                {getNationDisplayName(pendingNation.key, season)} 내실현황
               </h3>
               <p className="mt-2 text-sm font-medium text-[#aa9a82]">이 국가의 내실현황을 확인하시겠습니까?</p>
             </div>

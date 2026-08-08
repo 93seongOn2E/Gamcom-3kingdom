@@ -1,10 +1,12 @@
 import { MultiViewBuilder, type MultiViewMemberRow } from "@/components/MultiViewBuilder";
 import { getSoopLiveSnapshot } from "@/lib/soop-live-cache";
+import { parseSeason } from "@/lib/season";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function MultiViewPage() {
+export default async function MultiViewPage({ searchParams }: { searchParams: Promise<{ season?: string }> }) {
+  const season = parseSeason((await searchParams).season);
   const snapshot = await getSoopLiveSnapshot();
   const members = snapshot.members
     .map((member) => ({
@@ -27,7 +29,7 @@ export default async function MultiViewPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-36 pt-10 font-['Noto_Sans_KR','Malgun_Gothic',sans-serif]">
-      <MultiViewBuilder initialMembers={members} />
+      <MultiViewBuilder initialMembers={members} season={season} />
     </div>
   );
 }

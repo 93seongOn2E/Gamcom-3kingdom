@@ -4,6 +4,7 @@ import { EquipmentUpdateNoticeModal } from "@/components/EquipmentUpdateNoticeMo
 import { NationEquipmentTable, type EquipmentMemberRow } from "@/components/NationEquipmentTable";
 import Link from "next/link";
 import type { ThreeKingdomSeason } from "@/lib/season";
+import { getNationDisplayName } from "@/lib/nation-display";
 
 const nationMemberSlotCount = 30;
 export type EquipmentNation = (typeof nationConfigs)[number]["key"];
@@ -100,7 +101,7 @@ export async function FactionsEquipmentPage({
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-black" style={{ color: selectedNationConfig?.color ?? "#f3e7d0" }}>
-            {selectedNationConfig ? `${selectedNationConfig.short}나라 내실현황` : "통합 내실현황"}
+            {selectedNationConfig ? `${getNationDisplayName(selectedNationConfig.key, season)} 내실현황` : "통합 내실현황"}
           </h1>
           <p className="mt-2 text-sm font-medium leading-6 text-[#aa9a82]">
             장비 정보는 관리자가 방송·제보 내용을 확인한 뒤 입력하므로 실제 실시간 정보와 다를 수 있습니다.
@@ -158,7 +159,7 @@ export async function FactionsEquipmentPage({
                 <div className="mb-2.5 flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: nation.color }} />
                   <span className="text-sm font-black" style={{ color: nation.color }}>
-                    {nation.short}나라
+                    {getNationDisplayName(nation.key, season)}
                   </span>
                 </div>
                 <dl className="grid grid-cols-3 gap-1.5 text-center">
@@ -209,7 +210,7 @@ export async function FactionsEquipmentPage({
                       <span className="h-1.5 w-8 rounded-full" style={{ background: nation.color }} />
                       <span className="text-[10px] font-black tracking-[0.18em] text-[#8f8068]">내실 현황</span>
                     </div>
-                    <h2 className="text-2xl font-black tracking-[-0.04em] text-[#f3e7d0]">{nation.short}나라</h2>
+                    <h2 className="text-2xl font-black tracking-[-0.04em] text-[#f3e7d0]">{getNationDisplayName(nation.key, season)}</h2>
                   </div>
                   <div className="text-right">
                     <span className="inline-flex items-baseline gap-1 rounded-full border border-[rgba(212,167,86,0.24)] bg-black/30 px-3 py-1 text-xs font-black text-[#dbc292] shadow-inner">
