@@ -53,7 +53,7 @@ type SkillVideo = {
 };
 
 type HiddenSkillProfile = {
-  kingdom: "위나라" | "촉나라" | "꿈나라" | "모험/API 히든";
+  kingdom: "위나라" | "촉나라" | "오나라" | "모험/API 히든";
   name: string;
   role: string;
   skills: SkillInfo[];
@@ -366,7 +366,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
-    kingdom: "꿈나라",
+    kingdom: "오나라",
     name: "감녕",
     role: "영객",
     skills: [
@@ -376,7 +376,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
-    kingdom: "꿈나라",
+    kingdom: "오나라",
     name: "여몽",
     role: "창수",
     skills: [
@@ -386,7 +386,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
-    kingdom: "꿈나라",
+    kingdom: "오나라",
     name: "태사자",
     role: "창수",
     skills: [
@@ -396,7 +396,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
-    kingdom: "꿈나라",
+    kingdom: "오나라",
     name: "주유",
     role: "책사",
     skills: [
@@ -406,7 +406,7 @@ const hiddenSkillProfiles: HiddenSkillProfile[] = [
     ]
   },
   {
-    kingdom: "꿈나라",
+    kingdom: "오나라",
     name: "손권",
     role: "군주",
     skills: [
@@ -561,7 +561,7 @@ function SkillNameChips({ skills }: { skills: SkillInfo[] }) {
 function kingdomDotClass(kingdom: HiddenSkillProfile["kingdom"]) {
   if (kingdom === "위나라") return "bg-sky-400";
   if (kingdom === "촉나라") return "bg-emerald-400";
-  if (kingdom === "꿈나라") return "bg-amber-400";
+  if (kingdom === "오나라") return "bg-amber-400";
   return "bg-fuchsia-400";
 }
 
@@ -574,7 +574,7 @@ function kingdomPanelClass(kingdom: HiddenSkillProfile["kingdom"]) {
     return "border-emerald-400/24 bg-[radial-gradient(circle_at_top_left,rgba(52,211,153,0.13),transparent_34%),rgba(0,0,0,0.24)]";
   }
 
-  if (kingdom === "꿈나라") {
+  if (kingdom === "오나라") {
     return "border-amber-400/24 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.14),transparent_34%),rgba(0,0,0,0.24)]";
   }
 
@@ -607,7 +607,7 @@ export default function JobsPage() {
         </div>
 
         <div className="grid gap-4 p-4 md:p-5">
-          {(["위나라", "촉나라", "꿈나라", "모험/API 히든"] as const).map((kingdom) => {
+          {(["위나라", "촉나라", "오나라", "모험/API 히든"] as const).map((kingdom) => {
             const profiles = hiddenSkillProfiles
               .filter((profile) => profile.kingdom === kingdom)
               .sort((left, right) => {

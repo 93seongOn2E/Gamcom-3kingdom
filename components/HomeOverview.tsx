@@ -107,17 +107,17 @@ const warSchedule = [
 function getNationThemeClass(nation: string) {
   if (nation === "위나라") return "wei";
   if (nation === "촉나라") return "shu";
-  if (nation === "오나라" || nation === "꿈나라") return "wu";
+  if (nation === "오나라") return "wu";
   return "neutral";
 }
 
 function renderChronicleContent(content: string) {
-  return content.split(/(\r?\n|위나라|촉나라|오나라|꿈나라|성공|실패)/g).map((part, index) => {
+  return content.split(/(\r?\n|위나라|촉나라|오나라|성공|실패)/g).map((part, index) => {
     if (part === "\n" || part === "\r\n") {
       return <br key={`line-break-${index}`} />;
     }
 
-    const isNation = part === "위나라" || part === "촉나라" || part === "오나라" || part === "꿈나라";
+    const isNation = part === "위나라" || part === "촉나라" || part === "오나라";
 
     if (isNation) {
       return (

@@ -26,13 +26,12 @@ type ChronicleForm = {
   content: string;
 };
 
-const nationOptions = ["위나라", "촉나라", "꿈나라"];
+const nationOptions = ["위나라", "촉나라", "오나라"];
 
 const nationBadgeClassMap: Record<string, string> = {
   위나라: "bg-[#3f6797] text-white",
   촉나라: "bg-[#3f8153] text-white",
-  오나라: "bg-[#d4a017] text-[#1f1600]",
-  꿈나라: "bg-[#d4a017] text-[#1f1600]"
+  오나라: "bg-[#d4a017] text-[#1f1600]"
 };
 
 const approvalStatusLabelMap: Record<ChronicleRow["approval_status"], string> = {

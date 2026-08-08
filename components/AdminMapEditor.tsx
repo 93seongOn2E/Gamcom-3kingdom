@@ -58,7 +58,7 @@ const forceThemeClass: Record<TerritoryOwnerShort, "wei" | "shu" | "wu" | "uncla
 const forceLabels: Record<TerritoryOwnerShort, string> = {
   위: "위나라",
   촉: "촉나라",
-  오: "꿈나라",
+  오: "오나라",
   미점령: "미점령"
 };
 
