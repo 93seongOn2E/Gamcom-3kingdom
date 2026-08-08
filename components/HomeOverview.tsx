@@ -248,9 +248,9 @@ export function HomeOverview({
       const summaries = displayedChronicle.filter(
         (entry) => isWarDaySummary(entry) && getWarChronicleDay(entry.date)?.id === day.id
       );
-      const dayRecords = displayedChronicle.filter((entry) => getWarChronicleDay(entry.date)?.id === day.id);
+      const groupedRecords = [...entries, ...summaries].sort((left, right) => right.date.localeCompare(left.date));
       return entries.length > 0 || summaries.length > 0
-        ? [{ type: "war-day" as const, day, entries, summaries, sortDate: dayRecords[0].date }]
+        ? [{ type: "war-day" as const, day, entries, summaries, sortDate: groupedRecords[0].date }]
         : [];
     })
   ].sort((left, right) => right.sortDate.localeCompare(left.sortDate));
